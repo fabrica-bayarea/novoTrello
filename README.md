@@ -72,7 +72,7 @@ Após isso clone o projeto:
 
 3. Crie um container do Postgres:
   ```bash
-  docker run --name db_prontuario \
+  docker run --name database_trello \
     -e POSTGRES_PASSWORD=password_postgres -e POSTGRES_USER=user_postgres \
     -d -p 5432:5432 postgres
   ```
