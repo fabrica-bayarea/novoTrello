@@ -89,7 +89,7 @@ Após isso clone o projeto:
 
 6. Inicie a aplicação:
   ```bash
-  npm run dev
+  npm run start:dev
   ```
 
 7. Acesse [http://localhost:3001](http://localhost:3001) com o seu navegador para ver o resultado.
