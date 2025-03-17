@@ -28,7 +28,7 @@
     -d -p 5432:5432 postgres
   ```
 
-4. Criar arquivo .env de acordo com o arquivo .env.example que está em:
+4. Criar arquivo .env de acordo com o arquivo .env.example que está na pasta "back-end/"
   
 > [!IMPORTANT]  
 > É crucial que as variaveis de ambiente usada na criação do container seja a mesma no "DATABASE_URL"
@@ -40,7 +40,7 @@
 
 6. Inicie a aplicação:
   ```bash
-  npm run dev
+  npm run start:dev
   ```
 
 7. Acesse [http://localhost:3000/docs](http://localhost:3000/docs) com o seu navegador para ver o resultado.
