@@ -7,9 +7,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Novo Trello API - IESB')
-    .setDescription(
-      'Documentação da API do novo trello do BayArea - IESB',
-    )
+    .setDescription('Documentação da API do novo trello do BayArea - IESB')
     .addBearerAuth({
       type: 'http',
       scheme: 'bearer',
