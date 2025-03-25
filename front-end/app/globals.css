@@ -1,6 +1,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-open-sans: "Open Sans", sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -40,3 +41,4 @@ a {
     color-scheme: dark;
   }
 }
+
