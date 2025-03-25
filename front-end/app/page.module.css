@@ -1,9 +1,4 @@
 .main {
-  background-image: url('../images/background.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
   height: 100vh;
   display: flex;
   align-items: center;
@@ -12,16 +7,27 @@
   background-color: white;
 }
 
+.topImage{
+  position: fixed;
+  top: 0;
+  left: 1050px;
+}
+.bottomImage{
+  position: fixed;
+  bottom: 0;
+  right: 900px;
+}
+
 .loginSection{
 display: flex;
 align-items: center;
 justify-content: center;
 flex-direction: column;
 background-color: #DA2F35;
-width: 400px;
+width: 500px;
 height: 500px;
 position: relative;
-border-radius: 20px;
+border-radius: 10px;
 box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.712);
 
 }
@@ -38,47 +44,56 @@ display: flex;
 align-items: center;
 
 
+
 }
 .divInput input{
 display: flex;
+background-color: white;
 flex-direction: column;
 margin: 5px;
 padding: 10px;
-width: 100%;
+width: 250px;
 border-radius: 10px;
 box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.397);
 border: none;
 }
 
 .icon{
-
-font-size: 25px;
+font-size: 20px;
 color: white;
 
 }
 
-.checkbox{
-
+.checkbox label{
 color: white;
-margin: 5px;
+margin: 8px;
 font-size: 14px;
+display: flex;
+  align-items: center;
+  gap: 5px;
 
 } 
+.inputCheckbox{
+  background-color: white !important;
+  color: white;
+}
 
 .enter{
 margin: 10px;
 padding: 10px;
-width: 60%;  
+width: 55%;  
 border-radius: 10px;
 background-color: white;
 color: #DA2F35;
 font-weight: 800;
 border: none;
+box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.26);
+transition: transform 0.2s ease;
 }
+
 .enter:hover{
-background-color: rgba(253, 153, 153, 0.911);
-color: white;
 cursor: pointer;
+transform: scale(1.05);
 }
 
 .forgot{
@@ -99,19 +114,34 @@ text-decoration: underline;
 }
 
 .divider {
-display: flex;
-align-items: center;
-text-align: center;
-margin: 10px 0;
-color: white;
-font-weight: bold;
+margin-top: 15px;
+margin-bottom: 10px;
 }
 
+.conect{
+  text-align: center;
+  padding: 4px;
+}
+
+.lineDivider{
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.lineDivider::before,
+.lineDivider::after {
+  content: "";
+  display: block;
+  height: 3px;
+  width: 150px;
+  background-color: white;
+  
+}
 .socialIcons img {
-border-radius: 40%;
-margin: 5px;
-width: 40px;  
-height: 40px;
+border-radius: 50%;
+margin: 7px;
+width: 50px;  
+height: 50px;
 cursor: pointer;
 transition: transform 0.3s ease;
 }
@@ -128,16 +158,17 @@ padding: 6px;
 font-size: 15px;
 font-weight: 700;
 margin: 6px;
+transition: transform 0.2s ease;
 }
 .createAccount:hover{
-background-color: rgba(253, 153, 153, 0.911);
-color: white;
 cursor: pointer;
+transform: scale(1.05);
 }
+
 .rodape{
 color: white;
 font-size: 12px;
 font-weight: 700;
-margin: 5px;
+margin-top: 15px;
 }
 
