@@ -1,0 +1,26 @@
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { AuthController } from './auth.controller';
+import { PrismaService } from '../prisma/prisma.service';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { join } from 'path';
+
+@Module({
+  imports: [
+    MailerModule.forRoot({
+      transport: {
+        host: 'smtp.gmail.com', // Substitua pelo seu servidor SMTP
+        auth: {
+          user: 'testebayarea@gmail.com',
+          pass: 'jpwn clhc rozd fzbu',
+        },
+      },
+      defaults: {
+        from: '"Teste" <testebayarea@gmail.com>',
+      },
+    }),
+  ],
+  controllers: [AuthController],
+  providers: [AuthService, PrismaService],
+})
+export class AuthModule {}

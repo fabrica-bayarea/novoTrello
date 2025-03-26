@@ -12,4 +12,6 @@ model User {
   id Int @id @default(autoincrement())
   email String @unique
   name String
+  resetPasswordToken      String?  
+  resetPasswordExpires    DateTime? 
 }
