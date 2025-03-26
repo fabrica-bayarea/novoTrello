@@ -1,9 +1,11 @@
 import styles from "./page.module.css";
+import Link from "next/link";
 
 
 export default function Home() {
   return (
     <main className={styles.main}>
+    <img className={styles.logo} src="/images/logoIesb.png" alt="Logo IESB" />
     <img className={styles.topImage}src="/images/elementTop.png" alt="" />
     <img className={styles.bottomImage} src="/images/elementBottom1.png" alt="" />
     <section className={styles.loginSection}>
@@ -45,7 +47,7 @@ export default function Home() {
 </div>
 
 <div className={styles.createAccount}>
-<span>Clique aqui para criar uma conta.</span>
+<Link href="/register">Clique aqui para criar uma conta.</Link>
 </div>
 
       <p className={styles.rodape}>IESB - BAY AREA</p>

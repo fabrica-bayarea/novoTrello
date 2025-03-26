@@ -17,7 +17,12 @@
   bottom: 0;
   right: 900px;
 }
+.logo{
+  position: fixed;
+  top: 0px;
+  right: 1170px;
 
+}
 .loginSection{
 display: flex;
 align-items: center;
@@ -140,7 +145,7 @@ margin-bottom: 10px;
 .socialIcons img {
 border-radius: 50%;
 margin: 7px;
-width: 50px;  
+width: 55px;  
 height: 50px;
 cursor: pointer;
 transition: transform 0.3s ease;
