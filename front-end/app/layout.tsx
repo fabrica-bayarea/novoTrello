@@ -15,9 +15,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Home",
   description: "A simple Trello",
-  icons: {
-    icon: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined",
-  },
 };
 
 export default function RootLayout({
@@ -27,12 +24,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br">
-       <head>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-        />
-      </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         {children}
       </body>
