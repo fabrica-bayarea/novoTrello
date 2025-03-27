@@ -30,7 +30,7 @@ export class AuthController {
   @Get('microsoft')
 @UseGuards(MicrosoftOAuthGuard)
 async microsoftAuth(@Request() req) {
-  // Essa rota inicia o login via Microsoft
+
 }
 
 @Get('microsoft-redirect')
