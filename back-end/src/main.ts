@@ -1,9 +1,21 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import * as session from 'express-session';
+import * as passport from 'passport';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(
+    session({
+      secret: process.env.SESSION_SECRET || 'super-secret',
+      resave: false,
+      saveUninitialized: false,
+    }),
+  );
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   const config = new DocumentBuilder()
     .setTitle('Novo Trello API - IESB')
@@ -20,10 +32,6 @@ async function bootstrap() {
       'https://github.com/fabrica-bayarea/novoTrello',
     )
     .setContact('BayArea', '', 'nde.ads@iesb.br')
-    // .setLicense(
-    //  'name',
-    //  'https://url.com'
-    // )
     .setVersion('1.0')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
