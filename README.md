@@ -23,33 +23,6 @@ Após isso clone o projeto:
   git clone https://github.com/fabrica-bayarea/novoTrello.git
   ```
 
-## Front-end - Next.js
-
-### Tecnologias
-- Next.js
-- TypeScript
-- Docker
-
-### Rodando localmente
-1. Mude para a pasta `front-end`:
-  ```bash
-  cd front-end
-  ```
-
-2. Instale as dependências:
-  ```bash
-  npm install
-  ```
-
-3. Inicie a aplicação:
-  ```bash
-  npm run dev
-  ```
-
-4. Acesse [http://localhost:3000](http://localhost:3000) com o seu navegador para ver o resultado.
-
----
-
 ## Back-end - NestJS
 
 ### Tecnologias
@@ -77,7 +50,7 @@ Após isso clone o projeto:
     -d -p 5432:5432 postgres
   ```
 
-4. Criar arquivo .env de acordo com o arquivo .env.example que está em:
+4. Criar arquivo .env de acordo com o arquivo .env.example que está na pasta "back-end/"
   
 > [!IMPORTANT]  
 > É crucial que as variaveis de ambiente usada na criação do container seja a mesma no "DATABASE_URL"
@@ -89,7 +62,34 @@ Após isso clone o projeto:
 
 6. Inicie a aplicação:
   ```bash
+  npm run start:dev
+  ```
+
+---
+
+7. Acesse [http://localhost:3000](http://localhost:3000) com o seu navegador para ver o resultado.
+
+## Front-end - Next.js
+
+### Tecnologias
+- Next.js
+- TypeScript
+- Docker
+
+### Rodando localmente
+1. Mude para a pasta `front-end`:
+  ```bash
+  cd front-end
+  ```
+
+2. Instale as dependências:
+  ```bash
+  npm install
+  ```
+
+3. Inicie a aplicação:
+  ```bash
   npm run dev
   ```
 
-7. Acesse [http://localhost:3001](http://localhost:3001) com o seu navegador para ver o resultado.
+4. Acesse [http://localhost:3001](http://localhost:3001) com o seu navegador para ver o resultado.
