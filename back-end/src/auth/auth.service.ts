@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/prisma/modules-prisma/prisma.service';
 import {
   SignInUsuarioDto,
   SignUpUsuarioDto,
@@ -13,14 +13,15 @@ import {
   SignUpConvidadoDto,
   SignInAdministradorDto,
   SignUpAdministradorDto,
-  TiposDeConvidado
 } from 'src/DTO/auth.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import * as argon from 'argon2';
-import { Convidado, TipoUsuario } from '@prisma/client';
+import * as argon2 from "argon2";
 
 @Injectable()
 export class AuthService {
+  signInAdministrador(dto: SignInAdministradorDto) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
@@ -29,7 +30,7 @@ export class AuthService {
 
   async signToken(
     idUsuario: number,
-    tipo: 'ADMINISTRADOR' | 'CADASTRADOR' | 'CONVIDADO',
+    tipo: 'ADMINISTRADOR' | 'USUARIO' | 'CONVIDADO',
   ): Promise<{ access_token: string }> {
     const payload = {
       sub: idUsuario,
@@ -47,21 +48,20 @@ export class AuthService {
   async signUpUsuario(
     dto: SignUpUsuarioDto,
   ): Promise<{ access_token: string } | never> {
-    const hash = await argon.hash(dto.senha);
+    const hash = await argon2.hash(dto.senha);
     try {
       const dadosUsuario: any = {
         nome: dto.nome,
         email: dto.email,
-        tipo: dto.tipo,
         hash: hash,
       };
 
-      const usuario = await this.prisma.usuario.create({
+      const usuario = await this.prisma.user.create({
         data: dadosUsuario,
       });
 
       delete dadosUsuario.hash;
-      return this.signToken(usuario.id, 'CADASTRADOR');
+      return this.signToken(usuario.id, 'USUARIO');
     } catch (err) {
       if (err instanceof PrismaClientKnownRequestError) {
         if (err.code === 'P2002') {
@@ -75,12 +75,11 @@ export class AuthService {
   async signUpAdministrador(
     dto: SignUpAdministradorDto,
   ): Promise<{ access_token: string } | never> {
-    const hash = await argon.hash(dto.senha);
+    const hash = await argon2.hash(dto.senha);
     try {
       const dadosAdmin: any = {
         nome: dto.nome,
         email: dto.email,
-        tipo: dto.tipo,
         hash: hash,
       };
 
@@ -100,15 +99,14 @@ export class AuthService {
     }
   }
 
-  async signUpBeneficiario(
+  async signUpConvidado(
     dto: SignUpConvidadoDto,
   ): Promise<{ access_token: string } | never> {
-    const hash = await argon.hash(dto.senha);
+    const hash = await argon2.hash(dto.senha);
     try {
       const dadosConvidado: any = {
         nome: dto.nome,
         email: dto.email,
-        tipo: dto.tipo,
         hash: hash,
       };
       const convidado = await this.prisma.convidado.create({
@@ -130,16 +128,16 @@ export class AuthService {
   async signInUsuario(
     dto: SignInUsuarioDto,
   ): Promise<{ access_token: string } | never> {
-    const usuario = await this.prisma.usuario.findUnique({
+    const usuario = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
 
     if (!usuario) throw new ForbiddenException('Credenciais inválidas');
 
-    const senhaCorreta = await argon.verify(usuario.hash, dto.senha);
+    const senhaCorreta = await argon2.verify('USUARIO', dto.senha);
 
     if (!senhaCorreta) throw new ForbiddenException('Credenciais incorretas');
-    return this.signToken(usuario.id, usuario.);
+    return this.signToken(usuario.id, "USUARIO");
   }
 
   async signInAdmin(
@@ -151,51 +149,27 @@ export class AuthService {
 
     if (!administrador) throw new ForbiddenException('Credenciais inválidas');
 
-    const senhaCorreta = await argon.verify(administrador.hash, dto.senha);
+    const senhaCorreta = await argon2.verify("ADMINISTRADOR", dto.senha);
 
     if (!senhaCorreta) throw new ForbiddenException('Credenciais incorretas');
     return this.signToken(administrador.id, "ADMINISTRADOR");
   }
 
-  async signInBeneficiario(
+  async signInConvidado(
     dto: SignInConvidadoDto,
   ): Promise<{ access_token: string } | never> {
     if (!dto.email) {
       throw new BadRequestException('É necessário fornecer email.');
     }
-
-    let convidado: Convidado;
-
-      convidado = await this.prisma.convidado.findUnique({
-        where: { email: dto.email },
-      });
-
-    if (!TiposDeConvidado) {
+  
+    const convidado = await this.prisma.convidado.findUnique({
+      where: { email: dto.email },
+    });
+  
+    if (!convidado) {
       throw new ForbiddenException('Credenciais inválidas');
     }
-
-    const senhaCorreta = await argon.verify(convidado.hash, dto.senha);
-
-    if (!senhaCorreta) {
-      throw new ForbiddenException('Credenciais incorretas');
-    }
-
+  
     return this.signToken(convidado.id, "CONVIDADO");
-  }
-
-  async isAdministrator(idUsuario: number): Promise<boolean> {
-    const usuario = await this.prisma.usuario.findUnique({
-      where: { id: idUsuario },
-    });
-
-    return usuario?.tipo === 'ADMINISTRADOR';
-  }
-
-  async isCadastrador(idUsuario: number): Promise<boolean> {
-    const usuario = await this.prisma.usuario.findUnique({
-      where: { id: idUsuario },
-    });
-
-    return usuario?.tipo === 'USUARIO';
   }
 }

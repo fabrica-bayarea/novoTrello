@@ -6,7 +6,7 @@ import {
   SignUpConvidadoDto,
   SignUpUsuarioDto,
   SignInAdministradorDto,
-  SignUpAdministradorDto
+  SignUpAdministradorDto,
 } from 'src/DTO/auth.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -14,124 +14,61 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
-//cadastro usuario
-  @ApiOperation({
-    summary: 'Cadastra um novo Usuário',
-    description: 'Cria um novo usuário e o grava em banco de dados',
-  })
-  @ApiResponse({ status: 201, description: 'Usuário cadastrado com sucesso' })
-  @ApiResponse({ status: 403, description: 'Credenciais tomadas' })
-  @ApiOperation({
-    summary: 'Cadastra um novo Usuário',
-    description: 'Cria um novo usuário e o grava em banco de dados',
-  })
+
+  // Cadastro de Usuário
+  @ApiOperation({ summary: 'Cadastra um novo Usuário', description: 'Cria um novo usuário e o grava no banco de dados' })
   @ApiResponse({ status: 201, description: 'Usuário cadastrado com sucesso' })
   @ApiResponse({ status: 403, description: 'Credenciais tomadas' })
   @Post('signup/usuario')
   signUpUsuario(@Body() dto: SignUpUsuarioDto) {
     return this.authService.signUpUsuario(dto);
   }
-//entrada usuario
-  @ApiOperation({
-    summary: 'Login de Usuário',
-    description:
-      'Autentica um usuário, e, caso encontrado em banco de dados, permite o acesso desse usuário',
-  })
+
+  // Login de Usuário
+  @ApiOperation({ summary: 'Login de Usuário', description: 'Autentica um usuário e permite o acesso ao sistema' })
   @ApiResponse({ status: 200, description: 'Usuário autenticado com sucesso' })
-  @ApiResponse({ status: 403, description: 'Credenciais tomadas' })
-  @ApiResponse({ status: 403, description: 'Credenciais inválidas' })
-  @ApiOperation({
-    summary: 'Login de Usuário',
-    description:
-      'Autentica um usuário, e, caso encontrado em banco de dados, permite o acesso desse usuário',
-  })
-  @ApiResponse({ status: 200, description: 'Usuário autenticado com sucesso' })
-  @ApiResponse({ status: 403, description: 'Credenciais tomadas' })
   @ApiResponse({ status: 403, description: 'Credenciais inválidas' })
   @HttpCode(HttpStatus.OK)
   @Post('signin/usuario')
   signInUsuario(@Body() dto: SignInUsuarioDto) {
     return this.authService.signInUsuario(dto);
   }
-//cadastro admin
-  @ApiOperation({
-    summary: 'Cadastra um novo Usuário',
-    description: 'Cria um novo usuário e o grava em banco de dados',
-  })
-  @ApiResponse({ status: 201, description: 'Usuário cadastrado com sucesso' })
+
+  // Cadastro de Administrador
+  @ApiOperation({ summary: 'Cadastra um novo Administrador', description: 'Cria um novo administrador e o grava no banco de dados' })
+  @ApiResponse({ status: 201, description: 'Administrador cadastrado com sucesso' })
   @ApiResponse({ status: 403, description: 'Credenciais tomadas' })
-  @ApiOperation({
-    summary: 'Cadastra um novo Usuário',
-    description: 'Cria um novo usuário e o grava em banco de dados',
-  })
-  @ApiResponse({ status: 201, description: 'Usuário cadastrado com sucesso' })
-  @ApiResponse({ status: 403, description: 'Credenciais tomadas' })
-  @Post('signup/usuario')
+  @Post('signup/administrador')
   signUpAdministrador(@Body() dto: SignUpAdministradorDto) {
     return this.authService.signUpAdministrador(dto);
   }
-//entrada admin
-  @ApiOperation({
-    summary: 'Login de Usuário',
-    description:
-      'Autentica um usuário, e, caso encontrado em banco de dados, permite o acesso desse usuário',
-  })
-  @ApiResponse({ status: 200, description: 'Usuário autenticado com sucesso' })
-  @ApiResponse({ status: 403, description: 'Credenciais tomadas' })
-  @ApiResponse({ status: 403, description: 'Credenciais inválidas' })
-  @ApiOperation({
-    summary: 'Login de Admin',
-    description:
-      'Autentica um administrador, e, caso encontrado em banco de dados, permite o acesso desse usuário',
-  })
-  @ApiResponse({ status: 200, description: 'Usuário autenticado com sucesso' })
-  @ApiResponse({ status: 403, description: 'Credenciais tomadas' })
+
+  // Login de Administrador
+  @ApiOperation({ summary: 'Login de Administrador', description: 'Autentica um administrador e permite o acesso ao sistema' })
+  @ApiResponse({ status: 200, description: 'Administrador autenticado com sucesso' })
   @ApiResponse({ status: 403, description: 'Credenciais inválidas' })
   @HttpCode(HttpStatus.OK)
-  @Post('signin/usuario')
-  signInAdmin(@Body() dto: SignInAdministradorDto) {
-    return this.authService.signInAdmin(dto);
+  @Post('signin/administrador')
+  signInAdministrador(@Body() dto: SignInAdministradorDto) {
+    return this.authService.signInAdministrador(dto);
   }
 
-  
-  @ApiOperation({
-    summary: 'Cadastra um novo Convidado',
-    description:
-      'Cria um novo usuário "Convidado" e o grava em banco de dados',
-  })
-  @ApiResponse({ status: 201, description: 'Usuário criado com sucesso' })
+  // Cadastro de Convidado
+  @ApiOperation({ summary: 'Cadastra um novo Convidado', description: 'Cria um novo convidado e o grava no banco de dados' })
+  @ApiResponse({ status: 201, description: 'Convidado cadastrado com sucesso' })
   @ApiResponse({ status: 403, description: 'Credenciais tomadas' })
-  @ApiOperation({
-    summary: 'Cadastra um novo Convidado',
-    description:
-      'Cria um novo usuário "Convidado" e o grava em banco de dados',
-  })
-  @ApiResponse({ status: 201, description: 'Usuário criado com sucesso' })
-  @ApiResponse({ status: 403, description: 'Credenciais tomadas' })
-  @Post('signup/beneficiario')
+  @Post('signup/convidado')
   signUpConvidado(@Body() dto: SignUpConvidadoDto) {
-    return this.authService.signUpBeneficiario(dto);
+    return this.authService.signUpConvidado(dto);
   }
 
-  @ApiOperation({
-    summary: 'Loga um Convidado',
-    description:
-      'Autentica um usuário "Convidado", e, caso encontrado em banco de dados, permite o acesso desse usuário',
-  })
-  @ApiResponse({ status: 200, description: 'Usuário autenticado com sucesso' })
-  @ApiResponse({ status: 403, description: 'Credenciais tomadas' })
-  @ApiResponse({ status: 403, description: 'Credenciais inválidas' })
-  @ApiOperation({
-    summary: 'Loga um Convidado',
-    description:
-      'Autentica um usuário "Convidado", e, caso encontrado em banco de dados, permite o acesso desse usuário',
-  })
-  @ApiResponse({ status: 200, description: 'Usuário autenticado com sucesso' })
-  @ApiResponse({ status: 403, description: 'Credenciais tomadas' })
+  // Login de Convidado
+  @ApiOperation({ summary: 'Login de Convidado', description: 'Autentica um convidado e permite o acesso ao sistema' })
+  @ApiResponse({ status: 200, description: 'Convidado autenticado com sucesso' })
   @ApiResponse({ status: 403, description: 'Credenciais inválidas' })
   @HttpCode(HttpStatus.OK)
-  @Post('signin/beneficiario')
+  @Post('signin/convidado')
   signInConvidado(@Body() dto: SignInConvidadoDto) {
-    return this.authService.signInBeneficiario(dto);
+    return this.authService.signInConvidado(dto);
   }
 }

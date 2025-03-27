@@ -2,67 +2,52 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from 'src/prisma/prisma.service';
-import {Administrador, Convidado, PrismaClient, Usuario} from '@prisma/client'
+import { PrismaService } from 'src/prisma/modules-prisma/prisma.service';
+import { User, Administrador, Convidado } from '@prisma/client';
 
-const prisma = new PrismaClient();
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    config: ConfigService,
+    private readonly config: ConfigService,
     private prisma: PrismaService,
   ) {
+    const jwtSecret = config.get('JWT_SECRET'); // Pegando o JWT_SECRET do arquivo .env
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: config.get('JWT_SECRET'),
+      secretOrKey: jwtSecret,
     });
   }
 
-  async validate(payload: {
-    sub: number;
-    tipo: 'ADMINISTRADOR' | 'USUARIO' | 'CONVIDADO';
-  }): Promise<Usuario | Convidado | Administrador> {
-    if (
-      !['ADMINISTRADOR', 'USUARIO', 'CONVIDADO'].includes(payload.tipo)
-    ) {
-      throw new UnauthorizedException('Tipo de usuário inválido');
-    }
-
-    let usuario: Usuario | Convidado | Administrador;
+  // Aqui fazemos a validação do payload do JWT
+  async validate(payload: { id: number; tipo: 'ADMINISTRADOR' | 'CADASTRADOR' | 'CONVIDADO' }): Promise<User | Convidado | Administrador> {
+    let usuario: User | Convidado | Administrador;
+    
     try {
+      // Usando switch para determinar qual tipo de usuário buscar
       switch (payload.tipo) {
         case 'ADMINISTRADOR':
           usuario = await this.prisma.administrador.findUnique({
-            where: {
-              id: payload.sub,
-            },
+            where: { id: payload.id },
           });
           break;
-        case 'USUARIO':
-          usuario = await this.prisma.usuario.findUnique({
-            where: {
-              id: payload.sub,
-            },
+        case 'CADASTRADOR':
+          usuario = await this.prisma.user.findUnique({
+            where: { id: payload.id },
           });
           break;
         case 'CONVIDADO':
           usuario = await this.prisma.convidado.findUnique({
-            where: {
-              id: payload.sub,
-            },
+            where: { id: payload.id },
           });
           break;
+        default:
+          throw new UnauthorizedException('Tipo de usuário não suportado');
       }
     } catch (err) {
-      throw new UnauthorizedException('Usuário não encontrado');
+      throw new UnauthorizedException('Erro ao buscar usuário no banco de dados');
     }
-
-    if (!usuario || typeof usuario !== 'object') {
-      throw new UnauthorizedException('Usuário inválido');
-    }
-
-    delete usuario.hash;
     return usuario;
   }
 }
