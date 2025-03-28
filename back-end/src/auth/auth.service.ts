@@ -1,49 +1,19 @@
 import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
-
 
 @Injectable()
 export class AuthService {
   constructor(private prisma: PrismaService, private jwtService: JwtService) {}
-  
-  async validateUser(email: string, senha: string): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
-    });
-  
-    if (!user) {
-      return null;
-    }
-  
-    const senhaValida = user.senha ? await bcrypt.compare(senha, user.senha) : false;
-    if (!senhaValida) {
-      return null;
-    }
-  
-    return user;
-  }
-  async login(email: string, senha: string) {
 
-    const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user || !user.senha) {
-      throw new UnauthorizedException('Credenciais inválidas.');
-    }
-
-
-    const senhaValida = await bcrypt.compare(senha, user.senha);
-    if (!senhaValida) {
-      throw new UnauthorizedException('Credenciais inválidas.');
-    }
-
-
-    const token = this.jwtService.sign({ id: user.id, email: user.email });
-
-    return { message: 'Login realizado com sucesso!', token };
-  }
-  
+  /**
+   * Realiza o login via Google OAuth.
+   * Caso o usuário não exista no banco de dados, ele é criado automaticamente.
+   *
+   * @param req Objeto de requisição contendo as informações do usuário autenticado via Google.
+   * @returns Retorna os dados do usuário autenticado ou uma mensagem de erro caso a autenticação falhe.
+   */
   async googleLogin(req): Promise<User | string> {
     if (!req.user) {
       return 'No user from Google';
@@ -52,10 +22,12 @@ export class AuthService {
     const { firstName, lastName, email, google_id, accessToken } = req.user;
     const nome = `${firstName} ${lastName}`;
 
+    // Verifica se o usuário já existe no banco de dados
     let user = await this.prisma.user.findUnique({
       where: { email },
     });
 
+    // Se o usuário não existir, cria um novo registro
     if (!user) {
       user = await this.prisma.user.create({
         data: {
@@ -71,17 +43,27 @@ export class AuthService {
 
     return user as User;
   }
+
+  /**
+   * Realiza o login via Microsoft OAuth.
+   * Caso o usuário não exista no banco de dados, ele é criado automaticamente.
+   *
+   * @param req Objeto de requisição contendo as informações do usuário autenticado via Microsoft.
+   * @returns Retorna os dados do usuário autenticado ou uma mensagem de erro caso a autenticação falhe.
+   */
   async microsoftLogin(req): Promise<User | string> {
     if (!req.user) {
       return 'No user from Microsoft';
     }
-  
+
     const { microsoftId, email, nome, accessToken } = req.user;
-  
+
+    // Verifica se o usuário já existe no banco de dados
     let user = await this.prisma.user.findUnique({
       where: { email },
     });
-  
+
+    // Se o usuário não existir, cria um novo registro
     if (!user) {
       user = await this.prisma.user.create({
         data: {
@@ -94,7 +76,7 @@ export class AuthService {
         },
       });
     }
-  
+
     return user as User;
   }
 }

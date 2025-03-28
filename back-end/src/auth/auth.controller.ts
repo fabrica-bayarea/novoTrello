@@ -2,7 +2,6 @@ import { Controller, Get, Request, UseGuards, Post, Body } from '@nestjs/common'
 import { GoogleOAuthGuard } from './guard/google-oauth.guard';
 import { GoogleOAuthCallbackGuard } from './guard/google-oauth-callback.guard';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './guard/local-auth.guard';
 import { MicrosoftOAuthGuard } from './guard/microsoft-oauth.guard';
 import { MicrosoftOAuthCallbackGuard } from './guard/microsoft-oauth-callback.guard';
 
@@ -10,11 +9,6 @@ import { MicrosoftOAuthCallbackGuard } from './guard/microsoft-oauth-callback.gu
 export class AuthController {
   constructor(private authService: AuthService) { }
 
-  @UseGuards(LocalAuthGuard)
-  @Post('login')
-  async login(@Request() req) {
-    return this.authService.login(req.user.email, req.body.senha);
-  }
 
   @Get('google')
   @UseGuards(GoogleOAuthGuard)
