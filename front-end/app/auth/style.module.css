@@ -1,0 +1,15 @@
+.topImage{
+  position: fixed;
+  top: 0;
+  right: 0;
+}
+.bottomImage{
+  position: fixed;
+  bottom: 0;
+  left: 0;
+}
+.logo{
+  position: fixed;
+  top: 20px;
+  left: 0;
+}
