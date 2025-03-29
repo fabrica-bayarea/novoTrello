@@ -22,9 +22,6 @@ const openSans = Open_Sans({
 export const metadata: Metadata = {
   title: "Home",
   description: "A simple Trello",
-  icons: {
-    icon: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined",
-  },
 };
 
 export default function RootLayout({
