@@ -47,7 +47,7 @@ Certifique-se de ter as seguintes ferramentas instaladas no seu ambiente de dese
 1. Clone o repositório:
 
   ```bash
-  git clone https://github.com/fabrica-bayarea/prontuario-back.git
+  git clone https://github.com/fabrica-bayarea/novoTrello.git
   ```
 
 2. Inicie a aplicação:
