@@ -1,0 +1,85 @@
+services:
+  postgres:
+    image: "postgres:16-alpine"
+    container_name: trello-database
+    restart: always
+    env_file:
+      - .env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - volume-db:/var/lib/postgresql/data
+    networks:
+      - trello-net
+    healthcheck:
+      test: 
+        - "CMD-SHELL"
+        - "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h ${POSTGRES_HOST}"
+      interval: 1m
+      timeout: 3s
+      retries: 5
+
+  api:
+    build:
+      context: ./back-end/
+      dockerfile: Dockerfile
+    container_name: trello-api
+    restart: always
+    command: 
+      - "sh"
+      - "-c"
+      - "npx prisma migrate deploy && node dist/main.js"
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "${API_PORT}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - trello-net
+    healthcheck:
+      test: 
+        - "CMD-SHELL"
+        - "curl -f http://localhost:3000"
+      interval: 15s
+      timeout: 3s
+      retries: 5 
+
+  webui:
+    build:
+      context: ./front-end/
+      dockerfile: Dockerfile
+    container_name: trello-webui
+    restart: always
+    env_file:
+      - .env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "${UI_PORT}:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - trello-net
+
+volumes:
+  volume-db:
+
+networks:
+  trello-net:
+    driver: bridge
