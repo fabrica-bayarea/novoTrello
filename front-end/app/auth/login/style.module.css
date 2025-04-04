@@ -3,8 +3,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  background-color: white;
+  padding: 0 10px;
+  position: relative;
+  overflow: hidden;
 }
 
 .loginSection {
@@ -13,12 +14,60 @@
   justify-content: center;
   flex-direction: column;
   background-color: #DA2F35;
-  width: 450px;
+  width: 100%;
+  max-width: 450px;
+  min-width: 300px;
   padding: 30px;
-  position: relative;
   border-radius: 10px;
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.712);
+  box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+}
 
+.topImage,
+.middleImage,
+.bottomImage,
+.googleImage {
+  z-index: 1;
+  pointer-events: none;
+  width: 200px;
+  height: 200px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.topImage {
+  top: 0;
+  left: 0;
+  background-image: url('/images/elementTop.png');
+  background-position: center;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.middleImage {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background-image: url('/images/elementMiddle.png');
+  background-position: center;
+}
+
+.bottomImage {
+  bottom: 0;
+  left: 0;
+  background-image: url('/images/elementBottom1.png');
+  background-position: center;
+  transform: translate(-50%, 50%) rotate(45deg);
+}
+
+.googleImage {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background-image: url('/images/elementgoogle.png');
+  background-position: center;
+  z-index: 1;
 }
 
 .h1 {
@@ -26,24 +75,23 @@
   font-size: 25px;
   font-weight: bolder;
   margin: 10px;
+  text-align: center;
 }
 
 .divInput {
   display: flex;
   align-items: center;
-
-
-
+  width: 100%;
+  margin-bottom: 10px;
 }
 
 .divInput input {
   display: flex;
   color: black;
   background-color: white;
-  flex-direction: column;
-  margin: 5px;
   padding: 10px;
-  width: 250px;
+  width: 100%;
+  max-width: 100%;
   border-radius: 10px;
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.397);
   border: none;
@@ -52,7 +100,7 @@
 .icon {
   font-size: 20px;
   color: white;
-
+  margin-right: 10px;
 }
 
 .checkbox label {
@@ -62,7 +110,6 @@
   display: flex;
   align-items: center;
   gap: 5px;
-
 }
 
 .inputCheckbox {
@@ -132,7 +179,6 @@
   height: 3px;
   width: 100px;
   background-color: white;
-
 }
 
 .socialIcons img {
