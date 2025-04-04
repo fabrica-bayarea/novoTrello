@@ -9,14 +9,14 @@ import { join } from 'path';
   imports: [
     MailerModule.forRoot({
       transport: {
-        host: 'smtp.gmail.com', // Substitua pelo seu servidor SMTP
+        host: 'SMTP_HOST', 
         auth: {
-          user: 'testebayarea@gmail.com',
-          pass: 'jpwn clhc rozd fzbu',
+          user: 'SMTP_USER',
+          pass: 'SMTP_PASS',
         },
       },
       defaults: {
-        from: '"Teste" <testebayarea@gmail.com>',
+        from: '"Teste" <SMTP_USER>',
       },
     }),
   ],
