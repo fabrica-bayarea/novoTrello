@@ -16,7 +16,7 @@ export class SignUpUsuarioDto {
     @IsStrongPassword(
         {},
         {
-            message: 'Senha deve ter 8 caractéres, 1 especial, 1 número e uma letra maiúscula'
+            message: 'Senha deve ter 8 caracteres, 1 especial, 1 número e uma letra maiúscula'
         },
     )
     senha: string

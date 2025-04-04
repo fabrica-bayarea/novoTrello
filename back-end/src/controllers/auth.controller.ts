@@ -1,5 +1,5 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { AuthService } from 'src/auth/auth.service';
+import { AuthService } from 'src/services/auth.service';
 import {
   SignInUsuarioDto,
   SignUpUsuarioDto,
