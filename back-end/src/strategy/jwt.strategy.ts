@@ -2,7 +2,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/services/prisma.service';
 import { User } from '@prisma/client';
 
 @Injectable()
@@ -21,10 +21,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: { id: number}): Promise<User> {
-    let usuario = await this.prisma.user.findUnique({where:{id: payload.id} })
-    if (!usuario) {
+    let user = await this.prisma.user.findUnique({where:{id: payload.id} })
+    if (!user) {
         throw new UnauthorizedException('Usuário não encontrado')
     }
-    return usuario;
+    return user;
   }
 }

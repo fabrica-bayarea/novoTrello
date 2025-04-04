@@ -22,10 +22,10 @@ import {
     ) {}
   
     async signToken(
-      idUsuario: number,
+      IdUser: number,
     ): Promise<{ access_token: string }> {
       const payload = {
-        sub: idUsuario,
+        sub: IdUser,
       };
   
       const token = await this.jwt.signAsync(payload, {
@@ -39,19 +39,19 @@ import {
     async signUpUsuario(
       dto: SignUpUsuarioDto,
     ): Promise<{ access_token: string }> {
-      const hash = await argon2.hash(dto.senha);
+      const hash = await argon2.hash(dto.password);
       try {
-        const dadosUsuario: any = {
+        const userData: any = {
           name: dto.name,
           email: dto.email,
-          senha: hash,
+          password: hash,
         };
   
-        const usuario = await this.prisma.user.create({
-          data: dadosUsuario,
+        const user = await this.prisma.user.create({
+          data: userData,
         });
   
-        return this.signToken(usuario.id);
+        return this.signToken(user.id);
       } catch (err) {
         if (err instanceof PrismaClientKnownRequestError) {
           if (err.code === 'P2002') {
@@ -65,15 +65,15 @@ import {
     async signInUsuario(
       dto: SignInUsuarioDto,
     ): Promise<{ access_token: string }> {
-      const usuario = await this.prisma.user.findUnique({
+      const user = await this.prisma.user.findUnique({
         where: { email: dto.email },
       });
-      if (!usuario) {
+      if (!user) {
         throw new ForbiddenException('Credenciais inválidas');
       }
 
-      const senhaCorreta = await argon2.verify(usuario.senha, dto.senha);
-      if (!senhaCorreta) throw new ForbiddenException('Credenciais incorretas');
-      return this.signToken(usuario.id);
+      const validPassword = await argon2.verify(user.password, dto.password);
+      if (!validPassword) throw new ForbiddenException('Credenciais incorretas');
+      return this.signToken(user.id);
     }
   }

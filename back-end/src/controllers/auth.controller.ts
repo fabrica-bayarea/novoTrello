@@ -6,13 +6,13 @@ import {
 } from 'src/dto/auth.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('Operações de manutenção de Usuários')
+@ApiTags('Operações de Autenticação')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
     // verificando o cadastro do usuário
-  @ApiOperation({ summary: 'Cadastra um novo Usuário', description: 'Cria um novo usuário e o grava no banco de dados' })
+  @ApiOperation({ summary: 'Cadastra um novo Usuário', description: 'Cria um novo usuário e o grava no banco de dados.' })
   @ApiResponse({ status: 201, description: 'Usuário cadastrado com sucesso' })
   @ApiResponse({ status: 403, description: 'Credenciais tomadas' })
   @HttpCode(HttpStatus.OK)
@@ -22,7 +22,7 @@ export class AuthController {
   }
 
     //verificar a entrada do usuário
-  @ApiOperation({ summary: 'teste01', description: 'Autentica um usuário e permite o acesso ao sistema' })
+  @ApiOperation({ summary: 'Autenticação de usuário', description: 'Realiza a autenticação do usuário e retorna um token de acesso para utilização no sistema.' })
   @ApiResponse({ status: 200, description: 'Usuário autenticado com sucesso' })
   @ApiResponse({ status: 403, description: 'Credenciais inválidas' })
   @HttpCode(HttpStatus.OK)
