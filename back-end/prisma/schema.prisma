@@ -9,7 +9,12 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  email String @unique
-  name String
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  name         String
+  password     String
+  authProvider String   @default("local") @db.VarChar(20)
+  googleId     String?  @unique
+  accessToken  String?
+  createdAt    DateTime @default(now())
 }

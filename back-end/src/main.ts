@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { AppModule } from './app.module';
+import { AppModule } from './modules/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,10 +20,10 @@ async function bootstrap() {
       'https://github.com/fabrica-bayarea/novoTrello',
     )
     .setContact('BayArea', '', 'nde.ads@iesb.br')
-    // .setLicense(
-    //  'name',
-    //  'https://url.com'
-    // )
+    .setLicense(
+     'License GPL-3.0',
+     'https://github.com/fabrica-bayarea/novoTrello?tab=GPL-3.0-1-ov-file'
+    )
     .setVersion('1.0')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
