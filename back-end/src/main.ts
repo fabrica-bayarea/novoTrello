@@ -1,10 +1,23 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './modules/app.module';
+import { ValidationPipe } from '@nestjs/common';
+import { VersioningType } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+    }),
+  );
+  app.enableCors({
+    origin: '*', // mudar em produção
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  });
+  app.enableVersioning({
+    type: VersioningType.URI,
+  });
   const config = new DocumentBuilder()
     .setTitle('Novo Trello API - IESB')
     .setDescription(

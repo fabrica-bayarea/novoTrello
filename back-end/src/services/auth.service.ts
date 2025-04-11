@@ -1,79 +1,75 @@
 import {
-    BadRequestException,
-    ForbiddenException,
-    Injectable,
-  } from '@nestjs/common';
-  import { ConfigService } from '@nestjs/config';
-  import { JwtService } from '@nestjs/jwt';
-  import { PrismaService } from 'src/services/prisma.service';
-  import {
-    SignInUsuarioDto,
-    SignUpUsuarioDto,
-  } from 'src/dto/auth.dto';
-  import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-  import * as argon2 from "argon2";
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from 'src/services/prisma.service';
+import { SignInDto, SignUpDto } from 'src/dto/auth.dto';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import * as argon2 from "argon2";
 
-  @Injectable()
-  export class AuthService {
-    constructor(
-      private prisma: PrismaService,
-      private jwt: JwtService,
-      private config: ConfigService,
-    ) {}
-  
-    async signToken(
-      IdUser: number,
-    ): Promise<{ access_token: string }> {
-      const payload = {
-        sub: IdUser,
-      };
-  
-      const token = await this.jwt.signAsync(payload, {
-        secret: this.config.get('JWT_SECRET'),
-      });
-      return {
-        access_token: token,
-      };
-    }
-  
-    async signUpUsuario(
-      dto: SignUpUsuarioDto,
-    ): Promise<{ access_token: string }> {
-      const hash = await argon2.hash(dto.password);
-      try {
-        const userData: any = {
-          name: dto.name,
+@Injectable()
+export class AuthService {
+  constructor(
+    private prisma: PrismaService,
+    private readonly jwtService: JwtService,
+  ) { }
+
+  private async signToken(
+    userId: number,
+    rememberMe = false,
+  ): Promise<{ access_token: string }> {
+    const payload = { sub: userId };
+    const expiresIn = rememberMe ? '30d' : '1d';
+
+    return {
+      access_token: await this.jwtService.signAsync(payload, {
+        expiresIn
+      })
+    };
+  }
+
+  async signUp(
+    dto: SignUpDto,
+  ): Promise<{ access_token: string }> {
+    const hashedPassword = await argon2.hash(dto.password, {
+      type: argon2.argon2id,
+      memoryCost: 65536,
+      timeCost: 3,
+      parallelism: 4,
+    });
+
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          fullName: dto.fullName,
+          userName: dto.userName,
           email: dto.email,
-          password: hash,
-        };
-  
-        const user = await this.prisma.user.create({
-          data: userData,
-        });
-  
-        return this.signToken(user.id);
-      } catch (err) {
-        if (err instanceof PrismaClientKnownRequestError) {
-          if (err.code === 'P2002') {
-            throw new ForbiddenException('Credenciais tomadas');
-          }
-        }
-        throw err;
-      }
-    }
-  
-    async signInUsuario(
-      dto: SignInUsuarioDto,
-    ): Promise<{ access_token: string }> {
-      const user = await this.prisma.user.findUnique({
-        where: { email: dto.email },
+          password: hashedPassword,
+        },
       });
-      if (!user) {
-        throw new ForbiddenException('Credenciais inválidas');
-      }
 
-      const validPassword = await argon2.verify(user.password, dto.password);
-      if (!validPassword) throw new ForbiddenException('Credenciais incorretas');
       return this.signToken(user.id);
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
+        throw new ForbiddenException('Email ou nome de usuário já estão em uso');
+      }
+      throw new BadRequestException('Erro ao criar usuário');
     }
   }
+
+  async signIn(
+    dto: SignInDto,
+  ): Promise<{ access_token: string }> {
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (!user || !(await argon2.verify(user.password, dto.password))) {
+      throw new ForbiddenException('Credenciais inválidas');
+    }
+
+    return this.signToken(user.id, dto.rememberMe);
+  }
+}

@@ -1,13 +1,10 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from 'src/services/auth.service';
-import {
-  SignInUsuarioDto,
-  SignUpUsuarioDto,
-} from 'src/dto/auth.dto';
+import { SignInDto, SignUpDto } from 'src/dto/auth.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Operações de Autenticação')
-@Controller('auth')
+@Controller({ path: 'auth', version: '1' })
 export class AuthController {
   constructor(private authService: AuthService) {}
 
@@ -16,9 +13,9 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'Usuário cadastrado com sucesso' })
   @ApiResponse({ status: 403, description: 'Credenciais tomadas' })
   @HttpCode(HttpStatus.OK)
-  @Post('signup/usuario')
-  signUpUsuario(@Body() dto: SignUpUsuarioDto) {
-    return this.authService.signUpUsuario(dto);
+  @Post('signup')
+  SignUp(@Body() dto: SignUpDto) {
+    return this.authService.signUp(dto);
   }
 
     //verificar a entrada do usuário
@@ -26,8 +23,8 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Usuário autenticado com sucesso' })
   @ApiResponse({ status: 403, description: 'Credenciais inválidas' })
   @HttpCode(HttpStatus.OK)
-  @Post('signin/usuario')
-  signInUsuario(@Body() dto: SignInUsuarioDto) {
-    return this.authService.signInUsuario(dto);
+  @Post('signin')
+  SignIn(@Body() dto: SignInDto) {
+    return this.authService.signIn(dto);
   }
 }

@@ -11,7 +11,8 @@ datasource db {
 model User {
   id           Int      @id @default(autoincrement())
   email        String   @unique
-  name         String
+  fullName     String
+  userName     String
   password     String
   authProvider String   @default("local") @db.VarChar(20)
   googleId     String?  @unique

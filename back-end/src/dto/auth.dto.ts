@@ -1,11 +1,16 @@
-import {IsEmail,IsNotEmpty,IsString,IsStrongPassword,} from 'class-validator'
+import {IsBoolean, IsEmail,IsNotEmpty,IsOptional,IsString,IsStrongPassword,} from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 
-export class SignUpUsuarioDto {
-    @ApiProperty({ example: 'username'})
-    @IsNotEmpty({ message: 'Preencha o campo de nome'})
+export class SignUpDto {
+    @ApiProperty({ example: 'first name last name'})
+    @IsNotEmpty({ message: 'Preencha o campo de nome completo'})
     @IsString({ message: 'O nome deve ser uma string'})
-    name: string
+    fullName: string
+
+    @ApiProperty({ example: 'username'})
+    @IsNotEmpty({ message: 'Preencha o campo de nome de usuario'})
+    @IsString({ message: 'O nome deve ser uma string'})
+    userName: string
 
     @ApiProperty({ example: 'username@gmail.com'})
     @IsEmail({}, { message: 'Preencha o campo de email'})
@@ -13,6 +18,7 @@ export class SignUpUsuarioDto {
     email: string
 
     @ApiProperty({example: 'Senha123!'})
+    @IsString({ message: 'A senha deve ser uma string'})
     @IsStrongPassword(
         {},
         {
@@ -22,7 +28,7 @@ export class SignUpUsuarioDto {
     password: string
 }
 
-export class SignInUsuarioDto {
+export class SignInDto {
     @ApiProperty ({example:'username@gmail.com' })
     @IsEmail ({}, {message: 'deve ser no modelo de email'})
     email: string;
@@ -31,4 +37,9 @@ export class SignInUsuarioDto {
     @IsNotEmpty({message: 'preencha com sua senha'})
     @IsString({message: 'senha deve ser uma string'})
     password: string;
+
+    @ApiProperty({example: true})
+    @IsBoolean({message: 'deve ser um booleano'})
+    @IsNotEmpty({message: 'preencha o campo de lembrar de mim'})
+    rememberMe: boolean;
 }

@@ -8,22 +8,20 @@ import { User } from '@prisma/client';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private readonly config: ConfigService,
+    private readonly configService: ConfigService,
     private prisma: PrismaService,
   ) {
-    const jwtSecret = config.get('JWT_SECRET');
-
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: jwtSecret,
+      secretOrKey: configService.get<string>('JWT_SECRET') || (() => { throw new Error('JWT_SECRET is not defined'); })(),
     });
   }
 
-  async validate(payload: { id: number}): Promise<User> {
-    let user = await this.prisma.user.findUnique({where:{id: payload.id} })
+  async validate(payload: { id: number }): Promise<User> {
+    const user = await this.prisma.user.findUnique({ where: { id: payload.id } });
     if (!user) {
-        throw new UnauthorizedException('Usuário não encontrado')
+      throw new UnauthorizedException('User not found');
     }
     return user;
   }
