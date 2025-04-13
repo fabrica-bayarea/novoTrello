@@ -90,4 +90,3 @@ export class SignResponseJwtDto {
     @ApiProperty({ type: UserInfoDto })
     @IsNotEmpty({ message: 'Os dados do usuário não podem estar vazios' })
     user: UserInfoDto;
-}

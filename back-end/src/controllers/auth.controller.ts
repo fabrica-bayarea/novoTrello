@@ -31,7 +31,7 @@ export class AuthController {
   SignUp(@Body() dto: SignUpDto) {
     return this.authService.signUp(dto);
   }
-
+  
   @ApiOperation({ summary: 'Autenticação de usuário', description: 'Realiza a autenticação do usuário e retorna um token de acesso para utilização no sistema.' })
   @ApiResponse({ status: 200, description: 'Usuário autenticado com sucesso' })
   @ApiResponse({ status: 403, description: 'Credenciais inválidas' })

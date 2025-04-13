@@ -8,4 +8,4 @@ import { ConfigModule } from '@nestjs/config';
   exports: [PrismaService],
 })
 
-export class PrismaModule { }
+export class PrismaModule {}
