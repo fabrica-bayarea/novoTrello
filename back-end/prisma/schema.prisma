@@ -8,14 +8,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AuthProvider {
+  local
+  google
+  microsoft
+}
+
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
+  id           Int          @id @default(autoincrement())
+  email        String       @unique
   fullName     String
-  userName     String
-  password     String
-  authProvider String   @default("local") @db.VarChar(20)
-  googleId     String?  @unique
-  accessToken  String?
-  createdAt    DateTime @default(now())
+  userName     String       @unique
+  password     String?
+  authProvider AuthProvider
+  providerId   String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([authProvider, providerId], name: "AuthProviderAndIdUnique")
 }

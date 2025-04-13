@@ -41,7 +41,7 @@ async function bootstrap() {
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, documentFactory, {
-    customSiteTitle: 'Prontuario API - IESB',
+    customSiteTitle: 'Novo Trello API - IESB',
     customfavIcon:
       'https://www.iesb.br/content/themes/iesb-chleba-themosis/favicon.png',
     customCss: `

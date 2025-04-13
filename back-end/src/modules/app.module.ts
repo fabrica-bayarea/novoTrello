@@ -12,7 +12,7 @@ import { PrismaModule } from 'src/modules/prisma.module';
       envFilePath: '.env',
     }), 
     PrismaModule, 
-    AuthModule
+    AuthModule.register(),
   ],
   controllers: [AppController],
   providers: [AppService],
