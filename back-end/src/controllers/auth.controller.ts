@@ -109,7 +109,7 @@ export class AuthController {
   @UseGuards(IsEnabledAuthGuard('microsoft', 'ENABLE_MICROSOFT_OAUTH'))
   async microsoftAuthRedirect(@Req() { user }: any, @Res() res: Response) {
     try {
-      const accessToken = await this.authService.signInWithProvider('microsoft', {...user, providerId: user.googleId})
+      const accessToken = await this.authService.signInWithProvider('microsoft', {...user, providerId: user.microsoftId})
       if (accessToken) {
         return res.cookie('auth-token', accessToken, {
           httpOnly: true,
@@ -121,7 +121,7 @@ export class AuthController {
       throw new Error('Invalid authentication result');
     } catch (error) {
       this.logger.error('Erro no callback do Microsoft:', error.message);
-      return res.redirect(`${this.configService.get<string>('BASE_URL_UI')}/auth/error?message=google_login_failed`);
+      return res.redirect(`${this.configService.get<string>('BASE_URL_UI')}/auth/error?message=microsoft_login_failed`);
     }
   }
 }
