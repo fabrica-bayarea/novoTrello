@@ -1,70 +1,113 @@
-import styles from "./style.module.css";
+"use client"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+
+import { login } from "@/actions/auth"
+import styles from "@/app/auth/style.module.css";
+
+import Image from 'next/image';
 import Link from "next/link";
 
+
 export default function Home() {
+  const router = useRouter()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [rememberMe, setRememberMe] = useState(false)
+  const [error, setError] = useState("")
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError("")
+
+    try {
+      const result = await login(email, password, rememberMe)
+
+      if (result.success) {
+        router.push("/dashboard")
+        router.refresh()
+      } else {
+        setError(result.error || "Falha na autenticação")
+      }
+    } catch (err) {
+      setError("Ocorreu um erro ao tentar fazer login")
+    }
+  }
+
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
   return (
-    <main className={styles.main}>
-      <section className={styles.loginSection}>
-        <h1 className={styles.h1}>ACESSE SUA CONTA</h1>
+    <div className={styles.formContainer}>
+      <h1 className={styles.title}>ACESSE SUA CONTA</h1>
 
-        <div className={styles.divInput}>
-          <span className={`material-symbols-outlined ${styles.icon}`}>
-            account_circle
-          </span>
-          <input
-            className={styles.inputs}
-            type="email"
-            name="email"
-            id="email"
-            placeholder="Nome de usuário ou email"
+      <form className={styles.form}>
+        <div className={styles.inputGroup}>
+          <input 
+            onChange={(e) => setEmail(e.target.value)}
+            type="text" 
+            placeholder="Nome de usuário ou e-mail" 
+            className={styles.input} 
           />
         </div>
 
-        <div className={styles.divInput}>
-          <span className={`material-symbols-outlined ${styles.icon}`}>lock</span>
-          <input
-            className={styles.inputs}
-            type="password"
-            name="Senha"
-            id="Senha"
-            placeholder="Digite sua senha"
+        <div className={styles.inputGroup}>
+          <input 
+            onChange={(e) => setPassword(e.target.value)}
+            type="password" 
+            placeholder="Digite sua senha" 
+            className={styles.input} 
           />
         </div>
 
-        <div className={styles.checkbox}>
-          <label>
-            <input
-              className={styles.inputCheckbox}
-              type="checkbox"
-              name="manterConectado"
-              id="manterConectado"
-            />
+        <div className={styles.checkboxContainer}>
+          <input 
+            type="checkbox" 
+            id="remember" 
+            className={styles.checkbox} 
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)} 
+          />
+          <label htmlFor="remember" className={styles.checkboxLabel}>
             Continuar conectado
           </label>
         </div>
 
-        <input className={styles.enter} type="button" value="ENTRAR" />
+        <button type="submit" className={styles.button} onClick={handleSubmit}>
+          ENTRAR
+        </button>
 
-        <p className={styles.forgot}>Esqueceu sua senha?</p>
-        <a className={styles.link} href="#">Clique aqui</a>
-
-        <div className={styles.divider}>
-          <div className={styles.lineDivider}>
-            <p className={styles.conect}>Conecte-se também com</p>
-          </div>
+        <div className={styles.forgotPassword}>
+          <span>Esqueceu sua senha?</span>
+          <Link href="/auth/forgot-password" className={styles.link}>
+            Clique aqui!
+          </Link>
         </div>
+      </form>
 
-        <div className={styles.socialIcons}>
-          <img src="/images/logoIesb.png" alt="Login com Google" />
-          <img src="/images/microsoftIcon.png" alt="Login com Microsoft" />
-        </div>
+      <div className={styles.divider}>
+        <span>Conecte-se também com</span>
+      </div>
 
-        <div className={styles.createAccount}>
-          <Link href="/register">Clique aqui para criar uma conta.</Link>
-        </div>
+      <div className={styles.socialLogin}>
+        <button className={styles.socialButton}>
+          <Image src="/images/iesb-icon.png" alt="IESB" width={24} height={24} />
+        </button>
+        <Link href={`${apiBaseUrl}/v1/auth/google`} className={styles.socialButton}>
+          <Image src="/images/google-icon.png" alt="Google" width={24} height={24} />
+        </Link>
+        <Link href={`${apiBaseUrl}/v1/auth/microsoft`}  className={styles.socialButton}>
+          <Image src="/images/microsoft-icon.png" alt="Microsoft" width={24} height={24} />
+        </Link>
+      </div>
 
-        <p className={styles.rodape}>IESB - BAY AREA</p>
-      </section>
-    </main>
-  );
+      <div className={styles.createAccount}>
+        <Link href="/auth/register" className={styles.createAccountButton}>
+          Clique aqui para criar uma conta
+        </Link>
+      </div>
+
+      <div className={styles.footer}>IESB - BAY AREA</div>
+    </div>
+  )
 }
