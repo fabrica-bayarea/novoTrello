@@ -1,4 +1,4 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { DynamicModule, Module, Logger } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -28,6 +28,7 @@ export class AuthModule {
         }),
       ],
       providers: [
+        Logger,
         JwtStrategy,
         PrismaService,
         AuthService,
