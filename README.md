@@ -87,6 +87,8 @@ Após isso clone o projeto:
   npm install
   ```
 
+4. Criar arquivo .env de acordo com o arquivo .env.example que está na pasta "front-end/":
+
 3. Inicie a aplicação:
   ```bash
   npm run dev

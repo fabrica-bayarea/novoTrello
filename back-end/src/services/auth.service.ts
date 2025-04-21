@@ -5,8 +5,9 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/services/prisma.service';
-import { SignInDto, SignUpDto, SignResponseJwtDto } from 'src/dto/auth.dto';
+import { SignInDto, SignUpDto } from 'src/dto/auth.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { User } from '@prisma/client';
 import * as argon2 from "argon2";
 
 @Injectable()
@@ -14,158 +15,123 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
-  private async generateAuthToken(
-    userId: number,
-    rememberMe = false,
-  ): Promise<{ accessToken: string; expiresIn: string; createdAt: string }> {
-    const payload = { sub: userId };
-    const expiresIn = rememberMe ? '30d' : '1d';
-
-    const accessToken = await this.jwtService.signAsync(payload, {
-      expiresIn,
-    });
-
+  /**
+   * Gera um token JWT com base no payload fornecido.
+   */
+  private async generateJwt(user: User, rememberMe = false): Promise<{ accessToken: string }> {
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      userName: user.userName,
+    };
     return {
-      accessToken,
-      expiresIn,
-      createdAt: new Date().toISOString(),
+      accessToken: this.jwtService.sign(payload, { 
+        expiresIn: rememberMe ? '30d' : '1d', 
+        algorithm: 'HS256' 
+      }),
     };
   }
 
-  async signUp(
-    dto: SignUpDto,
-  ): Promise<SignResponseJwtDto> {
-    const hashedPassword = await argon2.hash(dto.password, {
+  /**
+   * Gera um hash seguro para a senha usando Argon2.
+   */
+  private async hashPassword(password: string): Promise<string> {
+    return argon2.hash(password, {
       type: argon2.argon2id,
       memoryCost: 65536,
       timeCost: 3,
       parallelism: 4,
     });
+  }
 
-    try {
-      const user = await this.prisma.user.create({
+  /**
+   * Busca um usuário pelo email ou cria um novo, dependendo do provedor de autentica-
+   * ção é guardado o providerId em vez da senha.
+   */
+  private async findOrCreateUser(data: any, provider: any): Promise<any> {
+    let user = await this.prisma.user.findUnique({ where: { email: data.email } });
+
+    if (!user) {
+      user = await this.prisma.user.create({
         data: {
-          fullName: dto.fullName,
-          userName: dto.userName,
-          email: dto.email,
-          authProvider: 'local',
-          providerId: null,
-          password: hashedPassword,
+          fullName: data.fullName,
+          userName: data.email.split('@')[0],
+          email: data.email,
+          authProvider: provider,
+          providerId: data.providerId || null,
+          password: provider === 'local' ? data.password : '',
         },
       });
+    }
 
-      return {
-        access: await this.generateAuthToken(user.id, false),
-        user: {
-          id: user.id,
-          fullName: user.fullName,
-          userName: user.userName,
-          email: user.email,
-        },
-      };
+    return user;
+  }
+
+  /**
+   * Trata erros específicos ao criar um usuário.
+   */
+  private handleSignUpError(error: any): never {
+    if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
+      throw new ForbiddenException('Email ou nome de usuário já estão em uso');
+    }
+    throw new BadRequestException('Erro ao criar usuário');
+  }
+
+  /**
+   * Registra um novo usuário localmente.
+   */
+  async signUp(dto: SignUpDto): Promise<{ accessToken: string }> {
+    const hashedPassword = await this.hashPassword(dto.password);
+
+    let user = await this.prisma.user.findUnique({ where: { email: dto.email } });
+
+    if (user) {
+      throw new ForbiddenException('Email já cadastrado');
+    }
+
+    try {
+      const user = await this.findOrCreateUser({ ...dto, password: hashedPassword }, 'local');
+      return this.generateJwt(user);
     } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
-        throw new ForbiddenException('Email ou nome de usuário já estão em uso');
-      }
-      throw new BadRequestException('Erro ao criar usuário');
+      this.handleSignUpError(error);
     }
   }
 
-  async signInJwt(
-    dto: SignInDto,
-  ): Promise<SignResponseJwtDto> {
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
-    });
+  /**
+   * Realiza login de um usuário local.
+   */
+  async signIn(dto: SignInDto): Promise<{ accessToken: string }> {
+    const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
 
-    if (!user || user.authProvider != "local" || !user.password || !(await argon2.verify(user.password, dto.password))) {
+    const isInvalidCredentials =
+      !user ||
+      !user.password ||
+      user.authProvider !== 'local' ||
+      !(await argon2.verify(user.password, dto.password));
+
+    if (isInvalidCredentials) {
       throw new ForbiddenException('Credenciais inválidas');
     }
 
-    return {
-      access: await this.generateAuthToken(user.id, dto.rememberMe),
-      user: {
-        id: user.id,
-        fullName: user.fullName,
-        userName: user.userName,
-        email: user.email,
-      },
-    };
+    return this.generateJwt(user, dto.rememberMe);
   }
 
-  async signInGoogle(
-    req: { google_id: string; email: string; name: string; accessToken: string },
-  ): Promise<SignResponseJwtDto | string> {
+  /**
+   * Realiza login com um provedor externo (Google, Microsoft, etc.).
+   */
+  async signInWithProvider(
+    provider: string,
+    req: { providerId: string; email: string; name: string }
+  ): Promise<{ accessToken: string }> {
     if (!req.email) {
-      return 'No user from Google';
+      throw new ForbiddenException(`No user from ${provider}`);
     }
 
-    const { google_id, email, name, accessToken } = req;
+    const user = await this.findOrCreateUser(req, provider);
 
-    let user = await this.prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      user = await this.prisma.user.create({
-        data: {
-          fullName: name,
-          userName: email.split('@')[0],
-          email,
-          authProvider: 'google',
-          providerId: google_id,
-          password: '',
-        },
-      });
-    }
-
-    return {
-      access: await this.generateAuthToken(user.id, false),
-      user: {
-        id: user.id,
-        fullName: user.fullName,
-        userName: user.userName,
-        email: user.email,
-      },
-    };
-  }
-
-  async signInMicrosoft(
-    req: { microsoftId: string; email: string; name: string; accessToken: string }
-  ): Promise<SignResponseJwtDto | string> {
-    if (!req.email) {
-      return 'No user from Microsoft';
-    }
-
-    const { microsoftId, email, name, accessToken } = req;
-
-    let user = await this.prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      user = await this.prisma.user.create({
-        data: {
-          fullName: name,
-          email,
-          userName: email.split('@')[0],
-          authProvider: 'microsoft',
-          providerId: microsoftId,
-          password: '',
-        },
-      });
-    }
-
-    return {
-      access: await this.generateAuthToken(user.id, false),
-      user: {
-        id: user.id,
-        fullName: user.fullName,
-        userName: user.userName,
-        email: user.email,
-      },
-    };
+    return this.generateJwt(user);
   }
 }
