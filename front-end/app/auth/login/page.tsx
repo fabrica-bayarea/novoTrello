@@ -35,6 +35,8 @@ export default function Home() {
     }
   }
 
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
   return (
     <div className={styles.formContainer}>
       <h1 className={styles.title}>ACESSE SUA CONTA</h1>
@@ -91,12 +93,12 @@ export default function Home() {
         <button className={styles.socialButton}>
           <Image src="/images/iesb-icon.png" alt="IESB" width={24} height={24} />
         </button>
-        <button className={styles.socialButton}>
+        <Link href={`${apiBaseUrl}/v1/auth/google`} className={styles.socialButton}>
           <Image src="/images/google-icon.png" alt="Google" width={24} height={24} />
-        </button>
-        <button className={styles.socialButton}>
+        </Link>
+        <Link href={`${apiBaseUrl}/v1/auth/microsoft`}  className={styles.socialButton}>
           <Image src="/images/microsoft-icon.png" alt="Microsoft" width={24} height={24} />
-        </button>
+        </Link>
       </div>
 
       <div className={styles.createAccount}>

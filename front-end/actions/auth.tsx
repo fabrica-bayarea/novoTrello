@@ -1,9 +1,8 @@
 "use server"
 
 import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
 
-const apiBaseUrl = process.env.API_HOST + ":" + process.env.API_PORT;
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export async function login(email: string, password: string, rememberMe: boolean) {
   try {
@@ -12,11 +11,7 @@ export async function login(email: string, password: string, rememberMe: boolean
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ 
-        email: email, 
-        password: password,
-        rememberMe: rememberMe,
-      }),
+      body: JSON.stringify({ email, password, rememberMe }),
     })
 
     if (!response.ok) {
@@ -24,16 +19,21 @@ export async function login(email: string, password: string, rememberMe: boolean
       return { success: false, error: errorData.message || "Erro ao fazer login" }
     }
 
-    const data = await response.json()
+    const { accessToken } = await response.json()
 
     const cookieStore = await cookies();
+
+    const payload = JSON.parse(
+      Buffer.from(accessToken.split('.')[1], 'base64').toString()
+    )
+
     cookieStore.set({
       name: "auth-token",
-      value: data.token,
+      value: accessToken,
       httpOnly: true,
       path: "/",
       secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 7, // 1 semana
+      expires: new Date(payload.exp * 1000),
     });
 
     return { success: true }
@@ -57,61 +57,65 @@ export async function register(fullName: string, userName: string, email: string
       return { success: false, error: errorData.message || "Erro ao fazer registro" };
     }
 
-    const { token } = await response.json();
+    const { accessToken } = await response.json()
 
-    // Armazenar o token em um cookie
     const cookieStore = await cookies();
+
+    const payload = JSON.parse(
+      Buffer.from(accessToken.split('.')[1], 'base64').toString()
+    )
+
     cookieStore.set({
       name: "auth-token",
-      value: token,
+      value: accessToken,
       httpOnly: true,
       path: "/",
       secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 7, // 1 semana
+      expires: new Date(payload.exp * 1000),
     });
 
     return { success: true };
   } catch (error: any) {
-    console.error("Erro ao registrar usuário:", error);
     return { success: false, error: "Erro ao conectar com o servidor" };
   }
 }
 
-export async function checkAuth() {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")
+// TODO implementar essas funções.
 
-  if (!token) {
-    return false
-  }
+// export async function checkAuth() {
+//   const cookieStore = await cookies()
+//   const token = cookieStore.get("auth-token")
 
-  try {
-    const response = await fetch("API_URL/check-auth", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+//   if (!token) {
+//     return false
+//   }
 
-    if (!response.ok) {
-      return false
-    }
+//   try {
+//     const response = await fetch("API_URL/check-auth", {
+//       method: "GET",
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     })
 
-    return true
-  } catch (error) {
-    return false
-  }
-}
+//     if (!response.ok) {
+//       return false
+//     }
 
-// Função para logout
-export async function logout() {
-  try {
-    const cookieStore = await cookies()
+//     return true
+//   } catch (error) {
+//     return false
+//   }
+// }
 
-    cookieStore.delete("auth-token")
-    redirect("/auth/login")
-  } catch (error) {
-    console.error("Erro ao fazer logout:", error)
-    redirect("/auth/login")
-  }
-}
+// export async function logout() {
+//   try {
+//     const cookieStore = await cookies()
+
+//     cookieStore.delete("auth-token")
+//     redirect("/auth/login")
+//   } catch (error) {
+//     console.error("Erro ao fazer logout:", error)
+//     redirect("/auth/login")
+//   }
+// }

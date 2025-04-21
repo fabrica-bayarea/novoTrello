@@ -110,7 +110,7 @@ export default function Register() {
           </label>
         </div>
 
-        <button type="submit" className={styles.button} >
+        <button type="submit" className={styles.button} onClick={handleSubmit}>
           CRIAR CONTA
         </button>
       </form>
