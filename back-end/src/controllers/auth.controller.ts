@@ -1,20 +1,16 @@
-import { 
-  Body, 
-  Controller, 
-  HttpCode, 
-  HttpStatus, 
-  Post, 
-  Get, 
-  Req, 
-  UseGuards, 
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Get,
+  Req,
+  UseGuards,
   Res,
   Logger,
 } from '@nestjs/common';
-import { 
-  ApiOperation, 
-  ApiResponse, 
-  ApiTags 
-} from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from 'src/services/auth.service';
 import { SignInDto, SignUpDto } from 'src/dto/auth.dto';
 import { Response } from 'express';
@@ -30,7 +26,10 @@ export class AuthController {
     private logger: Logger,
   ) {}
 
-  @ApiOperation({ summary: 'Cadastra um novo Usuário', description: 'Cria um novo usuário e o grava no banco de dados.' })
+  @ApiOperation({
+    summary: 'Cadastra um novo Usuário',
+    description: 'Cria um novo usuário e o grava no banco de dados.',
+  })
   @ApiResponse({ status: 201, description: 'Usuário cadastrado com sucesso' })
   @ApiResponse({ status: 403, description: 'Credenciais tomadas' })
   @Post('signup')
@@ -41,8 +40,12 @@ export class AuthController {
       this.logger.error('Erro ao tentar realizar registro:', error.message);
     }
   }
-  
-  @ApiOperation({ summary: 'Autenticação de usuário', description: 'Realiza a autenticação do usuário e retorna um token de acesso para utilização no sistema.' })
+
+  @ApiOperation({
+    summary: 'Autenticação de usuário',
+    description:
+      'Realiza a autenticação do usuário e retorna um token de acesso para utilização no sistema.',
+  })
   @ApiResponse({ status: 200, description: 'Usuário autenticado com sucesso' })
   @ApiResponse({ status: 403, description: 'Credenciais inválidas' })
   @HttpCode(HttpStatus.OK)
@@ -56,7 +59,10 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Iniciar autenticação com Google' })
-  @ApiResponse({ status: 302, description: 'Redireciona para a página de login do Google' })
+  @ApiResponse({
+    status: 302,
+    description: 'Redireciona para a página de login do Google',
+  })
   @UseGuards(IsEnabledAuthGuard('google', 'ENABLE_GOOGLE_OAUTH'))
   @Get('google')
   async googleAuth() {
@@ -74,24 +80,36 @@ export class AuthController {
   @UseGuards(IsEnabledAuthGuard('google', 'ENABLE_GOOGLE_OAUTH'))
   async googleAuthRedirect(@Req() { user }: any, @Res() res: Response) {
     try {
-      const accessToken = await this.authService.signInWithProvider('google', {...user, providerId: user.googleId});
+      const accessToken = await this.authService.signInWithProvider('google', {
+        ...user,
+        providerId: user.googleId,
+      });
       if (accessToken) {
-        return res.cookie('auth-token', accessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
-          expires: new Date(Date.now() + ( 24 * 60 * 60 * 1000 )),
-        }).redirect(`${this.configService.get<string>('BASE_URL_UI')}/dashboard`);
+        return res
+          .cookie('auth-token', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+          })
+          .redirect(
+            `${this.configService.get<string>('BASE_URL_UI')}/dashboard`,
+          );
       }
       throw new Error('Invalid authentication result');
     } catch (error) {
       this.logger.error('Erro no callback do Google:', error.message);
-      return res.redirect(`${this.configService.get<string>('BASE_URL_UI')}/auth/error?message=google_login_failed`);
+      return res.redirect(
+        `${this.configService.get<string>('BASE_URL_UI')}/auth/error?message=google_login_failed`,
+      );
     }
   }
 
   @ApiOperation({ summary: 'Iniciar autenticação com Microsoft' })
-  @ApiResponse({ status: 302, description: 'Redireciona para a página de login da Microsoft' })
+  @ApiResponse({
+    status: 302,
+    description: 'Redireciona para a página de login da Microsoft',
+  })
   @Get('microsoft')
   @UseGuards(IsEnabledAuthGuard('microsoft', 'ENABLE_MICROSOFT_OAUTH'))
   async microsoftAuth() {
@@ -103,25 +121,34 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Callback da Microsoft após autenticação' })
-  @ApiResponse({ status: 200, description: 'Login da Microsoft bem-sucedido',})
+  @ApiResponse({ status: 200, description: 'Login da Microsoft bem-sucedido' })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @Get('microsoft/callback')
   @UseGuards(IsEnabledAuthGuard('microsoft', 'ENABLE_MICROSOFT_OAUTH'))
   async microsoftAuthRedirect(@Req() { user }: any, @Res() res: Response) {
     try {
-      const accessToken = await this.authService.signInWithProvider('microsoft', {...user, providerId: user.microsoftId})
+      const accessToken = await this.authService.signInWithProvider(
+        'microsoft',
+        { ...user, providerId: user.microsoftId },
+      );
       if (accessToken) {
-        return res.cookie('auth-token', accessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
-          expires: new Date(Date.now() + ( 24 * 60 * 60 * 1000 )),
-        }).redirect(`${this.configService.get<string>('BASE_URL_UI')}/dashboard`);
+        return res
+          .cookie('auth-token', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+          })
+          .redirect(
+            `${this.configService.get<string>('BASE_URL_UI')}/dashboard`,
+          );
       }
       throw new Error('Invalid authentication result');
     } catch (error) {
       this.logger.error('Erro no callback do Microsoft:', error.message);
-      return res.redirect(`${this.configService.get<string>('BASE_URL_UI')}/auth/error?message=microsoft_login_failed`);
+      return res.redirect(
+        `${this.configService.get<string>('BASE_URL_UI')}/auth/error?message=microsoft_login_failed`,
+      );
     }
   }
 }
