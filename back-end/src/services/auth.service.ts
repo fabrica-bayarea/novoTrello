@@ -27,7 +27,7 @@ export class AuthService {
     const payload = {
       sub: user.id,
       email: user.email,
-      fullName: user.fullName,
+      name: user.name,
       userName: user.userName,
     };
     return {
@@ -62,12 +62,13 @@ export class AuthService {
     if (!user) {
       user = await this.prisma.user.create({
         data: {
-          fullName: data.fullName,
-          userName: data.email.split('@')[0],
           email: data.email,
+          name: data.name,
+          userName: data.userName,
+          passwordHash: provider === 'local' ? data.password : data.providerId,
+          providerId: provider === 'local' ? null : data.providerId,
+          role: 'ADMIN',
           authProvider: provider,
-          providerId: data.providerId || null,
-          password: provider === 'local' ? data.password : '',
         },
       });
     }
@@ -123,9 +124,9 @@ export class AuthService {
 
     const isInvalidCredentials =
       !user ||
-      !user.password ||
+      !user.passwordHash ||
       user.authProvider !== 'local' ||
-      !(await argon2.verify(user.password, dto.password));
+      !(await argon2.verify(user.passwordHash, dto.password));
 
     if (isInvalidCredentials) {
       throw new ForbiddenException('Credenciais inválidas');
