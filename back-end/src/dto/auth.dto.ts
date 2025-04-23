@@ -5,7 +5,7 @@ export class SignUpDto {
     @ApiProperty({ example: 'first name last name' })
     @IsNotEmpty({ message: 'Preencha o campo de nome completo' })
     @IsString({ message: 'O nome deve ser uma string' })
-    fullName: string
+    name: string
 
     @ApiProperty({ example: 'username' })
     @IsNotEmpty({ message: 'Preencha o campo de nome de usuario' })
