@@ -22,8 +22,37 @@ model User {
   password     String?
   authProvider AuthProvider
   providerId   String?
+  
+  boards       Board[]
+  boardmember  BoardMember[]
 
   createdAt DateTime @default(now())
 
   @@unique([authProvider, providerId], name: "AuthProviderAndIdUnique")
+}
+
+model Board {
+  id            Int @id @default(autoincrement())
+  title         String
+  description   String?
+  visibility    String
+  is_archived   Boolean
+  created_at    DateTime
+  updated_at    DateTime
+
+  boardmember   BoardMember[]
+
+  userId        Int
+  user          User @relation(fields: [userId], references: [id])
+}
+
+model BoardMember {
+  id        Int     @id @default(autoincrement())
+  boardId   Int
+  userId    Int
+
+  board     Board   @relation(fields: [boardId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@unique([boardId, userId])
 }
