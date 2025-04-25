@@ -9,13 +9,22 @@ import {
   UseGuards,
   Res,
   Logger,
+  Patch,
+  Put,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from 'src/services/auth.service';
-import { SignInDto, SignUpDto } from 'src/dto/auth.dto';
+import {
+  ChangePasswordDto,
+  ForgotPasswordDto,
+  SignInDto,
+  SignUpDto,
+} from 'src/dto/auth.dto';
 import { Response } from 'express';
 import { IsEnabledAuthGuard } from 'src/guards/is-enable-oauth.guard';
 import { ConfigService } from '@nestjs/config';
+import { JwtAuthGuard } from 'src/guards/jwt.guard';
+import { Request } from '@nestjs/common';
 
 @ApiTags('Operações de Autenticação')
 @Controller({ path: 'auth', version: '1' })
@@ -150,5 +159,19 @@ export class AuthController {
         `${this.configService.get<string>('BASE_URL_UI')}/auth/error?message=microsoft_login_failed`,
       );
     }
+  }
+
+  @ApiResponse({ status: 200, description: 'Email enviado com sucesso' })
+  @ApiResponse({ status: 401, description: 'Falha ao enviar o email' })
+  @Patch('/forgot-password')
+  forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(forgotPasswordDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('change-password')
+  async changePassword(@Request() req, @Body() dto: ChangePasswordDto) {
+    await this.authService.changePassword(req.user.id, dto);
+    return { message: 'Senha alterada com sucesso.' };
   }
 }
