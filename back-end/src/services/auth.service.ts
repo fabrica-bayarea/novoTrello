@@ -5,10 +5,12 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/services/prisma.service';
-import { SignInDto, SignUpDto } from 'src/dto/auth.dto';
+import { ChangePasswordDto, ForgotPasswordDto, SignInDto, SignUpDto } from 'src/dto/auth.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { User } from '@prisma/client';
 import * as argon2 from 'argon2';
+import * as nodemailer from 'nodemailer';
+import 'dotenv/config';
 
 @Injectable()
 export class AuthService {
@@ -150,4 +152,69 @@ export class AuthService {
 
     return this.generateJwt(user);
   }
+
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: forgotPasswordDto.email },
+    });
+
+    if (!user) {
+      throw new ForbiddenException('Email não encontrado');
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASS,
+      },
+    });
+
+    const newPassword = Math.random().toString(36).slice(-8);
+
+    await transporter.sendMail({
+      from: 'no-reply <demoemail.com>',
+      to: forgotPasswordDto.email,
+      subject: 'Recuperação de senha',
+      text: 'Olá, sua nova senha para acessar o sistema é: ' + newPassword
+        + 'Atenção: Esta senha é temporária e deve ser alterada assim que você acessar o sistema.',
+      html:
+        '<p>Olá, sua nova senha para acessar o sistema é: ' + newPassword +
+        '</p>'
+        + '<p>Atenção: Esta senha é temporária e deve ser alterada assim que você acessar o sistema.</p>',
+    });
+
+    const newPasswordHash = await argon2.hash(newPassword);
+
+    await this.prisma.user.update({
+      where: {
+        email: forgotPasswordDto.email,
+      },
+      data: {
+        passwordHash: newPasswordHash,
+      },
+    });
+  }
+
+  async changePassword(id: string, dto: ChangePasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Usuário não encontrado.');
+    }
+
+    const isOldPasswordValid = await argon2.verify(user.passwordHash, dto.oldPassword);
+    if (!isOldPasswordValid) {
+      throw new BadRequestException('Senha antiga incorreta.');
+    }
+
+    const hashedNewPassword = await argon2.hash(dto.newPassword);
+
+    await this.prisma.user.update({
+      where: { id },
+      data: { passwordHash: hashedNewPassword },
+    });
+  }  
 }
