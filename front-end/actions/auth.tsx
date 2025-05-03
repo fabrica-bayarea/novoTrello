@@ -49,7 +49,7 @@ export async function register(fullName: string, userName: string, email: string
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ fullName, userName, email, password }),
+      body: JSON.stringify({ name: fullName, userName, email, password }),
     });
 
     if (!response.ok) {
