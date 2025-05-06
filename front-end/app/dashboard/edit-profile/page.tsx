@@ -4,8 +4,8 @@ export default function EditProfilePage() {
   return (
     <div className={styles.container}>
       <h1>Editar Perfil</h1>
-      <div className={styles.formContainer}>
-        <form className={styles.form}>
+      <form className={styles.form}>
+        <div className={styles.wrapperDivisor}>
           <h2>Informações Pessoais</h2>
           <label>
             Nome:
@@ -23,14 +23,22 @@ export default function EditProfilePage() {
             E-mail:
             <input type="email" name="email" />
           </label>
-          <button type="submit">Salvar</button>
-          <button type="button" className={styles.deleteButton}>Deletar Conta</button>
-        </form>
-
-        <div className={styles.photoSection}>
-          <h3>Foto de Perfil</h3>
-          <input type="file" />
         </div>
+        <div className={styles.wrapperDivisor}>
+          <label className={styles.photoSection}>
+            Foto:
+            <input type="file" id="foto" name="foto" accept="image/*"/>
+          </label>
+          <button type="submit" className={styles.submitButton}>Salvar</button>
+        </div>
+      </form>
+      <div className={styles.wrapperDelete}>
+        <div className={styles.deleteInfo}>
+          <h2>Deletar conta</h2>
+          <p>Delete sua conta e informação do sistema</p>
+        </div>
+
+        <input type='button' className={styles.deleteButton} value="Deletar"/>
       </div>
     </div>
   )
