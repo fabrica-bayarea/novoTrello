@@ -80,6 +80,26 @@ export async function register(fullName: string, userName: string, email: string
   }
 }
 
+export async function forgotPassword(email: string) {
+  try {
+    const response = await fetch(`${apiBaseUrl}/v1/auth/forgot-password`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return { success: false, error: errorData.message || "Erro ao fazer registro" };
+    }
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: "Erro ao conectar com o servidor" };
+  }
+}
+
 // TODO implementar essas funções.
 
 // export async function checkAuth() {
