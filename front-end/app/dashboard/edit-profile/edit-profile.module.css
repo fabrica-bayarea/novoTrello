@@ -1,48 +1,69 @@
 .container {
-    padding: 2rem;
-    max-width: 900px;
-    margin: auto;
-  }
-  
-  .formContainer {
-    display: flex;
-    gap: 2rem;
-    margin-top: 1rem;
-  }
-  
-  .form {
-    flex: 2;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .form label {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .form input {
-    padding: 0.5rem;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-  }
-  
-  .deleteButton {
-    background-color: red;
-    color: white;
-    border: none;
-    padding: 0.7rem;
-    cursor: pointer;
-  }
-  
-  .photoSection {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    align-items: center;
-    border: 1px solid #ddd;
-    padding: 1rem;
-    border-radius: 8px;
-  }
+  padding: 2rem;
+  max-width: 900px;
+  margin: 50px auto;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.233);
+}
+
+.formContainer {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.form {
+  display: flex;
+  justify-content: space-between;
+}
+
+.wrapperDivisor{
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 48%;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+}
+
+.form input {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.photoSection {
+  margin-top: 50px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.deleteButton, .submitButton {
+  background-color: red;
+  color: white;
+  border: none;
+  font-size: 1.3rem;
+  border-radius: 5px;
+  padding: 10px 35px;
+  cursor: pointer;
+}
+.wrapperDelete{
+  color: red;
+  margin-top: 20px;
+  border: 1px solid red;
+  padding: 20px;
+  display: flex;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  justify-content: space-between;
+}
