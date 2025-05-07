@@ -92,7 +92,7 @@ export async function forgotPassword(email: string) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      return { success: false, error: errorData.message || "Erro ao fazer registro" };
+      return { success: false, error: errorData.message || "Erro ao solicitar redefinição de senha" };
     }
     return { success: true };
   } catch (error: any) {
