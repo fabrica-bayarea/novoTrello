@@ -20,16 +20,16 @@ novoTrello
 │   └── package.json
 ├── assets/
 ├── docker-compose.yaml ... Configuração para executar toda a stack via Docker.
-├── start.js .............. Script de inicialização automatizado.
+├── start.sh .............. Script de inicialização automatizado.
 ├── README.md ............. Documentação.
 └── LICENSE.md ............ Licença do projeto.
 ```
 
 ## 📦 Pré-requisitos
 
-Certifique-se de ter as seguintes ferramentas instaladas no seu ambiente de desenvolvimento:
+Certifique-se de ter as seguintes ferramentas instaladas no seu ambiente:
 
-- **Node.js**: [Guia de instalação](https://nodejs.org/)
+- **Git**: [Guia de instalação](https://git-scm.com/downloads)
 - **Docker**: [Guia de instalação](https://docs.docker.com/desktop/install/linux-install/)
 
 ## 🔥 Como Executar a Aplicação
@@ -47,13 +47,13 @@ Certifique-se de ter as seguintes ferramentas instaladas no seu ambiente de dese
 1. Clone o repositório:
 
   ```bash
-  git clone https://github.com/fabrica-bayarea/prontuario-back.git
+  git clone https://github.com/fabrica-bayarea/novoTrello.git
   ```
 
 2. Inicie a aplicação:
 
   ```bash
-  node start.js
+  bash start.js
   ```
 
 > **Nota:**  
@@ -74,10 +74,10 @@ Se você tiver perguntas, encontrar um bug, tiver sugestões para novos recursos
 ## 👥 Colaboradores
 Agradecemos a todos os incríveis colaboradores que tornaram este projeto possível:
 
-|<img src="https://github.com/aureliovieirarocha.png" width="100">|<img src="https://github.com/ApenasGui.png" width="100">|<img src="https://github.com/vgabriel-pereira.png" width="100">|<img src="https://github.com/gabrieldnf.png" width="100">|
-|:-:|:-:|:-:|:-:|
-|[Aurélio Vieira Rocha](https://github.com/aureliovieirarocha)|[Guilherme](https://github.com/ApenasGui)|[Victor Gabriel Pereira](https://github.com/vgabriel-pereira)|[Gabriel D. N. F.](https://github.com/gabrieldnf)|
-
-|<img src="https://github.com/CauaMata14.png" width="100">|<img src="https://github.com/ArthurRabel.png" width="100">|<img src="https://github.com/GeorgesCarmo.png" width="100">|
+|<img src="https://github.com/aureliovieirarocha.png" width="100">|<img src="https://github.com/ApenasGui.png" width="100">|<img src="https://github.com/vgabriel-pereira.png" width="100">|
 |:-:|:-:|:-:|
-|[Caua Mata](https://github.com/CauaMata14)|[Arthur Rabelo](https://github.com/ArthurRabel)|[GeorgesCarmo](https://github.com/GeorgesCarmo)|
+|[Aurélio Vieira Rocha](https://github.com/aureliovieirarocha)|[Guilherme](https://github.com/ApenasGui)|[Victor Gabriel Pereira](https://github.com/vgabriel-pereira)|
+
+|<img src="https://github.com/gabrieldnf.png" width="100">|<img src="https://github.com/ArthurRabel.png" width="100">|<img src="https://github.com/GeorgesCarmo.png" width="100">|
+|:-:|:-:|:-:|
+[Gabriel D. N. F.](https://github.com/gabrieldnf)|[Arthur Rabelo](https://github.com/ArthurRabel)|[GeorgesCarmo](https://github.com/GeorgesCarmo)|
