@@ -74,6 +74,27 @@
   width: 100%;
 }
 
+.inputGroup label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+.inputGroup input[type="checkbox"] {
+  accent-color: #fff;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 2px solid #fff;
+  margin-right: 4px;
+  outline: none;
+  box-shadow: none;
+}
+
 .input {
   width: 100%;
   padding: 12px 15px;
@@ -131,6 +152,29 @@
   font-size: 14px;
 }
 
+.links {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.links a {
+  color: white;
+  font-size: 14px;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.links a:hover {
+  background: #fff2;
+  color: #fff;
+}
+
 .button {
   width: 100%;
   padding: 12px;
@@ -170,60 +214,18 @@
   margin-top: 10px;
 }
 
-.link {
-  color: white;
+.forgotPasswordLink, .createAccountLink {
+  color: #fff;
+  font-size: 14px;
   text-decoration: underline;
   cursor: pointer;
+  margin-top: 4px;
+  margin-bottom: 2px;
+  transition: color 0.2s;
 }
 
-.divider {
-  position: relative;
-  text-align: center;
-  margin: 20px 0;
-  color: white;
-  font-size: 14px;
-}
-
-.divider::before,
-.divider::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  width: 20%;
-  height: 1px;
-  background-color: white;
-}
-
-.divider::before {
-  left: 0;
-}
-
-.divider::after {
-  right: 0;
-}
-
-.socialLogin {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.socialButton {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.socialButton:hover {
-  transform: scale(1.1);
+.forgotPasswordLink:hover, .createAccountLink:hover {
+  color: #ffe0e0;
 }
 
 .createAccount {
@@ -248,9 +250,10 @@
 
 .footer {
   text-align: center;
+  display: block;
   color: white;
   font-size: 14px;
-  margin-top: 15px;
+  margin-top: 25px;
   font-weight: bold;
 }
 
@@ -290,6 +293,86 @@
 
 .successRedirect p:first-child {
   font-weight: bold;
+}
+
+.divider {
+  position: relative;
+  text-align: center;
+  margin: 24px 0 10px 0;
+  color: white;
+  font-size: 15px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.divider span {
+  padding: 0 10px;
+  font-weight: 500;
+  font-size: 15px;
+}
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 2px;
+  background: #fff;
+  opacity: 0.7;
+  border-radius: 2px;
+}
+
+.oauthButtons {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 10px;
+}
+.oauthCircleButton {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  padding: 0;
+}
+.oauthCircleButton:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  transform: scale(1.10);
+}
+.oauthCircleButton img {
+  display: block;
+  width: 32px;
+  height: 32px;
+}
+
+.backToLoginLink {
+  color: #fff;
+  width: min-content;
+  font-size: 15px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+  transition: color 0.2s, background 0.2s;
+  padding: 0px 12px 0px 0px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+}
+.backToLoginLink span{
+  display: inline-flex;
+  align-items: center;
+}
+.backToLoginLink:hover {
+  background: #fff2;
+  color: #fff;
 }
 
 /* Responsive styles for mobile */

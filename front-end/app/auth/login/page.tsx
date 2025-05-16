@@ -6,9 +6,12 @@ import { useRouter } from "next/navigation"
 import { login } from "@/actions/auth"
 import styles from "@/app/auth/style.module.css";
 
-import Image from 'next/image';
-import Link from "next/link";
+import AuthFormContainer from "@/components/auth/AuthFormContainer";
+import AuthInput from "@/components/auth/AuthInput";
+import AuthButton from "@/components/auth/AuthButton";
+import AuthError from "@/components/auth/AuthError";
 
+import Link from "next/link";
 
 export default function Home() {
   const router = useRouter()
@@ -38,76 +41,47 @@ export default function Home() {
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   return (
-    <div className={styles.formContainer}>
-      <h1 className={styles.title}>ACESSE SUA CONTA</h1>
-
-      <form className={styles.form}>
+    <AuthFormContainer title="ACESSE SUA CONTA">
+      <form className={styles.form} onSubmit={handleSubmit}>
+        <AuthInput
+          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder="Nome de usuário ou e-mail"
+          value={email}
+        />
+        <AuthInput
+          onChange={(e) => setPassword(e.target.value)}
+          type="password"
+          placeholder="Senha"
+          value={password}
+        />
         <div className={styles.inputGroup}>
-          <input 
-            onChange={(e) => setEmail(e.target.value)}
-            type="text" 
-            placeholder="Nome de usuário ou e-mail" 
-            className={styles.input} 
-          />
-        </div>
-
-        <div className={styles.inputGroup}>
-          <input 
-            onChange={(e) => setPassword(e.target.value)}
-            type="password" 
-            placeholder="Digite sua senha" 
-            className={styles.input} 
-          />
-        </div>
-
-        <div className={styles.checkboxContainer}>
-          <input 
-            type="checkbox" 
-            id="remember" 
-            className={styles.checkbox} 
-            checked={rememberMe}
-            onChange={(e) => setRememberMe(e.target.checked)} 
-          />
-          <label htmlFor="remember" className={styles.checkboxLabel}>
-            Continuar conectado
+          <label>
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={() => setRememberMe(!rememberMe)}
+            />
+            continuar conectado
           </label>
         </div>
-
-        <button type="submit" className={styles.button} onClick={handleSubmit}>
-          ENTRAR
-        </button>
-
-        <div className={styles.forgotPassword}>
-          <span>Esqueceu sua senha?</span>
-          <Link href="/auth/forgot-password" className={styles.link}>
-            Clique aqui!
-          </Link>
+        <AuthError message={error} />
+        <AuthButton type="submit">Entrar</AuthButton>
+        <div className={styles.links}>
+          <Link href="/auth/forgot-password" className={styles.forgotPasswordLink}>Esqueceu sua senha?</Link>
+          <Link href="/auth/register" className={styles.createAccountLink}>Criar uma conta.</Link>
         </div>
       </form>
+      <div className={styles.divider}><span>Conecte-se também com:</span></div>
+      <div className={styles.oauthButtons}>
 
-      <div className={styles.divider}>
-        <span>Conecte-se também com</span>
+        <AuthButton type="button" onClick={() => window.location.href = `${apiBaseUrl}/v1/auth/google`} className={styles.oauthCircleButton} aria-label="Entrar com Google">
+          <img src="/images/google-icon.png" alt="Google" width={28} height={28} />
+        </AuthButton>
+        <AuthButton type="button" onClick={() => window.location.href = `${apiBaseUrl}/v1/auth/microsoft`} className={styles.oauthCircleButton} aria-label="Entrar com Microsoft">
+          <img src="/images/microsoft-icon.png" alt="Microsoft" width={28} height={28} />
+        </AuthButton>
       </div>
-
-      <div className={styles.socialLogin}>
-        <button className={styles.socialButton}>
-          <Image src="/images/iesb-icon.png" alt="IESB" width={24} height={24} />
-        </button>
-        <Link href={`${apiBaseUrl}/v1/auth/google`} className={styles.socialButton}>
-          <Image src="/images/google-icon.png" alt="Google" width={24} height={24} />
-        </Link>
-        <Link href={`${apiBaseUrl}/v1/auth/microsoft`}  className={styles.socialButton}>
-          <Image src="/images/microsoft-icon.png" alt="Microsoft" width={24} height={24} />
-        </Link>
-      </div>
-
-      <div className={styles.createAccount}>
-        <Link href="/auth/register" className={styles.createAccountButton}>
-          Clique aqui para criar uma conta
-        </Link>
-      </div>
-
-      <div className={styles.footer}>IESB - BAY AREA</div>
-    </div>
-  )
+    </AuthFormContainer>
+  );
 }
