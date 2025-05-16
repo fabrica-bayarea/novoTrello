@@ -9,25 +9,25 @@ export default function EditProfilePage() {
           <h2>Informações Pessoais</h2>
           <label>
             Nome:
-            <input type="text" name="firstName" />
+            <input type="text" name="firstName" placeholder="Digite seu nome" />
           </label>
           <label>
             Sobrenome:
-            <input type="text" name="lastName" />
+            <input type="text" name="lastName" placeholder="Digite seu sobrenome" />
           </label>
           <label>
             Nome de usuário:
-            <input type="text" name="username" />
+            <input type="text" name="username" placeholder="Escolha um nome de usuário" />
           </label>
           <label>
             E-mail:
-            <input type="email" name="email" />
+            <input type="email" name="email" placeholder="Seu e-mail" />
           </label>
         </div>
         <div className={styles.wrapperDivisor}>
           <label className={styles.photoSection}>
             Foto:
-            <input type="file" id="foto" name="foto" accept="image/*"/>
+            <input type="file" id="foto" name="foto" accept="image/*" />
           </label>
           <button type="submit" className={styles.submitButton}>Salvar</button>
         </div>
@@ -37,8 +37,7 @@ export default function EditProfilePage() {
           <h2>Deletar conta</h2>
           <p>Delete sua conta e informação do sistema</p>
         </div>
-
-        <input type='button' className={styles.deleteButton} value="Deletar"/>
+        <button className={styles.deleteButton}>Deletar</button>
       </div>
     </div>
   )

@@ -36,6 +36,15 @@
   border: 1px solid #ccc;
 }
 
+.form input[type="text"],
+.form input[type="email"] {
+  padding: 0.7rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  margin-top: 4px;
+}
+
 .photoSection {
   margin-top: 50px;
   height: 100%;
@@ -57,6 +66,36 @@
   padding: 10px 35px;
   cursor: pointer;
 }
+
+.submitButton {
+  background-color: #15bd2e;
+  color: white;
+  border: none;
+  font-size: 1.1rem;
+  border-radius: 5px;
+  padding: 10px 35px;
+  cursor: pointer;
+  margin-top: 24px;
+  transition: background 0.2s;
+}
+.submitButton:hover {
+  background-color: #119c24;
+}
+
+.deleteButton {
+  background-color: #e02b2b;
+  color: white;
+  border: none;
+  font-size: 1.1rem;
+  border-radius: 5px;
+  padding: 10px 35px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.deleteButton:hover {
+  background-color: #b81e1e;
+}
+
 .wrapperDelete{
   color: red;
   margin-top: 20px;
@@ -66,4 +105,33 @@
   font-size: 1.1rem;
   border-radius: 10px;
   justify-content: space-between;
+}
+
+.sectionHeaderCustom {
+  background: linear-gradient(90deg, #c51313 0%, #e02b2b 100%);
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 600;
+  border-radius: 10px 10px 0 0;
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.13);
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 700px) {
+  .container {
+    padding: 1rem;
+    margin: 20px 4px;
+  }
+  .form {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .wrapperDivisor {
+    width: 100%;
+  }
 }
