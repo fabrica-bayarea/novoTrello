@@ -17,7 +17,7 @@ export class BoardController {
         return this.boardService.getBoard(id)
     }
 
-    @Post()
+    @Post('createboard')
     async createBoard(@Body() postData: Board): Promise <Board>{
         return this.boardService.createBoard(postData)
     }
