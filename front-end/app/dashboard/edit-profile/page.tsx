@@ -3,10 +3,12 @@ import styles from './edit-profile.module.css'
 export default function EditProfilePage() {
   return (
     <div className={styles.container}>
-      <h1>Editar Perfil</h1>
+      <p style={{ color: '#777', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+        Dashboard &gt; edit-profile
+      </p>
+      <h1 style={{ fontSize: '1.8rem', marginBottom: '1rem' }}>Informações Pessoais</h1>
       <form className={styles.form}>
         <div className={styles.wrapperDivisor}>
-          <h2>Informações Pessoais</h2>
           <label>
             Nome:
             <input type="text" name="firstName" placeholder="Digite seu nome" />
@@ -25,11 +27,24 @@ export default function EditProfilePage() {
           </label>
         </div>
         <div className={styles.wrapperDivisor}>
+<<<<<<< HEAD
           <label className={styles.photoSection}>
             Foto:
             <input type="file" id="foto" name="foto" accept="image/*" />
           </label>
           <button type="submit" className={styles.submitButton}>Salvar</button>
+=======
+          <div className={styles.photoSection}>
+            <span>Foto de perfil</span>
+            <img
+              src=""
+              alt="Foto de perfil"
+              className={styles.profilePhoto}
+            />
+            <input type="file" id="foto" name="foto" accept="image/*" />
+          </div>
+          <button type="submit" className={styles.submitButton}>Atualizar</button>
+>>>>>>> 51cb81c (feat(profile): atualiza layout e estilos da tela de edição de perfil)
         </div>
       </form>
       <div className={styles.wrapperDelete}>
@@ -37,7 +52,11 @@ export default function EditProfilePage() {
           <h2>Deletar conta</h2>
           <p>Delete sua conta e informação do sistema</p>
         </div>
+<<<<<<< HEAD
         <button className={styles.deleteButton}>Deletar</button>
+=======
+        <input type='button' className={styles.deleteButton} value="Deletar"/>
+>>>>>>> 51cb81c (feat(profile): atualiza layout e estilos da tela de edição de perfil)
       </div>
     </div>
   )
