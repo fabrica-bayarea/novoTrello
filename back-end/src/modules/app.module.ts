@@ -5,16 +5,18 @@ import { AuthModule } from 'src/modules/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from 'src/modules/prisma.module';
 import { ProfileModule } from 'src/profile/profile.module';
+import { BoardModule } from './board.module';
 
 @Module({
-  imports: [ 
+  imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
-    }), 
-    PrismaModule, 
+    }),
+    PrismaModule,
     AuthModule.register(),
-    ProfileModule
+    ProfileModule,
+    BoardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

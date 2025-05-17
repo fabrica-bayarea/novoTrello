@@ -39,7 +39,7 @@ model User {
   CreatedAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   providerId   String?
-
+  
   boards       Board[]       @relation("OwnerBoards")
   memberships  BoardMember[]
   tasksCreated Task[]        @relation("TaskCreator")
@@ -127,3 +127,4 @@ model TaskLabel {
 
   @@id([taskId, labelId])
 }
+
