@@ -27,7 +27,6 @@ async function bootstrap() {
 
   // Middleware
   app.use(cookieParser());
-  app.use(new LoggingMiddleware().use); // ⬅️ adiciona o middleware
 
   // CORS Configuration
   app.enableCors({
