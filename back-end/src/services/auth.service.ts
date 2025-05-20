@@ -2,22 +2,32 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/services/prisma.service';
-import { ChangePasswordDto, ForgotPasswordDto, SignInDto, SignUpDto } from 'src/dto/auth.dto';
+import {
+  ChangePasswordDto,
+  ForgotPasswordDto,
+  SignInDto,
+  SignUpDto,
+} from 'src/dto/auth.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { User } from '@prisma/client';
 import * as argon2 from 'argon2';
 import * as nodemailer from 'nodemailer';
+import { randomBytes } from 'crypto';
+import * as fs from 'fs';
+import * as path from 'path';
 import 'dotenv/config';
+import { resolveTemplatePath } from 'src/utils/path.helper';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   /**
    * Gera um token JWT com base no payload fornecido.
@@ -162,6 +172,8 @@ export class AuthService {
       throw new ForbiddenException('Email não encontrado');
     }
 
+    const newPassword = randomBytes(4).toString('hex'); // 8 caracteres
+
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -170,29 +182,41 @@ export class AuthService {
       },
     });
 
-    const newPassword = Math.random().toString(36).slice(-8);
+    const templatePath = resolveTemplatePath('forgot-password.template.html');
+    let emailHtml = fs.readFileSync(templatePath, 'utf8');
 
-    await transporter.sendMail({
-      from: 'no-reply <demoemail.com>',
-      to: forgotPasswordDto.email,
-      subject: 'Recuperação de senha',
-      text: 'Olá, sua nova senha para acessar o sistema é: ' + newPassword
-        + 'Atenção: Esta senha é temporária e deve ser alterada assim que você acessar o sistema.',
-      html:
-        '<p>Olá, sua nova senha para acessar o sistema é: ' + newPassword +
-        '</p>'
-        + '<p>Atenção: Esta senha é temporária e deve ser alterada assim que você acessar o sistema.</p>',
-    });
+    emailHtml = emailHtml.replace('{{newPassword}}', newPassword);
+
+    try {
+      await transporter.sendMail({
+        from: `"Suporte novoTrello" <${process.env.EMAIL}>`,
+        to: forgotPasswordDto.email,
+        subject: 'Recuperação de senha',
+        html: emailHtml,
+        attachments: [
+          {
+            filename: 'bayarea-logo.png',
+            path: 'src/assets/bayarea-logo.png',
+            cid: 'bayarea-logo'
+          },
+          {
+            filename: 'iesb-logo.png',
+            path: 'src/assets/iesb-logo.png',
+            cid: 'iesb-logo'
+          },
+        ],
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Erro ao enviar o e-mail de recuperação. Erro: ' + error,
+      );
+    }
 
     const newPasswordHash = await argon2.hash(newPassword);
 
     await this.prisma.user.update({
-      where: {
-        email: forgotPasswordDto.email,
-      },
-      data: {
-        passwordHash: newPasswordHash,
-      },
+      where: { email: forgotPasswordDto.email },
+      data: { passwordHash: newPasswordHash },
     });
   }
 
@@ -205,7 +229,10 @@ export class AuthService {
       throw new BadRequestException('Usuário não encontrado.');
     }
 
-    const isOldPasswordValid = await argon2.verify(user.passwordHash, dto.oldPassword);
+    const isOldPasswordValid = await argon2.verify(
+      user.passwordHash,
+      dto.oldPassword,
+    );
     if (!isOldPasswordValid) {
       throw new BadRequestException('Senha antiga incorreta.');
     }
@@ -216,5 +243,5 @@ export class AuthService {
       where: { id },
       data: { passwordHash: hashedNewPassword },
     });
-  }  
+  }
 }
