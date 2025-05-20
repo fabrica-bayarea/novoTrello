@@ -1,14 +1,18 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './modules/app.module';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { ValidationPipe, VersioningType, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Logger } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
+import { LoggingMiddleware } from './middleware/logging.middleware'; // ⬅️ novo import
 
 async function bootstrap() {
+  const debugEnabled = process.env.DEBUG === 'true';
+
   const app = await NestFactory.create(AppModule, {
-    logger: ['log', 'error', 'warn', 'debug', 'verbose'],
+    logger: debugEnabled
+      ? ['log', 'error', 'warn', 'debug', 'verbose']
+      : ['log', 'error', 'warn'],
   });
 
   const configService = app.get(ConfigService);
@@ -21,14 +25,15 @@ async function bootstrap() {
     }),
   );
 
+  // Middleware
+  app.use(cookieParser());
+  app.use(new LoggingMiddleware().use); // ⬅️ adiciona o middleware
+
   // CORS Configuration
   app.enableCors({
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   });
-
-  // Middleware
-  app.use(cookieParser());
 
   // API Versioning
   app.enableVersioning({
