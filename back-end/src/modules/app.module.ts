@@ -4,7 +4,7 @@ import { AppService } from '../services/app.service';
 import { AuthModule } from 'src/modules/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from 'src/modules/prisma.module';
-import { ProfileModule } from 'src/profile/profile.module';
+import { ProfileModule } from 'src/modules/profile.module';
 import { LoggingMiddleware } from 'src/middleware/logging.middleware';
 
 @Module({

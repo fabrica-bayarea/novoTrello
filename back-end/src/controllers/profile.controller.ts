@@ -1,9 +1,9 @@
 import { Body, Controller, Get, UseGuards, Put, Delete } from '@nestjs/common';
 import { Request } from '@nestjs/common';
-import { ProfileService } from './profile.service';
+import { ProfileService } from '../services/profile.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../guards/jwt.guard';
-import { ProfileDto } from './profile.dto';
+import { ProfileDto } from '../dto/profile.dto';
 
 @ApiTags('Perfil de usuário')
 @Controller({ path: 'profile', version: '1' })
