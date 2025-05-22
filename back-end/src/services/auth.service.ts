@@ -27,7 +27,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   /**
    * Gera um token JWT com base no payload fornecido.
@@ -197,12 +197,12 @@ export class AuthService {
           {
             filename: 'bayarea-logo.png',
             path: 'src/assets/bayarea-logo.png',
-            cid: 'bayarea-logo'
+            cid: 'bayarea-logo',
           },
           {
             filename: 'iesb-logo.png',
             path: 'src/assets/iesb-logo.png',
-            cid: 'iesb-logo'
+            cid: 'iesb-logo',
           },
         ],
       });

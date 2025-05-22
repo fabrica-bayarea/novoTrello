@@ -91,7 +91,7 @@ export class AuthController {
     try {
       const accessToken = await this.authService.signInWithProvider('google', {
         ...user,
-        providerId: user.google_id
+        providerId: user.google_id,
       });
       if (accessToken) {
         return res
