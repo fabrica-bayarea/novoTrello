@@ -1,20 +1,20 @@
-.textForgotPassword {
-    font-size: 1rem;
-    color: white;
-    margin: 20px 0;
-    text-align: center;
+.forgotPasswordButton {
+  max-width: 200px;
+  margin: 20px auto 0;
+  border-radius: 20px;
 }
 
-.submit {
-    margin: 10px;
-    padding: 15px;
-    font-size: 1;
-    width: 100%;
-    border-radius: 10px;
-    background-color: white;
-    color: #DA2F35;
-    font-weight: 800;
-    border: none;
-    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.26);
-    transition: transform 0.2s ease;
+.forgotPasswordText {
+  color: white;
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.forgotPassword {
+  text-align: center;
+  color: white;
+  font-size: 14px;
+  margin-top: 10px;
 }

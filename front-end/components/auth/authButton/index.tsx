@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "@/app/auth/style.module.css";
+import styles from "./style.module.css";
 
 interface AuthButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;

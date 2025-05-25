@@ -2,16 +2,16 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-
-import { login } from "@/actions/auth"
-import styles from "@/app/auth/style.module.css";
-
-import AuthFormContainer from "@/components/auth/AuthFormContainer";
-import AuthInput from "@/components/auth/AuthInput";
-import AuthButton from "@/components/auth/AuthButton";
-import AuthError from "@/components/auth/AuthError";
-
 import Link from "next/link";
+
+import { login } from "@/lib/actions/auth"
+import AuthFormContainer from "@/components/auth/authFormContainer";
+import AuthInput from "@/components/auth/authInput";
+import AuthButton from "@/components/auth/authButton";
+import Notification from "@/components/shared/notification";
+
+import parentStyles from "../style.module.css";
+import styles from "./style.module.css";
 
 export default function Home() {
   const router = useRouter()
@@ -19,69 +19,70 @@ export default function Home() {
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState("")
+  const [showNotification, setShowNotification] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError("")
-
+    setShowNotification(false)
     try {
-      const result = await login(email, password, rememberMe)
+      await login(email, password, rememberMe)
 
-      if (result.success) {
-        router.push("/dashboard")
-        router.refresh()
-      } else {
-        setError(result.error || "Falha na autenticação")
-      }
+      router.push("/dashboard")
+      router.refresh()
     } catch (err) {
-      setError("Ocorreu um erro ao tentar fazer login")
+      setError((err instanceof Error && err.message) ? err.message : String(err))
+      setShowNotification(true)
     }
   }
 
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   return (
-    <AuthFormContainer title="ACESSE SUA CONTA">
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <AuthInput
-          onChange={(e) => setEmail(e.target.value)}
-          type="text"
-          placeholder="Nome de usuário ou e-mail"
-          value={email}
+    <>
+      {showNotification && error && (
+        <Notification
+          message={error}
+          type="failed"
+          onClose={() => setShowNotification(false)}
         />
-        <AuthInput
-          onChange={(e) => setPassword(e.target.value)}
-          type="password"
-          placeholder="Senha"
-          value={password}
-        />
-        <div className={styles.inputGroup}>
-          <label>
-            <input
+      )}
+      <AuthFormContainer title="ACESSE SUA CONTA">
+        <form className={parentStyles.form} onSubmit={handleSubmit}>
+          <AuthInput
+            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            placeholder="Nome de usuário ou e-mail"
+            value={email}
+          />
+          <AuthInput
+            onChange={(e) => setPassword(e.target.value)}
+            type="password"
+            placeholder="Senha"
+            value={password}
+          />
+          <AuthInput
               type="checkbox"
               checked={rememberMe}
               onChange={() => setRememberMe(!rememberMe)}
-            />
-            continuar conectado
-          </label>
+              label="Lembrar de mim"
+          />
+          <AuthButton type="submit">Entrar</AuthButton>
+          <div className={styles.links}>
+            <Link href="/auth/forgot-password" className={styles.forgotPasswordLink}>Esqueceu sua senha?</Link>
+            <Link href="/auth/register" className={styles.createAccountLink}>Criar uma conta.</Link>
+          </div>
+        </form>
+        <div className={styles.divider}><span>Conecte-se também com:</span></div>
+        <div className={styles.oauthButtons}>
+          <AuthButton type="button" onClick={() => window.location.href = `${apiBaseUrl}/v1/auth/google`} className={styles.oauthCircleButton} aria-label="Entrar com Google">
+            <img src="/images/google-icon.png" alt="Google" width={28} height={28} />
+          </AuthButton>
+          <AuthButton type="button" onClick={() => window.location.href = `${apiBaseUrl}/v1/auth/microsoft`} className={styles.oauthCircleButton} aria-label="Entrar com Microsoft">
+            <img src="/images/microsoft-icon.png" alt="Microsoft" width={28} height={28} />
+          </AuthButton>
         </div>
-        <AuthError message={error} />
-        <AuthButton type="submit">Entrar</AuthButton>
-        <div className={styles.links}>
-          <Link href="/auth/forgot-password" className={styles.forgotPasswordLink}>Esqueceu sua senha?</Link>
-          <Link href="/auth/register" className={styles.createAccountLink}>Criar uma conta.</Link>
-        </div>
-      </form>
-      <div className={styles.divider}><span>Conecte-se também com:</span></div>
-      <div className={styles.oauthButtons}>
-
-        <AuthButton type="button" onClick={() => window.location.href = `${apiBaseUrl}/v1/auth/google`} className={styles.oauthCircleButton} aria-label="Entrar com Google">
-          <img src="/images/google-icon.png" alt="Google" width={28} height={28} />
-        </AuthButton>
-        <AuthButton type="button" onClick={() => window.location.href = `${apiBaseUrl}/v1/auth/microsoft`} className={styles.oauthCircleButton} aria-label="Entrar com Microsoft">
-          <img src="/images/microsoft-icon.png" alt="Microsoft" width={28} height={28} />
-        </AuthButton>
-      </div>
-    </AuthFormContainer>
+      </AuthFormContainer>
+    </>
   );
 }

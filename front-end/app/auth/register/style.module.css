@@ -1,40 +1,18 @@
-.divText {
-  width: 300px;
-  margin: 5px;
+.successDiv{
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.text {
-  color: white;
-  font-size: 12px;
-  text-align: left;
-}
-
-.checkbox {
-  background-color: white;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  margin-right: 5px;
-}
-
-.submit {
-  padding: 10px;
-  width: 200px;
-  border-radius: 5px;
-  border: none;
-  background-color: white;
-  font-size: 15px;
+.title{
+  background: #fff;
+  color: #C62828;
+  border-radius: 16px;
+  padding: 8px 24px;
   font-weight: 600;
-  color: #DA2F35;
-  transition: transform 0.3s ease;
-}
-
-.submit:hover {
-  text-decoration: underline;
-  transform: scale(1.1);
-}
-
-.rodape {
-  margin-top: 20px;
-  color: white;
-  font-weight: 700;
+  font-size: 16px;
+  text-Align: center;
+  display: inline-block;
 }
