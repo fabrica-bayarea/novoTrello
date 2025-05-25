@@ -16,6 +16,7 @@
 
 .form {
   display: flex;
+  align-items: center;
   justify-content: space-between;
 }
 
@@ -51,7 +52,7 @@
 }
 
 .photoSection {
-  margin-top: 50px;
+  margin-top: 30px;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -79,50 +80,16 @@
   border-radius: 10px;
   padding: 12px 25px;
   cursor: pointer;
-  margin-top: 30px;
   align-self: center;
-  width: 60%;
+  width: 100%;
   transition: background-color 0.3s ease;
 }
 
-<<<<<<< HEAD
-.submitButton {
-  background-color: #15bd2e;
-  color: white;
-  border: none;
-  font-size: 1.1rem;
-  border-radius: 5px;
-  padding: 10px 35px;
-  cursor: pointer;
-  margin-top: 24px;
-  transition: background 0.2s;
-}
-.submitButton:hover {
-  background-color: #119c24;
-}
-
-.deleteButton {
-  background-color: #e02b2b;
-  color: white;
-  border: none;
-  font-size: 1.1rem;
-  border-radius: 5px;
-  padding: 10px 35px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.deleteButton:hover {
-  background-color: #b81e1e;
-}
-
-.wrapperDelete{
-=======
 .submitButton:hover {
   background-color: #b71c1c;
 }
 
 .wrapperDelete {
->>>>>>> 51cb81c (feat(profile): atualiza layout e estilos da tela de edição de perfil)
   color: red;
   margin-top: 40px;
   border: 1px solid red;
@@ -131,38 +98,6 @@
   font-size: 1.1rem;
   border-radius: 10px;
   justify-content: space-between;
-<<<<<<< HEAD
-}
-
-.sectionHeaderCustom {
-  background: linear-gradient(90deg, #c51313 0%, #e02b2b 100%);
-  color: #fff;
-  font-size: 1.4rem;
-  font-weight: 600;
-  border-radius: 10px 10px 0 0;
-  padding: 16px 32px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.13);
-  position: relative;
-  z-index: 2;
-}
-
-@media (max-width: 700px) {
-  .container {
-    padding: 1rem;
-    margin: 20px 4px;
-  }
-  .form {
-    flex-direction: column;
-    gap: 2rem;
-  }
-  .wrapperDivisor {
-    width: 100%;
-  }
-}
-=======
   align-items: center;
 }
 
@@ -191,4 +126,3 @@
 .deleteButton:hover {
   background-color: #a80000;
 }
->>>>>>> 51cb81c (feat(profile): atualiza layout e estilos da tela de edição de perfil)

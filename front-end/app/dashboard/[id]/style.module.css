@@ -1,0 +1,5 @@
+.teste{
+  min-height: 100vh;
+  background: linear-gradient(120deg, #f8fafc 0%, #e0e7ef 100%);
+  padding: 32px 0;
+}

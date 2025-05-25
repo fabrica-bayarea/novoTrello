@@ -1,0 +1,7 @@
+.listsContainer {
+  display: flex;
+  min-height: 50vh;
+  gap: 24px;
+  padding: 20px;
+  overflow-x: auto;
+}

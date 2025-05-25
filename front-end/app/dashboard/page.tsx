@@ -1,7 +1,13 @@
+"use client";
 import { Check, Trash2, PlusCircle } from "lucide-react";
 import styles from './style.module.css';
-import Section from "@/components/section";
 import Image from "next/image";
+import Section from '@/components/dashboard/section/Section';
+
+/*
+* Dados fictícios para o dashboard
+* TODO: Integrar com a API real
+*/
 
 const pendencias = [
   {
@@ -54,28 +60,28 @@ const boards = [
 export default function Dashboard() {
   return (
     <main className={styles.dashboardMainCustom}>
-      <div className={styles.sectionCustom}>
-        <div className={styles.sectionHeaderCustom}>
-          <span>Pendências</span>
-        </div>
+
+      <Section title="Pendências">
         <div className={styles.pendenciasList}>
           {pendencias.map((p) => (
             <div className={styles.pendenciaRow} key={p.id}>
               <span className={styles.pendenciaTitulo}>{p.titulo}</span>
+              <span className={styles.pendenciaAtrasadoWrapper}>
+                {p.atrasado && <span className={styles.pendenciaAtrasado}>Atrasado!</span>}
+              </span>
               <span className={styles.pendenciaGrupo}>{p.grupo}/<span>{p.andamento}</span></span>
-              {p.atrasado && <span className={styles.pendenciaAtrasado}>Atrasado!</span>}
               <button className={styles.pendenciaAction}><Trash2 size={18} /></button>
               <button className={styles.pendenciaAction}><Check size={18} /></button>
               <span className={styles.pendenciaData}>{p.data}</span>
             </div>
           ))}
         </div>
-      </div>
-      <div className={styles.sectionCustom}>
-        <div className={styles.sectionHeaderCustom}>
-          <span>Espaços de trabalho</span>
-          <button className={styles.criarButton}>Criar <PlusCircle size={20} /></button>
-        </div>
+      </Section>
+      
+      <Section 
+        title="Espaços de trabalho"
+        actionButton={() => window.location.href = '/dashboard/new-board'}
+      >
         <div className={styles.boardsGridCustom}>
           {boards.map((b) => (
             <div
@@ -98,7 +104,7 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
-      </div>
+      </Section>
     </main>
   );
 }
