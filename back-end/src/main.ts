@@ -26,7 +26,7 @@ async function bootstrap() {
   );
 
   // Middleware
-  app.use(cookieParser());
+  app.use(cookieParser.default());
 
   // CORS Configuration
   app.enableCors({
