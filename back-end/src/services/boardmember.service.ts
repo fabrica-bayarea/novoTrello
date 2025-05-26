@@ -20,7 +20,7 @@ export class BoardMemberService {
             throw new ForbiddenException('You do not have permission to do that')
         }
 
-        const checkUser = await this.prisma.board.findUnique({
+        const checkUser = await this.prisma.user.findUnique({
             where: {id: userId}
         })
         if (!checkUser) {
@@ -40,7 +40,7 @@ export class BoardMemberService {
     }
 
     async removeMember(currentUserId: number, boardId: number, userId: number) {
-        const checkBoard = await this.prisma.user.findUnique({
+        const checkBoard = await this.prisma.board.findUnique({
             where:{id:boardId}
         })
 
