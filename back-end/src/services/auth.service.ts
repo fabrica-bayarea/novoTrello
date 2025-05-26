@@ -5,10 +5,12 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/services/prisma.service';
-import { SignInDto, SignUpDto } from 'src/dto/auth.dto';
+import { ChangePasswordDto, ForgotPasswordDto, SignInDto, SignUpDto } from 'src/dto/auth.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { User } from '@prisma/client';
-import * as argon2 from "argon2";
+import * as argon2 from 'argon2';
+import * as nodemailer from 'nodemailer';
+import 'dotenv/config';
 
 @Injectable()
 export class AuthService {
@@ -20,17 +22,20 @@ export class AuthService {
   /**
    * Gera um token JWT com base no payload fornecido.
    */
-  private async generateJwt(user: User, rememberMe = false): Promise<{ accessToken: string }> {
+  private async generateJwt(
+    user: User,
+    rememberMe = false,
+  ): Promise<{ accessToken: string }> {
     const payload = {
       sub: user.id,
       email: user.email,
-      fullName: user.fullName,
+      name: user.name,
       userName: user.userName,
     };
     return {
-      accessToken: this.jwtService.sign(payload, { 
-        expiresIn: rememberMe ? '30d' : '1d', 
-        algorithm: 'HS256' 
+      accessToken: this.jwtService.sign(payload, {
+        expiresIn: rememberMe ? '30d' : '1d',
+        algorithm: 'HS256',
       }),
     };
   }
@@ -52,17 +57,20 @@ export class AuthService {
    * ção é guardado o providerId em vez da senha.
    */
   private async findOrCreateUser(data: any, provider: any): Promise<any> {
-    let user = await this.prisma.user.findUnique({ where: { email: data.email } });
+    let user = await this.prisma.user.findUnique({
+      where: { email: data.email },
+    });
 
     if (!user) {
       user = await this.prisma.user.create({
         data: {
-          fullName: data.fullName,
-          userName: data.email.split('@')[0],
           email: data.email,
+          name: data.name,
+          userName: data.userName,
+          passwordHash: provider === 'local' ? data.password : data.providerId,
+          providerId: provider === 'local' ? null : data.providerId,
+          role: 'ADMIN',
           authProvider: provider,
-          providerId: data.providerId || null,
-          password: provider === 'local' ? data.password : '',
         },
       });
     }
@@ -74,7 +82,10 @@ export class AuthService {
    * Trata erros específicos ao criar um usuário.
    */
   private handleSignUpError(error: any): never {
-    if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
+    if (
+      error instanceof PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
       throw new ForbiddenException('Email ou nome de usuário já estão em uso');
     }
     throw new BadRequestException('Erro ao criar usuário');
@@ -86,14 +97,19 @@ export class AuthService {
   async signUp(dto: SignUpDto): Promise<{ accessToken: string }> {
     const hashedPassword = await this.hashPassword(dto.password);
 
-    let user = await this.prisma.user.findUnique({ where: { email: dto.email } });
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
 
     if (user) {
       throw new ForbiddenException('Email já cadastrado');
     }
 
     try {
-      const user = await this.findOrCreateUser({ ...dto, password: hashedPassword }, 'local');
+      const user = await this.findOrCreateUser(
+        { ...dto, password: hashedPassword },
+        'local',
+      );
       return this.generateJwt(user);
     } catch (error) {
       this.handleSignUpError(error);
@@ -104,13 +120,15 @@ export class AuthService {
    * Realiza login de um usuário local.
    */
   async signIn(dto: SignInDto): Promise<{ accessToken: string }> {
-    const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
 
     const isInvalidCredentials =
       !user ||
-      !user.password ||
+      !user.passwordHash ||
       user.authProvider !== 'local' ||
-      !(await argon2.verify(user.password, dto.password));
+      !(await argon2.verify(user.passwordHash, dto.password));
 
     if (isInvalidCredentials) {
       throw new ForbiddenException('Credenciais inválidas');
@@ -124,7 +142,7 @@ export class AuthService {
    */
   async signInWithProvider(
     provider: string,
-    req: { providerId: string; email: string; name: string }
+    req: { providerId: string; email: string; name: string },
   ): Promise<{ accessToken: string }> {
     if (!req.email) {
       throw new ForbiddenException(`No user from ${provider}`);
@@ -134,4 +152,69 @@ export class AuthService {
 
     return this.generateJwt(user);
   }
+
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: forgotPasswordDto.email },
+    });
+
+    if (!user) {
+      throw new ForbiddenException('Email não encontrado');
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASS,
+      },
+    });
+
+    const newPassword = Math.random().toString(36).slice(-8);
+
+    await transporter.sendMail({
+      from: 'no-reply <demoemail.com>',
+      to: forgotPasswordDto.email,
+      subject: 'Recuperação de senha',
+      text: 'Olá, sua nova senha para acessar o sistema é: ' + newPassword
+        + 'Atenção: Esta senha é temporária e deve ser alterada assim que você acessar o sistema.',
+      html:
+        '<p>Olá, sua nova senha para acessar o sistema é: ' + newPassword +
+        '</p>'
+        + '<p>Atenção: Esta senha é temporária e deve ser alterada assim que você acessar o sistema.</p>',
+    });
+
+    const newPasswordHash = await argon2.hash(newPassword);
+
+    await this.prisma.user.update({
+      where: {
+        email: forgotPasswordDto.email,
+      },
+      data: {
+        passwordHash: newPasswordHash,
+      },
+    });
+  }
+
+  async changePassword(id: string, dto: ChangePasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Usuário não encontrado.');
+    }
+
+    const isOldPasswordValid = await argon2.verify(user.passwordHash, dto.oldPassword);
+    if (!isOldPasswordValid) {
+      throw new BadRequestException('Senha antiga incorreta.');
+    }
+
+    const hashedNewPassword = await argon2.hash(dto.newPassword);
+
+    await this.prisma.user.update({
+      where: { id },
+      data: { passwordHash: hashedNewPassword },
+    });
+  }  
 }

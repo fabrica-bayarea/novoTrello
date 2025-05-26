@@ -7,11 +7,9 @@ import { CreateBoardMemberDto } from "src/dto/create-boardmember.dto";
 export class BoardMemberService {
     constructor(private prisma: PrismaService) {}
 
-    //service para adicionar membros novos no board
     async addMember(currentUserId: number, dto: CreateBoardMemberDto) {
         const {boardId, userId} = dto;
 
-        // aqui eu to checando pra ver ser o Id do Board que foi colocado existe
         const checkExistentBoard = await this.prisma.board.findUnique({
             where: {id: boardId}
         })
@@ -22,7 +20,6 @@ export class BoardMemberService {
             throw new ForbiddenException('You do not have permission to do that')
         }
 
-        //aqui a mesma coisa só que com o usuário
         const checkUser = await this.prisma.board.findUnique({
             where: {id: userId}
         })
@@ -30,7 +27,6 @@ export class BoardMemberService {
             throw new NotFoundException('User not found')
         }
 
-        // se tudo está certo, aqui eu vou tentar criar/adicionar um membro no board
         try {
             return await this.prisma.boardMember.create({
                 data: {
@@ -71,7 +67,9 @@ export class BoardMemberService {
             include: {
                 user:{
                     select:{
-                        id: true, fullName: true, email:true
+                        id: true, 
+                        fullName: true, 
+                        email:true
                     }
                 }
             }

@@ -5,7 +5,7 @@ export class SignUpDto {
     @ApiProperty({ example: 'first name last name' })
     @IsNotEmpty({ message: 'Preencha o campo de nome completo' })
     @IsString({ message: 'O nome deve ser uma string' })
-    fullName: string
+    name: string
 
     @ApiProperty({ example: 'username' })
     @IsNotEmpty({ message: 'Preencha o campo de nome de usuario' })
@@ -90,4 +90,22 @@ export class SignResponseJwtDto {
     @ApiProperty({ type: UserInfoDto })
     @IsNotEmpty({ message: 'Os dados do usuário não podem estar vazios' })
     user: UserInfoDto;
+}
+
+export class ForgotPasswordDto {
+    @ApiProperty({ example: 'exemple@email.com' })
+    @IsEmail({}, { message: 'Deve ser um email válido' })
+    email?: string;
+}
+
+export class ChangePasswordDto {
+    @ApiProperty({ example: 'Password123!' })
+    @IsNotEmpty({ message: 'A senha não pode ser omitida' })
+    @IsString({ message: 'A senha deve ser uma string' })
+    oldPassword: string;
+  
+    @ApiProperty({ example: 'Password123!' })
+    @IsNotEmpty({ message: 'A nova senha não pode ser omitida' })
+    @IsString({ message: 'A nova senha deve ser uma string' })
+    newPassword: string;
 }
