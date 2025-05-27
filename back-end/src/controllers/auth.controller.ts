@@ -161,6 +161,11 @@ export class AuthController {
     }
   }
 
+  @ApiOperation({
+    summary: 'Envia email para recuperação de senha',
+    description:
+      'Envia um email com instruções para recuperação de senha ao usuário.',
+  })
   @ApiResponse({ status: 200, description: 'Email enviado com sucesso' })
   @ApiResponse({ status: 401, description: 'Falha ao enviar o email' })
   @Patch('/forgot-password')
@@ -168,6 +173,12 @@ export class AuthController {
     return this.authService.forgotPassword(forgotPasswordDto);
   }
 
+  @ApiOperation({
+    summary: 'Altera a senha do usuário',
+    description: 'Permite que o usuário altere sua senha.',
+  })
+  @ApiResponse({ status: 200, description: 'Senha alterada com sucesso' })
+  @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
   @UseGuards(JwtAuthGuard)
   @Put('change-password')
   async changePassword(@Request() req, @Body() dto: ChangePasswordDto) {

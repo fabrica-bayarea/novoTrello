@@ -33,21 +33,53 @@ export class BoardController {
     return this.boardService.create(user.id, dto);
   }
 
+  @ApiOperation({
+    summary: 'Busca todos os quadros do usuário autenticado',
+    description: 'Busca todos os quadros do usuário autenticado',
+  })
+  @ApiResponse({ status: 200, description: 'Quadros encontrados com sucesso' })
+  @ApiResponse({ status: 400, description: 'Erro ao buscar os quadros' })
+  @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
+  @ApiResponse({ status: 403, description: 'Acesso negado' })
   @Get()
   findAll(@CurrentUser() user: any) {
     return this.boardService.findAll(user.id);
   }
 
+  @ApiOperation({
+    summary: 'Busca um quadro específico',
+    description: 'Busca um quadro específico pelo ID',
+  })
+  @ApiResponse({ status: 200, description: 'Quadro encontrado com sucesso' })
+  @ApiResponse({ status: 400, description: 'Erro ao buscar o quadro' })
+  @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
+  @ApiResponse({ status: 403, description: 'Acesso negado' })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.boardService.findOne(id);
   }
 
+  @ApiOperation({
+    summary: 'Atualiza um quadro específico',
+    description: 'Atualiza um quadro específico pelo ID',
+  })
+  @ApiResponse({ status: 200, description: 'Quadro atualizado com sucesso' })
+  @ApiResponse({ status: 400, description: 'Erro ao atualizar o quadro' })
+  @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
+  @ApiResponse({ status: 403, description: 'Acesso negado' })
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateBoardDto) {
     return this.boardService.update(id, dto);
   }
 
+  @ApiOperation({
+    summary: 'Remove um quadro específico',
+    description: 'Remove um quadro específico pelo ID',
+  })
+  @ApiResponse({ status: 200, description: 'Quadro removido com sucesso' })
+  @ApiResponse({ status: 400, description: 'Erro ao remover o quadro' })
+  @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
+  @ApiResponse({ status: 403, description: 'Acesso negado' })
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.boardService.remove(id);
