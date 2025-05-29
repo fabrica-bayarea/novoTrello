@@ -6,6 +6,9 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from 'src/modules/prisma.module';
 import { ProfileModule } from 'src/modules/profile.module';
 import { LoggingMiddleware } from 'src/middleware/logging.middleware';
+import { BoardModule } from './board.module';
+import { ListModule } from './list.module';
+import { TaskModule } from './task.module';
 
 @Module({
   imports: [
@@ -16,6 +19,9 @@ import { LoggingMiddleware } from 'src/middleware/logging.middleware';
     PrismaModule,
     AuthModule.register(),
     ProfileModule,
+    BoardModule,
+    ListModule,
+    TaskModule,
   ],
   controllers: [AppController],
   providers: [AppService],
