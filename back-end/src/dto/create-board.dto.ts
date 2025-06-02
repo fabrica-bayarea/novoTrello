@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { BoardVisibility } from '@prisma/client';
+import { BoardVisibility } from 'src/common/enums/board-visibility.enum';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateBoardDto {
