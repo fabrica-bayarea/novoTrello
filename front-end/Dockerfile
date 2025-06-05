@@ -29,8 +29,10 @@ WORKDIR /app
 # Copia os arquivos necessários da etapa de build
 COPY --from=build /app/package.json /app/package-lock.json ./
 COPY --from=build /app/.next ./.next
-COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/public ./public
+
+# Instala pacotes necessários para o Next.js e outras dependências
+RUN npm ci --omit=dev
 
 # Configura o ambiente como produção
 ENV NODE_ENV=production

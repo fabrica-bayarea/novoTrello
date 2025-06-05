@@ -1,20 +1,35 @@
 #!/bin/bash
+set -euo pipefail
 
-# Verifica se o Docker ou Podman está instalado
-if command -v docker &>/dev/null; then
-    compose_command="docker compose up -d"
-elif command -v podman &>/dev/null; then
-    compose_command="podman compose up -d"
-else
-    echo "Erro: Nem Docker nem Podman estão instalados."
+# Função para exibir erro e sair
+error_exit() {
+    echo "Erro: $1" >&2
     exit 1
+}
+
+# Verifica se o Docker está instalado
+if ! command -v docker &>/dev/null; then
+    error_exit "Docker não está instalado."
 fi
+
+compose_command="docker compose up -d"
 
 # Verifica se o arquivo .env existe, se não, copia o .env.example
-[ ! -f ".env" ] && cp ".env.example" ".env"
-
-# Executa o comando
-if ! $compose_command; then
-    echo "Erro ao executar o comando de iniciar."
-    exit 1
+if [ ! -f ".env" ]; then
+    echo "Arquivo .env não encontrado, copiando de .env.example..."
+    cp ".env.example" ".env"
 fi
+
+export DOCKER_BUILDKIT=1
+
+# Executa o build com bake
+if ! docker buildx bake; then
+    error_exit "Falha no comando 'docker buildx bake'."
+fi
+
+# Executa o docker compose
+if ! $compose_command; then
+    error_exit "Erro ao executar 'docker compose up -d'."
+fi
+
+echo "Build e deploy finalizados com sucesso."

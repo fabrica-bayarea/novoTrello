@@ -43,6 +43,6 @@ COPY --from=build /app/prisma /app/prisma
 ENV NODE_ENV=production
 
 # Expõe a porta do container
-EXPOSE 3001
+EXPOSE 3000
 
 CMD ["node", "dist/main.js"]

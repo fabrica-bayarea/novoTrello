@@ -76,7 +76,7 @@ export class AuthService {
         data: {
           email: data.email,
           name: data.name,
-          userName: data.userName,
+          userName: data.email.split('@')[0],
           passwordHash: provider === 'local' ? data.password : data.providerId,
           providerId: provider === 'local' ? null : data.providerId,
           role: 'ADMIN',

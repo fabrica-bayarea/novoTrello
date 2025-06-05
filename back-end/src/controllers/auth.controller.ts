@@ -89,15 +89,16 @@ export class AuthController {
   @UseGuards(IsEnabledAuthGuard('google', 'ENABLE_GOOGLE_OAUTH'))
   async googleAuthRedirect(@Req() { user }: any, @Res() res: Response) {
     try {
-      const accessToken = await this.authService.signInWithProvider('google', {
+      const json = await this.authService.signInWithProvider('google', {
         ...user,
         providerId: user.google_id,
       });
-      if (accessToken) {
+      if (json) {
         return res
-          .cookie('auth-token', accessToken, {
+          .cookie('auth-token', json.accessToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            path: "/",
+            // secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
             expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
           })
@@ -136,15 +137,16 @@ export class AuthController {
   @UseGuards(IsEnabledAuthGuard('microsoft', 'ENABLE_MICROSOFT_OAUTH'))
   async microsoftAuthRedirect(@Req() { user }: any, @Res() res: Response) {
     try {
-      const accessToken = await this.authService.signInWithProvider(
+      const json = await this.authService.signInWithProvider(
         'microsoft',
         { ...user, providerId: user.microsoftId },
       );
-      if (accessToken) {
+      if (json) {
         return res
-          .cookie('auth-token', accessToken, {
+          .cookie('auth-token', json.accessToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            path: "/",
+            // secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
             expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
           })

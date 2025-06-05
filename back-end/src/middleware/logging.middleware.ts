@@ -13,22 +13,32 @@ export class LoggingMiddleware implements NestMiddleware {
       const elapsed = Date.now() - start;
       const { statusCode } = res;
 
-      const baseMessage = `${method} ${originalUrl} ${statusCode} - ${elapsed}ms`;
+      const baseMessage = `${method} ${originalUrl} ${statusCode} +${elapsed}ms`;
 
-      this.logger.log(baseMessage);
-
-      if (statusCode >= 400 && statusCode < 500) {
+      if (statusCode >= 200 && statusCode < 300) {
+        this.logger.log(baseMessage);
+      } else if (statusCode >= 400 && statusCode < 500) {
         this.logger.warn(baseMessage);
       } else if (statusCode >= 500) {
         this.logger.error(baseMessage);
       }
 
       if (process.env.DEBUG === 'true') {
-        this.logger.debug(`Headers: ${JSON.stringify(req.headers)}`);
-        this.logger.verbose(`IP: ${req.ip}`);
+        const ipLog = `IP: ${req.ip}`;
+        const headersLog = `Headers:\n${JSON.stringify(req.headers, this.filterSensitiveHeaders, 2)}`;
+        const hasBody = req.body && Object.keys(req.body).length > 0;
+        const bodyLog = hasBody ? `Body:\n${JSON.stringify(req.body, null, 2)}` : '';
+        const debugMessage = [ipLog, headersLog, bodyLog].filter(Boolean).join('\n');
+        this.logger.debug(debugMessage);
       }
+
     });
 
     next();
+  }
+
+  private filterSensitiveHeaders(key: string, value: any): any {
+    const sensitiveHeaders = ['authorization', 'cookie'];
+    return sensitiveHeaders.includes(key.toLowerCase()) ? '***' : value;
   }
 }

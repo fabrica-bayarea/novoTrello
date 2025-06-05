@@ -50,6 +50,50 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+*.d.ts.map
 
 # package lock files
 package-lock.json
+
+# Compiled output
+/.next/
+/out/
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# dotenv environment variable files
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# Temp directories
+.temp
+.tmp
+
+# Runtime data
+pids
+*.pid
+
+# Docker
+*.override.yaml
+
+# Prisma
+prisma/migrations/migration_lock.toml
+
+# Next.js cache
+.next/cache
