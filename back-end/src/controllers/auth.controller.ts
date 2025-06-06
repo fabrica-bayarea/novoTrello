@@ -25,6 +25,7 @@ import { IsEnabledAuthGuard } from 'src/guards/is-enable-oauth.guard';
 import { ConfigService } from '@nestjs/config';
 import { JwtAuthGuard } from 'src/guards/jwt.guard';
 import { Request } from '@nestjs/common';
+import { ResetPasswordDto } from 'src/dto/reset-password.dto';
 
 @ApiTags('Operações de Autenticação')
 @Controller({ path: 'auth', version: '1' })
@@ -173,6 +174,11 @@ export class AuthController {
   @Patch('/forgot-password')
   forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     return this.authService.forgotPassword(forgotPasswordDto);
+  }
+
+  @Put('reset-password')
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto);
   }
 
   @ApiOperation({
