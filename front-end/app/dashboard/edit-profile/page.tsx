@@ -26,7 +26,7 @@ export default function EditProfilePage() {
     }
 
     fetchUserProfile();
-  }, []);
+  }, [showNotification]);
 
   return (
     <div className={styles.container}>

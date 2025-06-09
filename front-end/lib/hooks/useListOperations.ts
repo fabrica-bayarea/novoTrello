@@ -24,31 +24,23 @@ export function useListOperations(boardId: string) {
       tasks: [],
     };
 
-    try {
-      const result = await createList(newListData);
-      if (result.success) {
-        addList({ ...result.data, tasks: result.data.tasks || [] });
-        closeCreateListModal();
-        showNotification("Lista criada com sucesso!", "success");
-      } else {
-        showNotification("Erro ao adicionar lista: " + result.error, "failed");
-      }
-    } catch (error) {
-      showNotification("Erro inesperado ao criar lista", "failed");
+    const result = await createList(newListData);
+    if (result.success) {
+      addList({ ...result.data, tasks: result.data.tasks || [] });
+      closeCreateListModal();
+      showNotification("Lista criada com sucesso!", "success");
+    } else {
+      showNotification("Erro ao adicionar lista: " + result.error, "failed");
     }
   }, [boardId, lists, addList, closeCreateListModal, showNotification]);
 
   const handleDeleteList = useCallback(async (listId: string) => {
-    try {
-      const result = await deleteList(listId);
-      if (result.success) {
-        removeList(listId);
-        showNotification("Lista deletada com sucesso!", "success");
-      } else {
-        showNotification(result.error || 'Erro ao deletar lista', "failed");
-      }
-    } catch (error) {
-      showNotification('Erro inesperado ao deletar lista', "failed");
+    const result = await deleteList(listId);
+    if (result.success) {
+      removeList(listId);
+      showNotification("Lista deletada com sucesso!", "success");
+    } else {
+      showNotification(result.error || 'Erro ao deletar lista', "failed");
     }
   }, [removeList, showNotification]);
 

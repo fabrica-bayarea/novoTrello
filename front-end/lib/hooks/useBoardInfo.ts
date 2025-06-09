@@ -20,16 +20,15 @@ export function useBoardInfo(boardId: string): BoardInfo {
     if (!boardId) return;
 
     const fetchBoardInfo = async () => {
-      try {
-        const { data } = await getBoardById(boardId);
-        if ( data ) {
-          setBoardInfo({
-          title: data.name,
-          description: "Workspace do projeto",
-          isLoading: false,
-        });
-        }
-      } catch (error) {
+      const result = await getBoardById(boardId);
+      if (result.success && result.data) {
+        setBoardInfo({
+        title: result.data.name,
+        description: result.data.description,
+        isLoading: false,
+      });
+
+      }else{
         showNotification("Erro ao carregar informações do board", "failed");
         setBoardInfo(prev => ({ ...prev, isLoading: false }));
       }

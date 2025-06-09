@@ -70,7 +70,7 @@ export default function Dashboard() {
       }
     }
     fetchBoards();
-  }, []);
+  }, [showNotification]);
 
   return (
     <main className={styles.dashboardMainCustom}>

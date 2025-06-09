@@ -40,8 +40,6 @@ export function useBoardData(boardId: string) {
         } else {
           showNotification("Erro ao buscar dados do quadro: " + result.error, "failed");
         }
-      } catch (error) {
-        showNotification("Erro inesperado ao carregar o quadro", "failed");
       } finally {
         setLoading(false);
       }

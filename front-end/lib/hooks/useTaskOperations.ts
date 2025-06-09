@@ -21,40 +21,32 @@ export function useTaskOperations() {
       ...taskData
     };
 
-    try {
-      const result = await createTask(newTaskData);
-      if (result.success && result.data) {
-        const task = {
-          id: result.data.id,
-          title: result.data.title,
-          description: result.data.description,
-          position: result.data.position,
-          status: result.data.status,
-          dueDate: result.data.dueDate
-        };
-        
-        addTask(selectedListId, task);
-        closeCreateTaskModal();
-        showNotification("Tarefa criada com sucesso!", "success");
-      } else {
-        showNotification("Erro ao criar tarefa: " + result.error, "failed");
-      }
-    } catch (error) {
-      showNotification("Erro inesperado ao criar tarefa", "failed");
+    const result = await createTask(newTaskData);
+    if (result.success && result.data) {
+      const task = {
+        id: result.data.id,
+        title: result.data.title,
+        description: result.data.description,
+        position: result.data.position,
+        status: result.data.status,
+        dueDate: result.data.dueDate
+      };
+      
+      addTask(selectedListId, task);
+      closeCreateTaskModal();
+      showNotification("Tarefa criada com sucesso!", "success");
+    } else {
+      showNotification("Erro ao criar tarefa: " + result.error, "failed");
     }
   }, [selectedListId, addTask, closeCreateTaskModal, showNotification]);
 
   const handleDeleteTask = useCallback(async (taskId: string) => {
-    try {
-      const result = await deleteTask(taskId);
-      if (result.success) {
-        removeTask(taskId);
-        showNotification("Tarefa deletada com sucesso!", "success");
-      } else {
-        showNotification(result.error || 'Erro ao deletar tarefa', "failed");
-      }
-    } catch (error) {
-      showNotification('Erro inesperado ao deletar tarefa', "failed");
+    const result = await deleteTask(taskId);
+    if (result.success) {
+      removeTask(taskId);
+      showNotification("Tarefa deletada com sucesso!", "success");
+    } else {
+      showNotification(result.error || 'Erro ao deletar tarefa', "failed");
     }
   }, [removeTask, showNotification]);
 

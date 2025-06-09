@@ -16,7 +16,6 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
   const { id: boardId } = use(params);
 
   const {
-    selectedListId,
     openCreateListModal,
   } = useModalStore();
 
