@@ -38,9 +38,9 @@ next-env.d.ts
 # ----------------------
 # Environment Files
 # ----------------------
-.env
-.env.local
-.env.*.local
+**/.env
+**/.env.local
+**/.env.*.local
 
 # ----------------------
 # IDEs
@@ -76,12 +76,6 @@ Thumbs.db
 !.yarn/versions
 
 # ----------------------
-# Docker
-# ----------------------
-*.override.yaml
-.dockerignore
-
-# ----------------------
 # Prisma
 # ----------------------
 **/prisma/migrations/migration_lock.toml
@@ -100,3 +94,9 @@ front-end/.tmp
 # ----------------------
 back-end/dist
 back-end/test-results
+
+# ----------------------
+# Miscellaneous
+# ----------------------
+/package.json
+/package-lock.json

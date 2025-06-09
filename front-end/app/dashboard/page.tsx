@@ -1,8 +1,14 @@
 "use client";
-import { Check, Trash2, PlusCircle } from "lucide-react";
-import styles from './style.module.css';
-import Image from "next/image";
+
+import { useEffect, useState } from "react";
+import { Check, Trash2 } from "lucide-react";
+
+import { getBoards } from "@/lib/actions/board";
+import { useNotificationStore } from '@/lib/stores/notification';
+
 import Section from '@/components/dashboard/section/Section';
+
+import styles from './style.module.css';
 
 /*
 * Dados fictícios para o dashboard
@@ -42,25 +48,32 @@ const pendencias = [
   }
 ];
 
-const boards = [
-  {
-    id: 1,
-    nome: "Bay-Area",
-    membros: 8,
-    img: "/images/board1.jpg"
-  },
-  {
-    id: 2,
-    nome: "Back-end",
-    membros: 8,
-    img: "/images/board2.jpg"
-  }
-];
+
+interface Board {
+  id: string;
+  name: string;
+  members: { id: string; name: string; avatar: string }[];
+  image: string;
+}
 
 export default function Dashboard() {
+  const [boards, setBoards] = useState<Board[]>([]);
+  const { showNotification } = useNotificationStore()
+
+  useEffect(() => {
+    async function fetchBoards() {
+      const result = await getBoards();
+      if (result.success) {
+        setBoards(result.data as Board[]);
+      } else {
+        showNotification(result.error || "Erro ao buscar boards", 'failed')
+      }
+    }
+    fetchBoards();
+  }, []);
+
   return (
     <main className={styles.dashboardMainCustom}>
-
       <Section title="Pendências">
         <div className={styles.pendenciasList}>
           {pendencias.map((p) => (
@@ -86,20 +99,15 @@ export default function Dashboard() {
           {boards.map((b) => (
             <div
               className={
-                b.img
-                  ? styles.boardCardCustom
-                  : styles.boardCardCustom + ' ' + styles.noImage
+                styles.boardCardCustom + ' ' + styles.noImage
               }
               key={b.id}
+              onClick={() => window.location.href = `/dashboard/${b.id}`}
             >
-              {b.img ? (
-                <Image src={b.img} alt={b.nome} width={180} height={100} className={styles.boardImgCustom} />
-              ) : (
-                <div className={styles.boardImgCustom} />
-              )}
+              <div className={styles.boardImgCustom}></div>
               <div className={styles.boardInfoCustom}>
-                <span className={styles.boardNameCustom}>{b.nome}</span>
-                <span className={styles.boardMembrosCustom}>{b.membros} Membros</span>
+                <span className={styles.boardNameCustom}>{b.name}</span> 
+                <span className={styles.boardMembrosCustom}>1 Membros</span> 
               </div>
             </div>
           ))}

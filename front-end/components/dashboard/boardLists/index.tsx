@@ -1,40 +1,32 @@
+"use client";
 import React from 'react';
+
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
 
+import { useBoardStore } from '@/lib/stores/board';
+import { useDragAndDrop } from '@/lib/hooks/useDragAndDrop';
+import { useBoardData } from '@/lib/hooks/useBoardData';
+
 import SortableItem from '@/components/dashboard/sortableItem';
 import ListCard from '@/components/dashboard/listCard';
+
 import styles from './style.module.css';
 
-interface Task {
-  id: string;
-  content: string;
-}
+export default function BoardLists({ boardId }: { boardId: string }) {
+  const { handleDragEnd } = useDragAndDrop();
+  const { lists } = useBoardStore();
 
-interface List {
-  id: string;
-  title: string;
-  tasks: Task[];
-}
+  useBoardData(boardId);
 
-interface BoardListsProps {
-  lists: List[];
-  onAddTask: (listId: string) => void;
-  onDragEnd: (event: any) => void;
-}
-
-export default function BoardLists({ lists, onAddTask, onDragEnd }: BoardListsProps) {
   return (
-    <DndContext collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={lists.map((l) => l.id)} strategy={horizontalListSortingStrategy}>
         <div className={styles.listsContainer}>
           {lists.map((list) => (
             <SortableItem key={list.id} id={list.id}>
               <ListCard
-                id={list.id}
-                title={list.title}
-                tasks={list.tasks}
-                onAddTask={onAddTask}
+                list={list}
               />
             </SortableItem>
           ))}

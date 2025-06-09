@@ -1,30 +1,32 @@
 "use server";
 
-import { getAuthTokenCookie, handleFetchError } from "@/lib/utils/auth";
+import { getAuthTokenCookie, handleFetchError } from "@/lib/utils/tokenCookie";
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-
+const BASE_URL_API = process.env.BASE_URL_API || 'http://localhost:3000';
 
 export async function getUserProfile() {
   const token = await getAuthTokenCookie();
 
-  const response = await fetch(`${apiBaseUrl}/v1/profile`, {
+  const response = await fetch(`${BASE_URL_API}/v1/profile`, {
     headers: {
       Authorization: `Bearer ${token}`,
     }
   });
 
   if (!response.ok) {
-    await handleFetchError(response, "Erro ao obter perfil do usuário");
+    return { 
+      success: false,
+      error: await handleFetchError(response, "Erro ao obter perfil do usuário"),
+    };
   }
-
-  return await response.json();
+  
+  return { success: true, data: await response.json() }
 }
 
 export async function updateUserProfile(formData: { name: string; userName: string; email: string; }) {
   const token = await getAuthTokenCookie();
 
-  const response = await fetch(`${apiBaseUrl}/v1/profile`, {
+  const response = await fetch(`${BASE_URL_API}/v1/profile`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -34,16 +36,19 @@ export async function updateUserProfile(formData: { name: string; userName: stri
   });
 
   if (!response.ok) {
-    await handleFetchError(response, "Erro ao atualizar perfil");
+    return { 
+      success: false,
+      error: await handleFetchError(response, "Erro ao atualizar perfil"),
+    };
   }
 
-  return await response.json();
+  return { success: true, data: await response.json() }
 }
 
 export async function deleteUserProfile() {
   const token = await getAuthTokenCookie();
 
-  const response = await fetch(`${apiBaseUrl}/v1/profile`, {
+  const response = await fetch(`${BASE_URL_API}/v1/profile`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -51,9 +56,12 @@ export async function deleteUserProfile() {
   });
 
   if (!response.ok) {
-    await handleFetchError(response, "Erro ao deletar perfil");
+    return { 
+      success: false, 
+      error: await handleFetchError(response, "Erro ao deletar perfil"),
+    };
   }
   
-  return await response.json();
+  return { success: true, data: await response.json() }
 }
 

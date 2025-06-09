@@ -9,6 +9,13 @@
   flex-direction: column;
 }
 
+.container p {
+  color: #777;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+
 .title {
   font-size: 1.8rem;
   color: #222;
