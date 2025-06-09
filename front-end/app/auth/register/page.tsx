@@ -5,60 +5,53 @@ import { useRouter } from "next/navigation";
 import { CheckCircle } from "lucide-react";
 
 import { register } from "@/lib/actions/auth";
+import { useNotificationStore } from '@/lib/stores/notification';
+
 import AuthFormContainer from "@/components/auth/authFormContainer";
 import AuthInput from "@/components/auth/authInput";
 import AuthButton from "@/components/auth/authButton";
-import Notification from "@/components/shared/notification";
 
 import parentStyles from "../style.module.css";
 import styles from "./style.module.css";
 
 export default function Register() {
   const router = useRouter()
+  const { showNotification } = useNotificationStore()
   const [fullname, setFullName] = useState("")
   const [userName, setUserName] = useState("")
   const [email, setEmail] = useState("")
   const [confirmEmail, setconfirmEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setconfirmConfirmPassword] = useState("")
-  const [error, setError] = useState("")
   const [isSuccess, setIsSuccess] = useState(false)
   const [agreeTerms, setAgreeTerms] = useState(false)
-  const [showNotification, setShowNotification] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setError("")
-    setShowNotification(false)
 
     if (!agreeTerms) {
-      setError("Você precisa concordar com os termos de serviço.");
-      setShowNotification(true);
+      showNotification("Você precisa concordar com os termos de serviço.", 'failed')
       return;
     }
 
     if(confirmEmail != email){
-      setError("E-mails não coincidem")
-      setShowNotification(true);
+      showNotification("E-mails não coincidem", 'failed');
       return;
     }
     if(confirmPassword != password){
-      setError("Senhas não coincidem")
-      setShowNotification(true);
+      showNotification("Senhas não coincidem", 'failed')
       return;
     }
-    try {
-      await register(fullname, userName, email, password);
+    const result = await register(fullname, userName, email, password);
 
+    if (result.success) {
       setIsSuccess(true);
       await new Promise((resolve) => setTimeout(resolve, 3000));
 
       router.push("/dashboard");
       router.refresh();
-
-    } catch (err) {
-      setError((err instanceof Error && err.message) ? err.message : String(err))
-      setShowNotification(true)
+    } else {
+      showNotification(result.error || "Erro desconhecido", 'failed')
     }
   }
 
@@ -80,13 +73,6 @@ export default function Register() {
 
   return (
     <>
-      {showNotification && error && (
-        <Notification
-          message={error}
-          type="failed"
-          onClose={() => setShowNotification(false)}
-        />
-      )}
       <AuthFormContainer title="CRIE SUA CONTA" showBackToLogin={true}>
         <form className={parentStyles.form} onSubmit={handleSubmit}>
           <AuthInput

@@ -1,10 +1,12 @@
+"use client"
+
 import React, { useEffect, useState } from "react";
 import styles from "./style.module.css";
 
-interface NotificationProps {
-  message: string;
-  type: "success" | "failed" | "info";
-  onClose?: () => void;
+type NotificationProps = {
+  message: string
+  type: 'success' | 'failed' | 'info'
+  onClose: () => void
 }
 
 const icons = {
@@ -13,7 +15,7 @@ const icons = {
   info: "ℹ️"
 };
 
-const Notification: React.FC<NotificationProps> = ({ message, type, onClose }) => {
+export default function Notification ({ message, type, onClose }: NotificationProps) {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
@@ -37,5 +39,3 @@ const Notification: React.FC<NotificationProps> = ({ message, type, onClose }) =
     </div>
   );
 };
-
-export default Notification;
