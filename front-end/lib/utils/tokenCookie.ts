@@ -18,6 +18,7 @@ export async function setAuthTokenCookie(token: string, exp: number) {
     httpOnly: true,
     path: "/",
     secure: process.env.NODE_ENV === "production",
+    sameSite: 'strict',
     expires: new Date(exp * 1000),
   });
 }
@@ -50,5 +51,5 @@ export async function handleFetchError(response: Response, fallbackMsg = "Erro a
     // ignorar erro ao tentar extrair mensagem
   }
 
-  throw new Error(errorMsg);
+  return errorMsg;
 }

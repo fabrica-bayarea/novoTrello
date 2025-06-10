@@ -1,11 +1,11 @@
 "use server"
 
-import { parseJwt, setAuthTokenCookie, handleFetchError } from "@/lib/utils/auth";
+import { parseJwt, setAuthTokenCookie, handleFetchError } from "@/lib/utils/tokenCookie";
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+const BASE_URL_API = process.env.BASE_URL_API || 'http://trello-api:3000';
 
 export async function login(email: string, password: string, rememberMe: boolean) {
-  const response = await fetch(`${apiBaseUrl}/v1/auth/signin`, {
+  const response = await fetch(`${BASE_URL_API}/v1/auth/signin`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -14,19 +14,21 @@ export async function login(email: string, password: string, rememberMe: boolean
   });
 
   if (!response.ok) {
-    await handleFetchError(response, "Erro ao fazer login");
+    return {
+      success: false,
+      error: await handleFetchError(response, "Erro ao fazer login"),
+    };
   }
 
   const { accessToken } = await response.json();
   const payload = parseJwt(accessToken);
-
   await setAuthTokenCookie(accessToken, payload.exp);
-  
-  return { message: 'success' };
+
+  return { success: true, data: { message: 'success' } };
 }
 
 export async function register(fullName: string, userName: string, email: string, password: string) {
-  const response = await fetch(`${apiBaseUrl}/v1/auth/signup`, {
+  const response = await fetch(`${BASE_URL_API}/v1/auth/signup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -35,19 +37,21 @@ export async function register(fullName: string, userName: string, email: string
   });
 
   if (!response.ok) {
-    await handleFetchError(response, "Erro ao fazer registro");
+    return {
+      success: false,
+      error: await handleFetchError(response, "Erro ao fazer registro"),
+    };
   }
 
   const { accessToken } = await response.json();
-  const payload = parseJwt(await response.json());
-
+  const payload = parseJwt(accessToken);
   await setAuthTokenCookie(accessToken, payload.exp);
 
-  return { message: 'success' };
+  return { success: true, data: { message: 'success' } };
 }
 
 export async function forgotPassword(email: string) {
-  const response = await fetch(`${apiBaseUrl}/v1/auth/forgot-password`, {
+  const response = await fetch(`${BASE_URL_API}/v1/auth/forgot-password`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -56,10 +60,13 @@ export async function forgotPassword(email: string) {
   });
 
   if (!response.ok) {
-    await handleFetchError(response, "Erro ao solicitar redefinição de senha");
+    return {
+      success: false,
+      error: await handleFetchError(response, "Erro ao solicitar redefinição de senha"),
+    };
   }
 
-  return { message: 'success' };
+  return { success: true, data: { message: 'success' } };
 }
 
 // export async function logout() {

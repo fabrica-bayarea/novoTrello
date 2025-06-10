@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
+
 import { updateUserProfile } from "@/lib/actions/profile";
-import Notification from "@/components/shared/notification";
-import styles from "./edit-profile.module.css";
+import { useNotificationStore } from '@/lib/stores/notification';
+
+import styles from "./style.module.css";
 
 interface UserProfile {
   name?: string;
@@ -19,17 +22,14 @@ export default function EditProfileForm({ profile }: { profile: UserProfile | nu
     email: profile?.email || "",
     photoUrl: profile?.photoUrl || "/images/iesb-icon.png",
   });
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  // const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
-  const [showNotification, setShowNotification] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const { showNotification } = useNotificationStore()
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value, files } = e.target;
     if (name === "foto" && files && files[0]) {
-      setPhotoFile(files[0]);
+      // setPhotoFile(files[0]);
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
@@ -38,43 +38,26 @@ export default function EditProfileForm({ profile }: { profile: UserProfile | nu
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setError("");
-    setSuccess(false);
-    setShowNotification(false);
-    setShowSuccess(false);
-    try {
-      const formData = {
-        name: form.name || "",
-        userName: form.userName || "",
-        email: form.email || "",
-      };
-      await updateUserProfile(formData);
-      setSuccess(true);
-      setShowSuccess(true);
-    } catch (err: any) {
-      setError((err instanceof Error && err.message) ? err.message : String(err));
-      setShowNotification(true);
-    } finally {
-      setLoading(false);
+
+    const formData = {
+      name: form.name || "",
+      userName: form.userName || "",
+      email: form.email || "",
+    };
+
+    const response = await updateUserProfile(formData);
+
+    if (response.success) {
+      showNotification("Perfil atualizado com sucesso!", 'success')
+    } else {
+      showNotification(response.error || "Erro desconhecido", 'failed')
     }
+
+    setLoading(false);
   }
 
   return (
     <>
-      {showNotification && error && (
-        <Notification
-          message={error}
-          type="failed"
-          onClose={() => setShowNotification(false)}
-        />
-      )}
-      {showSuccess && (
-        <Notification
-          message="Perfil atualizado com sucesso!"
-          type="success"
-          onClose={() => setShowSuccess(false)}
-        />
-      )}
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.wrapperDivisor}>
           <label>
@@ -114,14 +97,16 @@ export default function EditProfileForm({ profile }: { profile: UserProfile | nu
         <div className={styles.wrapperDivisor}>
           <div className={styles.photoSection}>
             <span>Foto de perfil</span>
-            <img
+            <Image
               src={form.photoUrl || "/images/iesb-icon.png"}
               alt="Foto de perfil"
               className={styles.profilePhoto}
+              width={100}
+              height={100}
             />
             <input type="file" id="foto" name="foto" accept="image/*" onChange={handleChange} />
           </div>
-        </div>    
+        </div>
       </form>
     </>
   );

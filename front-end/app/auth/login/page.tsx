@@ -3,50 +3,40 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link";
+import Image from "next/image";
 
-import { login } from "@/lib/actions/auth"
+import { login } from "@/lib/actions/auth";
+import { useNotificationStore } from '@/lib/stores/notification';
+
 import AuthFormContainer from "@/components/auth/authFormContainer";
 import AuthInput from "@/components/auth/authInput";
 import AuthButton from "@/components/auth/authButton";
-import Notification from "@/components/shared/notification";
 
 import parentStyles from "../style.module.css";
 import styles from "./style.module.css";
 
 export default function Home() {
   const router = useRouter()
+  const { showNotification } = useNotificationStore()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
-  const [error, setError] = useState("")
-  const [showNotification, setShowNotification] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setError("")
-    setShowNotification(false)
-    try {
-      await login(email, password, rememberMe)
 
-      router.push("/dashboard")
-      router.refresh()
-    } catch (err) {
-      setError((err instanceof Error && err.message) ? err.message : String(err))
-      setShowNotification(true)
+    const result = await login(email, password, rememberMe);
+
+    if (result.success) {
+      router.push("/dashboard");
+      router.refresh();
+    } else {
+      showNotification(result.error || "Erro desconhecido", 'failed')
     }
   }
 
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-
   return (
     <>
-      {showNotification && error && (
-        <Notification
-          message={error}
-          type="failed"
-          onClose={() => setShowNotification(false)}
-        />
-      )}
       <AuthFormContainer title="ACESSE SUA CONTA">
         <form className={parentStyles.form} onSubmit={handleSubmit}>
           <AuthInput
@@ -75,11 +65,11 @@ export default function Home() {
         </form>
         <div className={styles.divider}><span>Conecte-se também com:</span></div>
         <div className={styles.oauthButtons}>
-          <AuthButton type="button" onClick={() => window.location.href = `${apiBaseUrl}/v1/auth/google`} className={styles.oauthCircleButton} aria-label="Entrar com Google">
-            <img src="/images/google-icon.png" alt="Google" width={28} height={28} />
+          <AuthButton type="button" onClick={() => window.location.href = `/api/v1/auth/google`} className={styles.oauthCircleButton} aria-label="Entrar com Google">
+            <Image src="/images/google-icon.png" alt="Google" width={28} height={28} />
           </AuthButton>
-          <AuthButton type="button" onClick={() => window.location.href = `${apiBaseUrl}/v1/auth/microsoft`} className={styles.oauthCircleButton} aria-label="Entrar com Microsoft">
-            <img src="/images/microsoft-icon.png" alt="Microsoft" width={28} height={28} />
+          <AuthButton type="button" onClick={() => window.location.href = `/api/v1/auth/microsoft`} className={styles.oauthCircleButton} aria-label="Entrar com Microsoft">
+            <Image src="/images/microsoft-icon.png" alt="Microsoft" width={28} height={28} />
           </AuthButton>
         </div>
       </AuthFormContainer>

@@ -1,17 +1,39 @@
-import { getUserProfile } from "@/lib/actions/profile";
-import EditProfileForm from "./EditProfileForm";
-import DeleteAccountButton from "./DeleteAccountButton";
-import styles from "./edit-profile.module.css";
+"use client";
 
-export default async function EditProfilePage() {
-  const profile = await getUserProfile();
+import { useEffect, useState } from "react";
+
+import { getUserProfile } from "@/lib/actions/profile";
+import { useNotificationStore } from '@/lib/stores/notification';
+
+import EditProfileForm from "@/components/dashboard/editProfile/EditInfoUser";
+import DeleteAccountButton from "@/components/dashboard/editProfile/DeleteAccountButton";
+
+import styles from "./style.module.css";
+
+export default function EditProfilePage() {
+  const { showNotification } = useNotificationStore()
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    async function fetchUserProfile() {
+      const response = await getUserProfile();
+
+      if (!response.success) {
+        showNotification(response.error || "Erro ao carregar perfil", 'failed')
+      } else {
+        setProfile(response.data);
+      }
+    }
+
+    fetchUserProfile();
+  }, [showNotification]);
 
   return (
     <div className={styles.container}>
-      <p style={{ color: '#777', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+      <p className={styles.history}>
         Dashboard &gt; edit-profile
       </p>
-      <h1 style={{ fontSize: '1.8rem', marginBottom: '1rem' }}>Informações Pessoais</h1>
+      <h1 className={styles.title}>Informações Pessoais</h1>
       <EditProfileForm profile={profile} />
       <DeleteAccountButton />
     </div>

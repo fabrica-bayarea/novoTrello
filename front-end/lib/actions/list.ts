@@ -1,0 +1,100 @@
+'use server';
+
+import { getAuthTokenCookie, handleFetchError } from "@/lib/utils/tokenCookie";
+
+const BASE_URL_API = process.env.BASE_URL_API || 'http://localhost:3000';
+
+interface Task {
+  id: string;
+  content: string;
+}
+
+interface List {
+  id: string;
+  title: string;
+  tasks: Task[];
+  position?: number;
+  boardId?: string;
+}
+
+interface NewListData {
+  boardId: string;
+  title: string;
+  position: number;
+}
+
+export async function getAllList(boardId: string) {
+  const token = await getAuthTokenCookie();
+  const response = await fetch(`${BASE_URL_API}/v1/lists/board/${boardId}`, {
+    headers: {
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    return {
+      success: false,
+      error: await handleFetchError(response, 'Falha ao buscar listas'),
+    };
+  }
+
+  const data = await response.json();
+  return { success: true, data: data.sort((a: List, b: List) => (a.position || 0) - (b.position || 0)) };
+}
+
+export async function createList(newListData: NewListData) {
+  const token = await getAuthTokenCookie();
+  const response = await fetch(`${BASE_URL_API}/v1/lists`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(newListData),
+  });
+
+  if (!response.ok) {
+    return {
+      success: false,
+      error: await handleFetchError(response, 'Falha ao criar lista'),
+    };
+  }
+
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return { success: true, data: await response.json() };
+  } else {
+    const responseText = await response.text();
+    return {
+      success: false,
+      error: responseText || 'Falha ao criar lista: formato de resposta inesperado do servidor.',
+    };
+  }
+}
+
+export async function deleteList(listId: string) {
+  const token = await getAuthTokenCookie();
+  const response = await fetch(`${BASE_URL_API}/v1/lists/${listId}`, {
+    method: 'DELETE',
+    headers: {
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    return {
+      success: false,
+      error: await handleFetchError(response, 'Falha ao deletar lista'),
+    };
+  }
+
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return { success: true, data: await response.json() };
+  } else {
+    return { success: true, data: null };
+  }
+}
