@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import { getUserProfile } from "@/lib/actions/profile";
 import { useNotificationStore } from '@/lib/stores/notification';
 
-import EditProfileForm from "@/components/dashboard/editProfile/EditInfoUser";
-import DeleteAccountButton from "@/components/dashboard/editProfile/DeleteAccountButton";
+import EditProfileForm from "@/components/features/dashboard/editProfile/formEditUser";
+import DeleteAccountButton from "@/components/features/dashboard/editProfile/deleteProfile";
 
 import styles from "./style.module.css";
 
@@ -30,11 +30,12 @@ export default function EditProfilePage() {
 
   return (
     <div className={styles.container}>
+      {/* TODO: criar um componente para mostrar para isso */}
       <p className={styles.history}>
         Dashboard &gt; edit-profile
       </p>
       <h1 className={styles.title}>Informações Pessoais</h1>
-      <EditProfileForm profile={profile} />
+      {profile && <EditProfileForm profile={profile} />}
       <DeleteAccountButton />
     </div>
   );

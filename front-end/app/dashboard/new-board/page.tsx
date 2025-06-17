@@ -7,6 +7,8 @@ import Image from "next/image";
 import { createBoard } from "@/lib/actions/board";
 import { useNotificationStore } from '@/lib/stores/notification';
 
+import { Input, Textarea } from "@/components/ui";
+
 import styles from "./style.module.css";
 
 export default function NewBoardPage() {
@@ -51,14 +53,20 @@ export default function NewBoardPage() {
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.rowGroups}>
           <div className={styles.leftGroup}>
-            <label className={styles.label}>
-              Nome
-              <input type="text" className={styles.input} value={name} onChange={e => setName(e.target.value)} required />
-            </label>
-            <label className={styles.label}>
-              Descrição
-              <textarea className={styles.textarea} value={description} onChange={e => setDescription(e.target.value)} rows={3} />
-            </label>
+            <Input 
+              label="Nome" 
+              type="text"
+              value={name} 
+              onChange={(e) => setName(e.target.value)} 
+              required 
+            />
+            <Textarea
+              label="Descrição"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              required
+            />
           </div>
           <div className={styles.rightGroup}>
             <label className={styles.label}>

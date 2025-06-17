@@ -23,6 +23,14 @@ export interface CreateTaskData {
   dueDate?: string;
 }
 
+export interface EditTaskData {
+  title?: string;
+  description?: string;
+  position?: number;
+  status?: string;
+  dueDate?: string;
+}
+
 export interface CreateListData {
   boardId: string;
   title: string;

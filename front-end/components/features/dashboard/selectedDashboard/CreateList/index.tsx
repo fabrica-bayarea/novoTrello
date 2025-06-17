@@ -5,6 +5,8 @@ import React, { useState, useEffect } from 'react';
 import { useModalStore } from '@/lib/stores/modal';
 import { useListOperations } from '@/lib/hooks/useListOperations';
 
+import { Input } from "@/components/ui";
+
 import styles from './style.module.css';
 
 export default function CreateListModal({ boardId }: { boardId: string }) {
@@ -39,7 +41,7 @@ export default function CreateListModal({ boardId }: { boardId: string }) {
     <div className={styles.modalOverlay} onClick={handleOverlayClick}>
       <div className={styles.modalContent}>
         <h2>Criar Nova Lista</h2>
-        <input
+        <Input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}

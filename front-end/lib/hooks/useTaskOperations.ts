@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
-import { createTask, deleteTask } from '@/lib/actions/task';
+import { createTask, updateTask, deleteTask } from '@/lib/actions/task';
 import { useBoardStore } from '@/lib/stores/board';
 import { useModalStore } from '@/lib/stores/modal';
 import { useNotificationStore } from '@/lib/stores/notification';
 import type { CreateTaskData } from '@/lib/types/board';
 
 export function useTaskOperations() {
-  const { addTask, removeTask, getNextTaskPosition } = useBoardStore();
+  const { addTask, editTask, removeTask, getNextTaskPosition } = useBoardStore();
   const { selectedListId, closeCreateTaskModal } = useModalStore();
   const { showNotification } = useNotificationStore();
 
@@ -40,6 +40,27 @@ export function useTaskOperations() {
     }
   }, [selectedListId, addTask, closeCreateTaskModal, showNotification]);
 
+  const handleEditTask = useCallback(async (taskId: string, updatedData: Partial<CreateTaskData>) => {
+    try {
+      const result = await updateTask(taskId, updatedData);
+      if (result.success && result.data) {
+        editTask(taskId, {
+          id: result.data.id,
+          title: result.data.title,
+          description: result.data.description,
+          position: result.data.position,
+          status: result.data.status,
+          dueDate: result.data.dueDate
+        });
+        showNotification("Tarefa editada com sucesso!", "success");
+      } else {
+        showNotification("Erro ao editar tarefa: " + result.error, "failed");
+      }
+    } catch (error) {
+      showNotification("Erro inesperado ao editar tarefa: " + error, "failed");
+    }
+  }, [editTask, showNotification]);
+
   const handleDeleteTask = useCallback(async (taskId: string) => {
     const result = await deleteTask(taskId);
     if (result.success) {
@@ -52,6 +73,7 @@ export function useTaskOperations() {
 
   return {
     handleCreateTask,
+    handleEditTask,
     handleDeleteTask,
     getNextTaskPosition,
   };

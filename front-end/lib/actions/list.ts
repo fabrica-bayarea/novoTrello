@@ -23,6 +23,13 @@ interface NewListData {
   position: number;
 }
 
+interface PatchListData {
+  id: string;
+  title?: string;
+  position?: number;
+}
+
+
 export async function getAllList(boardId: string) {
   const token = await getAuthTokenCookie();
   const response = await fetch(`${BASE_URL_API}/v1/lists/board/${boardId}`, {
@@ -71,6 +78,41 @@ export async function createList(newListData: NewListData) {
       success: false,
       error: responseText || 'Falha ao criar lista: formato de resposta inesperado do servidor.',
     };
+  }
+}
+
+export async function editList(List: PatchListData) {
+  const token = await getAuthTokenCookie();
+  const updateData: Partial<Omit<PatchListData, 'id'>> = {};
+  if (List.title !== undefined) {
+    updateData.title = List.title;
+  }
+  if (List.position !== undefined) {
+    updateData.position = List.position;
+  }
+
+  const response = await fetch(`${BASE_URL_API}/v1/lists/${List.id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(updateData),
+  });
+
+  if (!response.ok) {
+    return {
+      success: false,
+      error: await handleFetchError(response, 'Falha ao editar lista'),
+    };
+  }
+
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return { success: true, data: await response.json() };
+  } else {
+    return { success: true, data: null };
   }
 }
 

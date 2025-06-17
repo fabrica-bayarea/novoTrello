@@ -3,41 +3,43 @@
 import React, { useState, useEffect } from 'react';
 
 import { useModalStore } from '@/lib/stores/modal';
-import { useBoardStore } from '@/lib/stores/board';
 import { useTaskOperations } from '@/lib/hooks/useTaskOperations';
+
+import { Input, Textarea } from "@/components/ui";
 
 import styles from './style.module.css';
 
-export default function CreateTaskModal () {
-  const { handleCreateTask } = useTaskOperations();
-  const { getNextTaskPosition } = useBoardStore();
-  const { selectedListId, isCreateTaskModalOpen, closeCreateTaskModal } = useModalStore();
+export default function EditTaskModal () {
+  const { handleEditTask } = useTaskOperations();
+  const { selectedTask, isEditTaskModalOpen, closeEditTaskModal } = useModalStore();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('pending');
   const [dueDate, setDueDate] = useState('');
 
-  const nextPosition = selectedListId ? getNextTaskPosition(selectedListId) : 0
-
   useEffect(() => {
-    if (isCreateTaskModalOpen) {
-      setTitle('');
-      setDescription('');
-      setStatus('pending');
-      setDueDate('');
+    if (isEditTaskModalOpen && selectedTask) {
+      setTitle(selectedTask.title || '');
+      setDescription(selectedTask.description || '');
+      setStatus(selectedTask.status || 'pending');
+      setDueDate(selectedTask.dueDate ? toLocalDateTime(selectedTask.dueDate) : '');
     }
-  }, [isCreateTaskModalOpen]);
+  }, [isEditTaskModalOpen, selectedTask]);
 
-  if (!isCreateTaskModalOpen) return null;
+  if (!isEditTaskModalOpen || !selectedTask) return null;
+
+  function toLocalDateTime(iso: string) {
+    const date = new Date(iso);
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
 
   const formatToISO = (dateTimeLocal: string): string | undefined => {
     if (!dateTimeLocal.trim()) return undefined;
-    
     try {
       const date = new Date(dateTimeLocal);
       if (isNaN(date.getTime())) return undefined;
-      
       return date.toISOString();
     } catch {
       return undefined;
@@ -46,28 +48,32 @@ export default function CreateTaskModal () {
 
   const handleSubmit = () => {
     if (title.trim()) {
-      handleCreateTask({
-        title: title.trim(),
-        description: description.trim() || undefined,
-        position: nextPosition,
-        status,
-        dueDate: formatToISO(dueDate),
-      });
+      handleEditTask(
+        selectedTask.id,
+        {
+          title: title.trim(),
+          description: description.trim() || undefined,
+          status,
+          dueDate: formatToISO(dueDate),
+          position: selectedTask.position
+        }
+      );
+      closeEditTaskModal();
     }
   };
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
-      closeCreateTaskModal();
+      closeEditTaskModal();
     }
   };
 
   return (
     <div className={styles.modalOverlay} onClick={handleOverlayClick}>
       <div className={styles.modalContent}>
-        <h2>Criar Nova Tarefa</h2>
+        <h2>Editar Tarefa</h2>
         
-        <input
+        <Input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -76,7 +82,7 @@ export default function CreateTaskModal () {
           autoFocus
         />
         
-        <textarea
+        <Textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Descrição (opcional)"
@@ -103,8 +109,8 @@ export default function CreateTaskModal () {
         />
               
         <div className={styles.modalActions}>
-          <button onClick={closeCreateTaskModal} className={styles.cancelButton}>Cancelar</button>
-          <button onClick={handleSubmit} className={styles.submitButton}>Criar Tarefa</button>
+          <button onClick={closeEditTaskModal} className={styles.cancelButton}>Cancelar</button>
+          <button onClick={handleSubmit} className={styles.submitButton}>Salvar Alterações</button>
         </div>
       </div>
     </div>

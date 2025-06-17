@@ -10,12 +10,14 @@ interface BoardState {
   // Actions para listas
   setLists: (lists: List[]) => void;
   addList: (list: List) => void;
+  renameList: (listId: string, title: string) => void;
   removeList: (listId: string) => void;
   setLoading: (loading: boolean) => void;
   
   // Actions para tarefas
   addTask: (listId: string, task: Task) => void;
   removeTask: (taskId: string) => void;
+  editTask: (taskId: string, updatedTask: Partial<Task>) => void;
   moveTask: (sourceListIdx: number, taskIdx: number, destListIdx: number, destTaskIdx?: number) => void;
   
   // Utils
@@ -37,6 +39,12 @@ export const useBoardStore = create<BoardState>()(
       lists: [...state.lists, list]
     })),
     
+    renameList: (listId, title) => set((state) => ({
+      lists: state.lists.map((list) =>
+        list.id === listId ? { ...list, title } : list
+      )
+    })),
+
     removeList: (listId) => set((state) => ({
       lists: state.lists.filter(list => list.id !== listId)
     })),
@@ -62,6 +70,19 @@ export const useBoardStore = create<BoardState>()(
         tasks: list.tasks.filter(task => task.id !== taskId)
       }))
     })),
+    
+    editTask: (taskId, updatedTask) => set((state) => {
+      const lists = state.lists.map(list => {
+        const taskIndex = list.tasks.findIndex(task => task.id === taskId);
+        if (taskIndex !== -1) {
+          const updatedTasks = [...list.tasks];
+          updatedTasks[taskIndex] = { ...updatedTasks[taskIndex], ...updatedTask };
+          return { ...list, tasks: updatedTasks };
+        }
+        return list;
+      });
+      return { lists };
+    }),
     
     moveTask: (sourceListIdx, taskIdx, destListIdx, destTaskIdx) => set((state) => {
       const newLists = state.lists.map(l => ({ ...l, tasks: [...l.tasks] }));

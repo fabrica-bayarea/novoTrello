@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { forgotPassword } from "@/lib/actions/auth";
 import { useNotificationStore } from '@/lib/stores/notification';
 
-import AuthFormContainer from "@/components/auth/authFormContainer";
-import AuthInput from "@/components/auth/authInput";
-import AuthButton from "@/components/auth/authButton";
+import AuthFormContainer from "@/components/ui/authFormContainer";
+import AuthInput from "@/components/ui/authInput";
+import AuthButton from "@/components/ui/authButton";
 
 import styles from "./style.module.css";
 

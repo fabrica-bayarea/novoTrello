@@ -23,6 +23,12 @@
   color: #334155;
 }
 
+.listActions{
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
 .taskCard {
   display: flex;
   justify-content: space-between;
@@ -66,6 +72,11 @@
   color: #c51313;
 }
 
+.taskActions{
+  display: flex;
+  align-items: center;
+}
+
 .deleteButton {
   background: none;
   border: none;
@@ -96,7 +107,6 @@
   justify-content: center;
   transition: all 0.2s ease;
   opacity: 0;
-  margin-left: 8px;
 }
 
 .taskCard:hover .deleteTaskButton {

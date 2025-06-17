@@ -6,7 +6,7 @@ import { Check, Trash2 } from "lucide-react";
 import { getBoards } from "@/lib/actions/board";
 import { useNotificationStore } from '@/lib/stores/notification';
 
-import Section from '@/components/dashboard/section/Section';
+import Section from '@/components/features/dashboard/selectedDashboard/section';
 
 import styles from './style.module.css';
 

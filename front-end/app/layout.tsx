@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
-import NotificationWrapper from "@/components/shared/notification/NotificationWrapper";
+import Notification from "@/components/features/shared/notification";
 
 import "./globals.css";
 
@@ -35,7 +35,7 @@ export default function RootLayout(
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         {children}
-        <NotificationWrapper />
+        <Notification />
       </body>
     </html>
   );

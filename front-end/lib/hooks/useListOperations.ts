@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
-import { createList, deleteList } from '@/lib/actions/list';
+import { createList, editList, deleteList } from '@/lib/actions/list';
 import { useBoardStore } from '@/lib/stores/board';
 import { useModalStore } from '@/lib/stores/modal';
 import { useNotificationStore } from '@/lib/stores/notification';
 import type { CreateListData } from '@/lib/types/board';
 
 export function useListOperations(boardId: string) {
-  const { lists, addList, removeList } = useBoardStore();
+  const { lists, addList, renameList, removeList } = useBoardStore();
   const { closeCreateListModal } = useModalStore();
   const { showNotification } = useNotificationStore();
 
@@ -34,6 +34,22 @@ export function useListOperations(boardId: string) {
     }
   }, [boardId, lists, addList, closeCreateListModal, showNotification]);
 
+  const handleRenameList = useCallback(async (data: { id: string; title: string; }) => {
+    if (!data.title || data.title.trim() === "") {
+      showNotification("O título da lista não pode estar vazio.", "failed");
+      return;
+    }
+
+    const result = await editList({id: data.id, title: data.title.trim()});
+
+    if (result.success) {
+      renameList(data.id, data.title.trim());
+      showNotification("Lista renomeada com sucesso!", "success");
+    } else {
+      showNotification("Erro ao renomear lista: " + result.error, "failed");
+    }
+  }, [renameList, showNotification]);
+
   const handleDeleteList = useCallback(async (listId: string) => {
     const result = await deleteList(listId);
     if (result.success) {
@@ -47,5 +63,6 @@ export function useListOperations(boardId: string) {
   return {
     handleCreateList,
     handleDeleteList,
+    handleRenameList,
   };
 }

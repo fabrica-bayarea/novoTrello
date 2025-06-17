@@ -6,16 +6,19 @@ import Image from "next/image";
 import { updateUserProfile } from "@/lib/actions/profile";
 import { useNotificationStore } from '@/lib/stores/notification';
 
+import { Input } from "@/components/ui";
+
 import styles from "./style.module.css";
 
 interface UserProfile {
-  name?: string;
-  userName?: string;
-  email?: string;
+  name: string;
+  userName: string;
+  email: string;
   photoUrl?: string;
 }
 
-export default function EditProfileForm({ profile }: { profile: UserProfile | null }) {
+export default function EditProfileForm({ profile }: { profile: UserProfile }) {
+  
   const [form, setForm] = useState<UserProfile>({
     name: profile?.name || "",
     userName: profile?.userName || "",
@@ -60,36 +63,30 @@ export default function EditProfileForm({ profile }: { profile: UserProfile | nu
     <>
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.wrapperDivisor}>
-          <label>
-            Nome:
-            <input
-              type="text"
-              name="name"
-              placeholder="Digite seu nome"
-              value={form.name}
-              onChange={handleChange}
-            />
-          </label>
-          <label>
-            Nome de usuário:
-            <input
-              type="text"
-              name="userName"
-              placeholder="Escolha um nome de usuário"
-              value={form.userName}
-              onChange={handleChange}
-            />
-          </label>
-          <label>
-            E-mail:
-            <input
-              type="email"
-              name="email"
-              placeholder="Seu e-mail"
-              value={form.email}
-              onChange={handleChange}
-            />
-          </label>
+          <Input
+            type="text"
+            name="name"
+            label="Nome"
+            placeholder="Digite seu nome"
+            value={form.name}
+            onChange={handleChange}
+          />
+          <Input
+            type="text"
+            name="userName"
+            label="Nome de usuário"
+            placeholder="Escolha um nome de usuário"
+            value={form.userName}
+            onChange={handleChange}
+          />
+          <Input
+            type="email"
+            name="email"
+            label="Email"
+            placeholder="Seu e-mail"
+            value={form.email}
+            onChange={handleChange}
+          />
           <button type="submit" className={styles.submitButton} disabled={loading}>
             {loading ? "Atualizando..." : "Atualizar"}
           </button>
