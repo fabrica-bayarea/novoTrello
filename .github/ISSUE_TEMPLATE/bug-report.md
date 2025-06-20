@@ -1,5 +1,11 @@
-**Descrição do Bug**
-Uma descrição clara e concisa do que o bug é.
+---
+name: Bug report
+about: Uma descrição clara e concisa do que o bug é.
+title: ''
+labels: bug
+assignees: ''
+
+---
 
 **Passos para Reproduzir**
 Passos para reproduzir o comportamento:

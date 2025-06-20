@@ -1,6 +1,12 @@
+---
+name: Feature request
+about: Descreva a funcionalidade de forma breve e clara. Qual problema ou necessidade
+  ela visa resolver?
+title: ''
+labels: enhancement
+assignees: ''
 
-**Resumo da Funcionalidade**
-Descreva a funcionalidade de forma breve e clara. Qual problema ou necessidade ela visa resolver?
+---
 
 **Objetivo**
 Explique o objetivo principal da funcionalidade, como ela agregará valor ao projeto e beneficiará os usuários.
