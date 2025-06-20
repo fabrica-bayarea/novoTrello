@@ -34,6 +34,7 @@
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.10.1",
     "passport": "^0.7.0",

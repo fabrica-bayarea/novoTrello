@@ -3,19 +3,25 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './modules/app.module';
 import { ValidationPipe, VersioningType, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as cookieParser from 'cookie-parser';
-import { LoggingMiddleware } from './middleware/logging.middleware'; // ⬅️ novo import
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 
 async function bootstrap() {
-  const debugEnabled = process.env.DEBUG === 'true';
-
-  const app = await NestFactory.create(AppModule, {
-    logger: debugEnabled
-      ? ['log', 'error', 'warn', 'debug', 'verbose']
-      : ['log', 'error', 'warn'],
-  });
+  const app = await NestFactory.create(AppModule);
 
   const configService = app.get(ConfigService);
+
+  const DEBUG = configService.get<string>('DEBUG') === 'true';
+  const PRODUCTION = configService.get<string>('NODE_ENV') === 'production';
+  const CORS_ORIGIN = configService.get<string>('CORS_ORIGIN') || '*';
+  const PORT = configService.get<string>('PORT') ?? 3000;
+
+  app.useLogger(
+    DEBUG
+      ? ['log', 'error', 'warn', 'debug', 'verbose']
+      : ['log', 'error', 'warn'],
+  );
+
   const logger = new Logger('Bootstrap');
 
   // Global Pipes
@@ -26,11 +32,31 @@ async function bootstrap() {
   );
 
   // Middleware
-  app.use(cookieParser.default());
+  app.use(cookieParser());
+  app.use(
+    helmet({
+      contentSecurityPolicy: PRODUCTION
+        ? {
+            directives: {
+              defaultSrc: ["'self'"],
+              scriptSrc: ["'self'", 'https://apis.google.com'],
+              styleSrc: ["'self'", 'https://fonts.googleapis.com'],
+              imgSrc: ["'self'"],
+              fontSrc: ["'self'", 'https://fonts.googleapis.com'],
+              connectSrc: ["'self'"],
+              frameAncestors: ["'self'"],
+            },
+          }
+        : false,
+      frameguard: {
+        action: 'sameorigin',
+      },
+    }),
+  );
 
   // CORS Configuration
   app.enableCors({
-    origin: '*',
+    origin: CORS_ORIGIN,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   });
 
@@ -78,9 +104,21 @@ async function bootstrap() {
   });
 
   // Start the application
-  const port = configService.get<string>('PORT') ?? 3000;
-  await app.listen(port);
+  await app.listen(PORT);
+  logger.log(`Application is running on: http://localhost:${PORT}`);
 
-  logger.log(`Application is running on: http://localhost:${port}`);
+  process.on('SIGINT', async () => {
+    logger.log('Recebido SIGINT. Desligando...');
+    await app.close();
+    logger.log('Aplicação desligada.');
+    process.exit(0);
+  });
+
+  process.on('SIGTERM', async () => {
+    logger.log('Recebido SIGTERM. Desligando...');
+    await app.close();
+    logger.log('Aplicação desligada.');
+    process.exit(0);
+  });
 }
 bootstrap();
