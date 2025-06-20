@@ -1,0 +1,61 @@
+name: CI para PRs
+
+on:
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  build-and-test:
+    name: Build e Test Node ${{ matrix.node-version }} em ${{ matrix.os }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Versão Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # --- BACK-END (API) ---
+      - name: Cache de dependências (api)
+        uses: actions/cache@v4
+        with:
+          path: ./back-end/node_modules
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-api-${{ hashFiles('./back-end/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.node-version }}-api-
+
+      - name: Instalar dependências (api)
+        working-directory: ./back-end
+        run: npm ci
+
+      - name: Rodar lint (api)
+        working-directory: ./back-end
+        run: npm run lint
+
+      - name: Rodar testes (api)
+        working-directory: ./back-end
+        run: npm run test
+
+      # --- FRONT-END (UI) ---
+      - uses: actions/cache@v4
+        with:
+          path: ./front-end/node_modules
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-ui-${{ hashFiles('./front-end/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.node-version }}-ui-
+          
+      - name: Instalar dependências (ui)
+        working-directory: ./front-end
+        run: npm ci
+
+      - name: Rodar lint (ui)
+        working-directory: ./front-end
+        run: npm run lint
