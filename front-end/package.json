@@ -1,7 +1,10 @@
 {
   "name": "front-end",
-  "version": "0.1.0",
+  "version": "1.0.0-alpha",
+  "description": "Front-end da plataforma Novo Trello - Sistema de gerenciamento de tarefas baseado no modelo Kanban",
+  "author": "Fábrica Bay Area - IESB",
   "private": true,
+  "license": "GPL-3.0-only",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
