@@ -1,26 +1,49 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
+ 
+export function middleware(request: NextRequest) {
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
+  const cspHeader = `
+    default-src 'self';
+    script-src 'nonce-${nonce}' 'strict-dynamic';
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    img-src 'self' data:;
+    font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com;
+    connect-src 'self';
+    frame-ancestors 'self';
+    upgrade-insecure-requests;
+    form-action 'self';
+    base-uri 'self';
+    object-src 'none';
+  `;
+  const sanitizedCspHeader = cspHeader.replace(/\s{2,}/g, ' ').trim();
 
-/*
-* TODO: Implementar a verificação de validade do token JWT
-* TODO: Remover cookie com accessToken inválido
-*/
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-nonce', nonce);
 
-export async function middleware(request: NextRequest) {
-  const loginURL = new URL('/auth/login', request.url);
-
-  const tokenCookie = request.cookies.get('auth-token');
-
-  if (!tokenCookie?.value) {
-    return NextResponse.redirect(loginURL);
+  const isProtectedRoute = !request.nextUrl.pathname.startsWith('/auth');
+  if (isProtectedRoute) {
+    const tokenCookie = request.cookies.get('auth-token');
+    if (!tokenCookie?.value) {
+      const loginURL = new URL('/auth/login', request.url);
+      const redirectResponse = NextResponse.redirect(loginURL);
+      redirectResponse.headers.set('Content-Security-Policy', sanitizedCspHeader);
+      return redirectResponse;
+    }
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+
+  response.headers.set(
+    'Content-Security-Policy',
+    sanitizedCspHeader
+  );
+
+  return response
 }
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|auth|public|images).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|public|images).*)',
     '/dashboard/:path*',
     '/profile',
   ],

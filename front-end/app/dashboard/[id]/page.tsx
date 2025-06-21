@@ -17,9 +17,7 @@ import styles from './style.module.css';
 export default function BoardPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: boardId } = use(params);
 
-  const {
-    openCreateListModal,
-  } = useModalStore();
+  const { openCreateListModal } = useModalStore();
 
   return (
     <main className={styles.dashboardMainCustom}>

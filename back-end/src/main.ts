@@ -3,11 +3,12 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './modules/app.module';
 import { ValidationPipe, VersioningType, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const configService = app.get(ConfigService);
 
@@ -35,19 +36,6 @@ async function bootstrap() {
   app.use(cookieParser());
   app.use(
     helmet({
-      contentSecurityPolicy: PRODUCTION
-        ? {
-            directives: {
-              defaultSrc: ["'self'"],
-              scriptSrc: ["'self'", 'https://apis.google.com'],
-              styleSrc: ["'self'", 'https://fonts.googleapis.com'],
-              imgSrc: ["'self'"],
-              fontSrc: ["'self'", 'https://fonts.googleapis.com'],
-              connectSrc: ["'self'"],
-              frameAncestors: ["'self'"],
-            },
-          }
-        : false,
       frameguard: {
         action: 'sameorigin',
       },
