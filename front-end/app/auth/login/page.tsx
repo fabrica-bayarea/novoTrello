@@ -3,14 +3,13 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link";
-import Image from "next/image";
 
 import { login } from "@/lib/actions/auth";
 import { useNotificationStore } from '@/lib/stores/notification';
 
 import AuthFormContainer from "@/components/ui/authFormContainer";
-import AuthInput from "@/components/ui/authInput";
-import AuthButton from "@/components/ui/authButton";
+
+import { AuthInput, AuthButton, Image } from "@/components/ui";
 
 import parentStyles from "../style.module.css";
 import styles from "./style.module.css";

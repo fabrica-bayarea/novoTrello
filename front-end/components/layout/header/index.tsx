@@ -1,5 +1,5 @@
 import { Bell, CircleHelp } from "lucide-react";
-import Image from 'next/image';
+import { Image } from "@/components/ui";
 import Link from 'next/link';
 import styles from "./style.module.css";
 

@@ -1,5 +1,5 @@
 import styles from "./style.module.css";
-import Image from 'next/image';
+import { Image } from "@/components/ui";
 
 export default function
  AuthLayout({ children }: { children: React.ReactNode }) {

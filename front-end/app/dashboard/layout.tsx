@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { Image } from "@/components/ui";
 
 import Header from "@/components/layout/header";
 
