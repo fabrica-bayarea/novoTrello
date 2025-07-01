@@ -5,11 +5,21 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
-  constructor(private configService: ConfigService) {
+  constructor(private readonly configService: ConfigService) {
+    const clientID = configService.get<string>('MICROSOFT_CLIENT_ID');
+    const clientSecret = configService.get<string>('MICROSOFT_CLIENT_SECRET');
+    const isProduction = configService.get<string>('NODE_ENV') === 'production';
+    
+    const baseUrl = configService.get<string>('BASE_URL') || 'http://localhost';
+    const baseurlApi = configService.get<string>('BASE_URL_API') || 'http://localhost:3000';
+    const ProductionBaseUrl = `${baseUrl}/api/v1/auth/microsoft/callback`;
+    const DevelopmentBaseUrl = `${baseurlApi}/v1/auth/microsoft/callback`;
+    const callbackURL = isProduction ? ProductionBaseUrl : DevelopmentBaseUrl;
+
     super({
-      clientID: configService.get<string>('MICROSOFT_CLIENT_ID'),
-      clientSecret: configService.get<string>('MICROSOFT_CLIENT_SECRET'),
-      callbackURL: `${configService.get<string>('BASE_URL_API')}/v1/auth/microsoft/callback`,
+      clientID,
+      clientSecret,
+      callbackURL,
       scope: ['user.read'],
       tenant: 'common',
       passReqToCallback: true,

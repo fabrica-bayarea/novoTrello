@@ -6,10 +6,24 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(private configService: ConfigService) {
+    const clientID = configService.get<string>('GOOGLE_CLIENT_ID');
+    const clientSecret = configService.get<string>('GOOGLE_CLIENT_SECRET');
+    const isProduction = configService.get<string>('NODE_ENV') === 'production';
+
+    const baseUrl = configService.get<string>('BASE_URL') || 'http://localhost';
+    const baseurlApi = configService.get<string>('BASE_URL_API') || 'http://localhost:3000';
+    const ProductionBaseUrl = `${baseUrl}/api/v1/auth/google/callback`;
+    const DevelopmentBaseUrl = `${baseurlApi}/v1/auth/google/callback`;
+    const callbackURL = isProduction ? ProductionBaseUrl : DevelopmentBaseUrl;
+
+    if (!clientID || !clientSecret || !baseUrl) {
+      throw new Error('Google OAuth configuration is missing');
+    }
+
     super({
-      clientID: configService.get<string>('GOOGLE_CLIENT_ID') || '',
-      clientSecret: configService.get<string>('GOOGLE_CLIENT_SECRET') || '',
-      callbackURL: `${configService.get<string>('BASE_URL_API')}/v1/auth/google/callback`,
+      clientID,
+      clientSecret,
+      callbackURL,
       scope: ['email', 'profile'],
       passReqToCallback: true,
     });

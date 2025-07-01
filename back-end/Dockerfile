@@ -9,9 +9,8 @@ WORKDIR /app
 # Copia os arquivos de dependências (package.json e package-lock.json) para o container
 COPY package*.json ./
 
-# Instala as dependências de forma limpa, garantindo consistência com o package-lock.json
-RUN npm install --quiet --no-fund --loglevel=error && \
-    npm cache clean --force
+# Instala as dependências de forma limpa
+RUN npm install --quiet --no-fund --loglevel=error
 
 # Copia todos os arquivos do projeto para o container
 COPY . .
@@ -34,10 +33,16 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends openssl curl
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Comando para criar usuário
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+
 # Copia os arquivos necessários da etapa de build
-COPY --from=build /app/dist /app/dist
-COPY --from=build /app/node_modules /app/node_modules
-COPY --from=build /app/prisma /app/prisma
+COPY --from=build --chown=appuser:appgroup /app/dist /app/dist
+COPY --from=build --chown=appuser:appgroup /app/node_modules /app/node_modules
+COPY --from=build --chown=appuser:appgroup /app/prisma /app/prisma
+
+# Define o usuário para executar a aplicação
+USER appuser
 
 # Configura o ambiente como produção
 ENV NODE_ENV=production

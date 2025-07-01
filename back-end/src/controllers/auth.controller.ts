@@ -36,6 +36,13 @@ export class AuthController {
     private logger: Logger,
   ) {}
 
+  private get BASE_URL_UI(): string {
+    const isProduction = this.configService.get<string>('NODE_ENV') === 'production';
+    const baseUrl = this.configService.get<string>('BASE_URL') || 'http://localhost';
+    const baseUrlUI = this.configService.get<string>('BASE_URL_UI') || 'http://localhost:3001';
+    return isProduction ? baseUrl : baseUrlUI;
+  }
+
   @ApiOperation({
     summary: 'Cadastra um novo Usuário',
     description: 'Cria um novo usuário e o grava no banco de dados.',
@@ -99,19 +106,19 @@ export class AuthController {
           .cookie('auth-token', json.accessToken, {
             httpOnly: true,
             path: "/",
-            // secure: process.env.NODE_ENV === 'production',
+            secure: this.configService.get<string>('NODE_ENV') === 'production',
             sameSite: 'lax',
             expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
           })
           .redirect(
-            `${this.configService.get<string>('BASE_URL_UI')}/dashboard`,
+            `${this.BASE_URL_UI}/dashboard`,
           );
       }
       throw new Error('Invalid authentication result');
     } catch (error) {
       this.logger.error('Erro no callback do Google:', error.message);
       return res.redirect(
-        `${this.configService.get<string>('BASE_URL_UI')}/auth/error?message=google_login_failed`,
+        `${this.BASE_URL_UI}/auth/error?message=google_login_failed`,
       );
     }
   }
@@ -147,19 +154,19 @@ export class AuthController {
           .cookie('auth-token', json.accessToken, {
             httpOnly: true,
             path: "/",
-            // secure: process.env.NODE_ENV === 'production',
+            secure: this.configService.get<string>('NODE_ENV') === 'production',
             sameSite: 'lax',
             expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
           })
           .redirect(
-            `${this.configService.get<string>('BASE_URL_UI')}/dashboard`,
+            `${this.BASE_URL_UI}/dashboard`,
           );
       }
       throw new Error('Invalid authentication result');
     } catch (error) {
       this.logger.error('Erro no callback do Microsoft:', error.message);
       return res.redirect(
-        `${this.configService.get<string>('BASE_URL_UI')}/auth/error?message=microsoft_login_failed`,
+        `${this.BASE_URL_UI}/auth/error?message=microsoft_login_failed`,
       );
     }
   }
