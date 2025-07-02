@@ -3,10 +3,10 @@ import { ListController } from '../../src/controllers/list.controller';
 import { ListService } from '../../src/services/list.service';
 import { CreateListDto } from '../../src/dto/create-list.dto';
 import { UpdateListDto } from '../../src/dto/update-list.dto';
+import { AuthenticatedUser } from '../../src/types/user.interface';
 
 describe('ListController', () => {
   let controller: ListController;
-  let service: ListService;
 
   const mockListService = {
     create: jest.fn(),
@@ -23,14 +23,20 @@ describe('ListController', () => {
     }).compile();
 
     controller = module.get<ListController>(ListController);
-    service = module.get<ListService>(ListService);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  const user = { id: 'user-123' };
+  const user: AuthenticatedUser = {
+    id: 'user-123',
+    email: 'test@example.com',
+    name: 'Test User',
+    userName: 'testuser',
+    role: 'ADMIN',
+    authProvider: 'local',
+  };
 
   describe('create', () => {
     it('should call listService.create with correct params', async () => {

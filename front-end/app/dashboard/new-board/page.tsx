@@ -2,12 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 
 import { createBoard } from "@/lib/actions/board";
 import { useNotificationStore } from '@/lib/stores/notification';
 
-import { Input, Textarea } from "@/components/ui";
+import { Input, Textarea, Image } from "@/components/ui";
 
 import styles from "./style.module.css";
 

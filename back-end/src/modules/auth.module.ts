@@ -10,7 +10,7 @@ import { PrismaService } from 'src/services/prisma.service';
 import { AuthService } from 'src/services/auth.service';
 import { AuthController } from 'src/controllers/auth.controller';
 
-@Module({}) 
+@Module({})
 export class AuthModule {
   static register(): DynamicModule {
     return {
@@ -21,7 +21,7 @@ export class AuthModule {
         JwtModule.registerAsync({
           imports: [ConfigModule],
           inject: [ConfigService],
-          useFactory: async (configService: ConfigService) => ({
+          useFactory: (configService: ConfigService) => ({
             secret: configService.getOrThrow<string>('JWT_SECRET'),
             signOptions: { expiresIn: '1d' },
           }),
@@ -35,8 +35,12 @@ export class AuthModule {
         {
           provide: 'OAUTH_STRATEGIES',
           useFactory: (configService: ConfigService) => [
-            ...(configService.get<string>('ENABLE_GOOGLE_OAUTH') === 'true' ? [new GoogleStrategy(configService)] : []),
-            ...(configService.get<string>('ENABLE_MICROSOFT_OAUTH') === 'true' ? [new MicrosoftStrategy(configService)] : []),
+            ...(configService.get<string>('ENABLE_GOOGLE_OAUTH') === 'true'
+              ? [new GoogleStrategy(configService)]
+              : []),
+            ...(configService.get<string>('ENABLE_MICROSOFT_OAUTH') === 'true'
+              ? [new MicrosoftStrategy(configService)]
+              : []),
           ],
           inject: [ConfigService],
         },

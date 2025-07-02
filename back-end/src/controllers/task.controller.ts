@@ -14,6 +14,7 @@ import { UpdateTaskDto } from '../dto/update-task.dto';
 import { JwtAuthGuard } from '../guards/jwt.guard';
 import { CurrentUser } from '../strategy/decorators/current-user.decorator';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { AuthenticatedUser } from 'src/types/user.interface';
 
 @UseGuards(JwtAuthGuard)
 @Controller({ path: 'tasks', version: '1' })
@@ -29,7 +30,7 @@ export class TaskController {
   @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
   @ApiResponse({ status: 403, description: 'Acesso negado' })
   @Post()
-  create(@CurrentUser() user: any, @Body() dto: CreateTaskDto) {
+  create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateTaskDto) {
     return this.taskService.create(user.id, dto);
   }
 

@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 
 import { updateUserProfile } from "@/lib/actions/profile";
 import { useNotificationStore } from '@/lib/stores/notification';
 
-import { Input } from "@/components/ui";
+import { Input, Image } from "@/components/ui";
 
 import styles from "./style.module.css";
 

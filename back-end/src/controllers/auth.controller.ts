@@ -36,6 +36,16 @@ export class AuthController {
     private logger: Logger,
   ) {}
 
+  private get BASE_URL_UI(): string {
+    const isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
+    const baseUrl =
+      this.configService.get<string>('BASE_URL') || 'http://localhost';
+    const baseUrlUI =
+      this.configService.get<string>('BASE_URL_UI') || 'http://localhost:3001';
+    return isProduction ? baseUrl : baseUrlUI;
+  }
+
   @ApiOperation({
     summary: 'Cadastra um novo Usuário',
     description: 'Cria um novo usuário e o grava no banco de dados.',
@@ -47,7 +57,10 @@ export class AuthController {
     try {
       return this.authService.signUp(dto);
     } catch (error) {
-      this.logger.error('Erro ao tentar realizar registro:', error.message);
+      this.logger.error(
+        'Erro ao tentar realizar registro:',
+        (error as Error).message,
+      );
     }
   }
 
@@ -64,7 +77,10 @@ export class AuthController {
     try {
       return this.authService.signIn(dto);
     } catch (error) {
-      this.logger.error('Erro ao tentar realizar Login:', error.message);
+      this.logger.error(
+        'Erro ao tentar realizar Login:',
+        (error as Error).message,
+      );
     }
   }
 
@@ -88,30 +104,44 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @Get('google/callback')
   @UseGuards(IsEnabledAuthGuard('google', 'ENABLE_GOOGLE_OAUTH'))
-  async googleAuthRedirect(@Req() { user }: any, @Res() res: Response) {
+  async googleAuthRedirect(
+    @Req()
+    req: {
+      user: {
+        google_id: string;
+        email: string;
+        name: string;
+        access_token: string;
+      };
+    },
+    @Res() res: Response,
+  ) {
     try {
+      const user = req.user;
       const json = await this.authService.signInWithProvider('google', {
-        ...user,
         providerId: user.google_id,
+        email: user.email,
+        name: user.name,
       });
       if (json) {
         return res
           .cookie('auth-token', json.accessToken, {
             httpOnly: true,
-            path: "/",
-            // secure: process.env.NODE_ENV === 'production',
+            path: '/',
+            secure: this.configService.get<string>('NODE_ENV') === 'production',
             sameSite: 'lax',
             expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
           })
-          .redirect(
-            `${this.configService.get<string>('BASE_URL_UI')}/dashboard`,
-          );
+          .redirect(`${this.BASE_URL_UI}/dashboard`);
       }
       throw new Error('Invalid authentication result');
     } catch (error) {
-      this.logger.error('Erro no callback do Google:', error.message);
+      this.logger.error(
+        'Erro no callback do Google:',
+        (error as Error).message,
+      );
       return res.redirect(
-        `${this.configService.get<string>('BASE_URL_UI')}/auth/error?message=google_login_failed`,
+        `${this.BASE_URL_UI}/auth/error?message=google_login_failed`,
       );
     }
   }
@@ -136,30 +166,44 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @Get('microsoft/callback')
   @UseGuards(IsEnabledAuthGuard('microsoft', 'ENABLE_MICROSOFT_OAUTH'))
-  async microsoftAuthRedirect(@Req() { user }: any, @Res() res: Response) {
+  async microsoftAuthRedirect(
+    @Req()
+    req: {
+      user: {
+        microsoftId: string;
+        email: string;
+        name: string;
+        access_token: string;
+      };
+    },
+    @Res() res: Response,
+  ) {
     try {
-      const json = await this.authService.signInWithProvider(
-        'microsoft',
-        { ...user, providerId: user.microsoftId },
-      );
+      const user = req.user;
+      const json = await this.authService.signInWithProvider('microsoft', {
+        providerId: user.microsoftId,
+        email: user.email,
+        name: user.name,
+      });
       if (json) {
         return res
           .cookie('auth-token', json.accessToken, {
             httpOnly: true,
-            path: "/",
-            // secure: process.env.NODE_ENV === 'production',
+            path: '/',
+            secure: this.configService.get<string>('NODE_ENV') === 'production',
             sameSite: 'lax',
             expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
           })
-          .redirect(
-            `${this.configService.get<string>('BASE_URL_UI')}/dashboard`,
-          );
+          .redirect(`${this.BASE_URL_UI}/dashboard`);
       }
       throw new Error('Invalid authentication result');
     } catch (error) {
-      this.logger.error('Erro no callback do Microsoft:', error.message);
+      this.logger.error(
+        'Erro no callback do Microsoft:',
+        (error as Error).message,
+      );
       return res.redirect(
-        `${this.configService.get<string>('BASE_URL_UI')}/auth/error?message=microsoft_login_failed`,
+        `${this.BASE_URL_UI}/auth/error?message=microsoft_login_failed`,
       );
     }
   }
@@ -189,8 +233,12 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
   @UseGuards(JwtAuthGuard)
   @Put('change-password')
-  async changePassword(@Request() req, @Body() dto: ChangePasswordDto) {
-    await this.authService.changePassword(req.user.id, dto);
+  async changePassword(
+    @Request() req: { user: { id: string } },
+    @Body() dto: ChangePasswordDto,
+  ) {
+    const userId = req.user.id;
+    await this.authService.changePassword(userId, dto);
     return { message: 'Senha alterada com sucesso.' };
   }
 }

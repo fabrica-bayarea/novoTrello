@@ -9,8 +9,8 @@ WORKDIR /app
 # Copia os arquivos de dependências (package.json e package-lock.json) para o container
 COPY package*.json ./
 
-# Instala as dependências de forma limpa, garantindo consistência com o package-lock.json
-RUN npm ci
+# Instala as dependências de forma limpa
+RUN npm install --quiet --no-fund --loglevel=error
 
 # Copia todos os arquivos do projeto para o container
 COPY . .
@@ -26,13 +26,16 @@ FROM node:22-slim AS production
 # Define o diretório de trabalho dentro do container
 WORKDIR /app
 
-# Copia os arquivos necessários da etapa de build
-COPY --from=build /app/package.json /app/package-lock.json ./
-COPY --from=build /app/.next ./.next
-COPY --from=build /app/public ./public
+# Comando para criar usuário
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 
-# Instala pacotes necessários para o Next.js e outras dependências
-RUN npm ci --omit=dev
+# Copia os arquivos necessários da etapa de build
+COPY --from=build --chown=appuser:appgroup /app/.next/standalone ./
+COPY --from=build --chown=appuser:appgroup /app/.next/static ./.next/static
+COPY --from=build --chown=appuser:appgroup /app/public ./public
+
+# Define o usuário para executar a aplicação
+USER appuser
 
 # Configura o ambiente como produção
 ENV NODE_ENV=production
@@ -41,4 +44,4 @@ ENV NODE_ENV=production
 EXPOSE 3000
 
 # Inicia a aplicação Next.js no modo de produção
-CMD ["npm", "run", "start"]
+CMD ["node", "server.js"]

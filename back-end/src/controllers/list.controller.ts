@@ -14,6 +14,7 @@ import { UpdateListDto } from '../dto/update-list.dto';
 import { JwtAuthGuard } from '../guards/jwt.guard';
 import { CurrentUser } from 'src/strategy/decorators/current-user.decorator';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { AuthenticatedUser } from 'src/types/user.interface';
 
 @UseGuards(JwtAuthGuard)
 @Controller({ path: 'lists', version: '1' })
@@ -29,20 +30,24 @@ export class ListController {
   @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
   @ApiResponse({ status: 403, description: 'Acesso negado' })
   @Post()
-  create(@CurrentUser() user: any, @Body() dto: CreateListDto) {
+  create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateListDto) {
     return this.listService.create(user.id, dto);
   }
 
   @ApiOperation({
     summary: 'Busca todas as listas de um quadro',
-    description: 'Busca todas as listas de um quadro específico do usuário autenticado',
+    description:
+      'Busca todas as listas de um quadro específico do usuário autenticado',
   })
   @ApiResponse({ status: 200, description: 'Listas encontradas com sucesso' })
   @ApiResponse({ status: 400, description: 'Erro ao buscar as listas' })
   @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
   @ApiResponse({ status: 403, description: 'Acesso negado' })
   @Get('board/:boardId')
-  findAll(@CurrentUser() user: any, @Param('boardId') boardId: string) {
+  findAll(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('boardId') boardId: string,
+  ) {
     return this.listService.findAll(user.id, boardId);
   }
 

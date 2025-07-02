@@ -15,10 +15,9 @@ import {
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { User } from '@prisma/client';
 import * as argon2 from 'argon2';
-import * as nodemailer from 'nodemailer';
+import { createTransport, Transporter } from 'nodemailer';
 import { randomBytes } from 'crypto';
 import * as fs from 'fs';
-import * as path from 'path';
 import 'dotenv/config';
 import { resolveTemplatePath } from 'src/utils/path.helper';
 import { ResetPasswordDto } from 'src/dto/reset-password.dto';
@@ -33,10 +32,7 @@ export class AuthService {
   /**
    * Gera um token JWT com base no payload fornecido.
    */
-  private async generateJwt(
-    user: User,
-    rememberMe = false,
-  ): Promise<{ accessToken: string }> {
+  private generateJwt(user: User, rememberMe = false): { accessToken: string } {
     const payload = {
       sub: user.id,
       email: user.email,
@@ -67,32 +63,43 @@ export class AuthService {
    * Busca um usuário pelo email ou cria um novo, dependendo do provedor de autentica-
    * ção é guardado o providerId em vez da senha.
    */
-  private async findOrCreateUser(data: any, provider: any): Promise<any> {
-    let user = await this.prisma.user.findUnique({
+  private async findOrCreateUser(
+    data: {
+      email: string;
+      name: string;
+      providerId?: string;
+      password?: string;
+    },
+    provider: string,
+  ): Promise<User> {
+    const existingUser = await this.prisma.user.findUnique({
       where: { email: data.email },
     });
 
-    if (!user) {
-      user = await this.prisma.user.create({
-        data: {
-          email: data.email,
-          name: data.name,
-          userName: data.email.split('@')[0],
-          passwordHash: provider === 'local' ? data.password : data.providerId,
-          providerId: provider === 'local' ? null : data.providerId,
-          role: 'ADMIN',
-          authProvider: provider,
-        },
+    if (!existingUser) {
+      const userData = {
+        email: data.email,
+        name: data.name,
+        userName: data.email.split('@')[0],
+        passwordHash: provider === 'local' ? data.password! : data.providerId!,
+        providerId: provider === 'local' ? null : data.providerId!,
+        role: 'ADMIN' as const,
+        authProvider: provider as 'local' | 'google' | 'microsoft',
+      };
+
+      const newUser = await this.prisma.user.create({
+        data: userData,
       });
+      return newUser;
     }
 
-    return user;
+    return existingUser;
   }
 
   /**
    * Trata erros específicos ao criar um usuário.
    */
-  private handleSignUpError(error: any): never {
+  private handleSignUpError(error: unknown): never {
     if (
       error instanceof PrismaClientKnownRequestError &&
       error.code === 'P2002'
@@ -108,11 +115,11 @@ export class AuthService {
   async signUp(dto: SignUpDto): Promise<{ accessToken: string }> {
     const hashedPassword = await this.hashPassword(dto.password);
 
-    const user = await this.prisma.user.findUnique({
+    const existingUser = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
 
-    if (user) {
+    if (existingUser) {
       throw new ForbiddenException('Email já cadastrado');
     }
 
@@ -124,6 +131,7 @@ export class AuthService {
       return this.generateJwt(user);
     } catch (error) {
       this.handleSignUpError(error);
+      throw error;
     }
   }
 
@@ -164,6 +172,9 @@ export class AuthService {
     return this.generateJwt(user);
   }
 
+  /**
+   * Gera uma nova senha aleatória e envia por email para recuperação de senha.
+   */
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: forgotPasswordDto.email },
@@ -184,11 +195,11 @@ export class AuthService {
       },
     });
 
-    const transporter = nodemailer.createTransport({
+    const transporter: Transporter = createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.EMAIL,
-        pass: process.env.PASS,
+        user: process.env.EMAIL!,
+        pass: process.env.PASS!,
       },
     });
 
@@ -198,7 +209,7 @@ export class AuthService {
 
     try {
       await transporter.sendMail({
-        from: `"Suporte novoTrello" <${process.env.EMAIL}>`,
+        from: `"Suporte novoTrello" <${process.env.EMAIL!}>`,
         to: forgotPasswordDto.email,
         subject: 'Recuperação de senha',
         html: emailHtml,
@@ -217,7 +228,7 @@ export class AuthService {
       });
     } catch (error) {
       throw new InternalServerErrorException(
-        'Erro ao enviar o e-mail de recuperação. Erro: ' + error,
+        'Erro ao enviar o e-mail de recuperação. Erro: ' + String(error),
       );
     }
   }
@@ -254,6 +265,9 @@ export class AuthService {
     });
   }
 
+  /**
+   * Altera a senha de um usuário após validar a senha atual.
+   */
   async changePassword(id: string, dto: ChangePasswordDto) {
     const user = await this.prisma.user.findUnique({
       where: { id },

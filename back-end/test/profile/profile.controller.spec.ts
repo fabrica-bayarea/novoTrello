@@ -2,10 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ProfileController } from '../../src/controllers/profile.controller';
 import { ProfileService } from '../../src/services/profile.service';
 import { ProfileDto } from '../../src/dto/profile.dto';
+import { AuthenticatedUser } from '../../src/types/user.interface';
 
 describe('ProfileController', () => {
   let controller: ProfileController;
-  let service: ProfileService;
 
   const mockProfileService = {
     getProfile: jest.fn(),
@@ -13,8 +13,13 @@ describe('ProfileController', () => {
     deleteProfile: jest.fn(),
   };
 
-  const mockUser = {
+  const mockUser: AuthenticatedUser = {
     id: 'user-123',
+    email: 'test@example.com',
+    name: 'Test User',
+    userName: 'testuser',
+    role: 'ADMIN',
+    authProvider: 'local',
   };
 
   beforeEach(async () => {
@@ -29,7 +34,6 @@ describe('ProfileController', () => {
     }).compile();
 
     controller = module.get<ProfileController>(ProfileController);
-    service = module.get<ProfileService>(ProfileService);
   });
 
   afterEach(() => {
@@ -48,7 +52,7 @@ describe('ProfileController', () => {
 
       const result = await controller.getUserProfile({ user: mockUser });
 
-      expect(service.getProfile).toHaveBeenCalledWith('user-123');
+      expect(mockProfileService.getProfile).toHaveBeenCalledWith('user-123');
       expect(result).toEqual(mockProfile);
     });
   });
@@ -65,7 +69,10 @@ describe('ProfileController', () => {
 
       const result = await controller.updateProfile({ user: mockUser }, dto);
 
-      expect(service.updateProfile).toHaveBeenCalledWith('user-123', dto);
+      expect(mockProfileService.updateProfile).toHaveBeenCalledWith(
+        'user-123',
+        dto,
+      );
       expect(result).toEqual({
         message: 'Perfil atualizado com sucesso.',
         data: dto,
@@ -79,7 +86,7 @@ describe('ProfileController', () => {
 
       const result = await controller.deleteProfile({ user: mockUser });
 
-      expect(service.deleteProfile).toHaveBeenCalledWith('user-123');
+      expect(mockProfileService.deleteProfile).toHaveBeenCalledWith('user-123');
       expect(result).toEqual({ message: 'Conta deletada com sucesso.' });
     });
   });
