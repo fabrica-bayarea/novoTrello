@@ -7,7 +7,6 @@ import { UpdateListDto } from 'src/dto/update-list.dto';
 
 describe('ListService', () => {
   let service: ListService;
-  let prisma: PrismaService;
 
   const mockPrisma = {
     board: {
@@ -31,7 +30,6 @@ describe('ListService', () => {
     }).compile();
 
     service = module.get<ListService>(ListService);
-    prisma = module.get<PrismaService>(PrismaService);
   });
 
   afterEach(() => {

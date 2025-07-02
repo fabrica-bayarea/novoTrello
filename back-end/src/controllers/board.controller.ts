@@ -14,6 +14,7 @@ import { CreateBoardDto } from '../dto/create-board.dto';
 import { UpdateBoardDto } from '../dto/update-board.dto';
 import { JwtAuthGuard } from 'src/guards/jwt.guard';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { AuthenticatedUser } from 'src/types/user.interface';
 
 @UseGuards(JwtAuthGuard)
 @Controller({ path: 'boards', version: '1' })
@@ -29,7 +30,7 @@ export class BoardController {
   @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
   @ApiResponse({ status: 403, description: 'Acesso negado' })
   @Post()
-  create(@CurrentUser() user: any, @Body() dto: CreateBoardDto) {
+  create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateBoardDto) {
     return this.boardService.create(user.id, dto);
   }
 
@@ -42,7 +43,7 @@ export class BoardController {
   @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
   @ApiResponse({ status: 403, description: 'Acesso negado' })
   @Get()
-  findAll(@CurrentUser() user: any) {
+  findAll(@CurrentUser() user: AuthenticatedUser) {
     return this.boardService.findAll(user.id);
   }
 

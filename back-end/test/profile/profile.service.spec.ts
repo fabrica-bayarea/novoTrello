@@ -5,7 +5,6 @@ import { ProfileDto } from '../../src/dto/profile.dto';
 
 describe('ProfileService', () => {
   let service: ProfileService;
-  let prisma: PrismaService;
 
   const mockPrisma = {
     user: {
@@ -27,7 +26,6 @@ describe('ProfileService', () => {
     }).compile();
 
     service = module.get<ProfileService>(ProfileService);
-    prisma = module.get<PrismaService>(PrismaService);
   });
 
   afterEach(() => {

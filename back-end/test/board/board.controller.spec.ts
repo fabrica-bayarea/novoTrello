@@ -4,10 +4,10 @@ import { BoardService } from 'src/services/board.service';
 import { CreateBoardDto } from 'src/dto/create-board.dto';
 import { UpdateBoardDto } from 'src/dto/update-board.dto';
 import { BoardVisibility } from 'src/common/enums/board-visibility.enum';
+import { AuthenticatedUser } from 'src/types/user.interface';
 
 describe('BoardController', () => {
   let controller: BoardController;
-  let service: BoardService;
 
   const mockBoardService = {
     create: jest.fn(),
@@ -17,7 +17,14 @@ describe('BoardController', () => {
     remove: jest.fn(),
   };
 
-  const mockUser = { id: 'user-id' };
+  const mockUser: AuthenticatedUser = {
+    id: 'user-id',
+    email: 'test@example.com',
+    name: 'Test User',
+    userName: 'testuser',
+    role: 'ADMIN',
+    authProvider: 'local',
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -26,7 +33,6 @@ describe('BoardController', () => {
     }).compile();
 
     controller = module.get<BoardController>(BoardController);
-    service = module.get<BoardService>(BoardService);
   });
 
   afterEach(() => {

@@ -3,10 +3,10 @@ import { TaskController } from 'src/controllers/task.controller';
 import { TaskService } from 'src/services/task.service';
 import { CreateTaskDto } from 'src/dto/create-task.dto';
 import { UpdateTaskDto } from 'src/dto/update-task.dto';
+import { AuthenticatedUser } from 'src/types/user.interface';
 
 describe('TaskController', () => {
   let controller: TaskController;
-  let service: TaskService;
 
   const mockTaskService = {
     create: jest.fn(),
@@ -23,7 +23,6 @@ describe('TaskController', () => {
     }).compile();
 
     controller = module.get<TaskController>(TaskController);
-    service = module.get<TaskService>(TaskService);
   });
 
   afterEach(() => {
@@ -32,7 +31,14 @@ describe('TaskController', () => {
 
   describe('create', () => {
     it('should call taskService.create with user.id and dto', async () => {
-      const user = { id: 'user-123' };
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        email: 'test@example.com',
+        name: 'Test User',
+        userName: 'testuser',
+        role: 'ADMIN',
+        authProvider: 'local',
+      };
       const dto: CreateTaskDto = {
         title: 'Nova tarefa',
         listId: 'list-1',
@@ -45,7 +51,7 @@ describe('TaskController', () => {
 
       const result = await controller.create(user, dto);
 
-      expect(service.create).toHaveBeenCalledWith(user.id, dto);
+      expect(mockTaskService.create).toHaveBeenCalledWith(user.id, dto);
       expect(result).toEqual(expectedResult);
     });
   });
@@ -59,7 +65,7 @@ describe('TaskController', () => {
 
       const result = await controller.findAll(listId);
 
-      expect(service.findAllByList).toHaveBeenCalledWith(listId);
+      expect(mockTaskService.findAllByList).toHaveBeenCalledWith(listId);
       expect(result).toEqual(expectedTasks);
     });
   });
@@ -73,7 +79,7 @@ describe('TaskController', () => {
 
       const result = await controller.findOne(id);
 
-      expect(service.findOne).toHaveBeenCalledWith(id);
+      expect(mockTaskService.findOne).toHaveBeenCalledWith(id);
       expect(result).toEqual(expectedTask);
     });
   });
@@ -88,7 +94,7 @@ describe('TaskController', () => {
 
       const result = await controller.update(id, dto);
 
-      expect(service.update).toHaveBeenCalledWith(id, dto);
+      expect(mockTaskService.update).toHaveBeenCalledWith(id, dto);
       expect(result).toEqual(updatedTask);
     });
   });
@@ -102,7 +108,7 @@ describe('TaskController', () => {
 
       const result = await controller.remove(id);
 
-      expect(service.remove).toHaveBeenCalledWith(id);
+      expect(mockTaskService.remove).toHaveBeenCalledWith(id);
       expect(result).toEqual(removed);
     });
   });

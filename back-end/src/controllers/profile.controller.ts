@@ -4,6 +4,11 @@ import { ProfileService } from '../services/profile.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../guards/jwt.guard';
 import { ProfileDto } from '../dto/profile.dto';
+import { AuthenticatedUser } from 'src/types/user.interface';
+
+interface AuthenticatedRequest {
+  user: AuthenticatedUser;
+}
 
 @ApiTags('Perfil de usuário')
 @Controller({ path: 'profile', version: '1' })
@@ -18,7 +23,7 @@ export class ProfileController {
   @ApiResponse({ status: 404, description: 'Perfil não encontrado' })
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getUserProfile(@Request() req) {
+  async getUserProfile(@Request() req: AuthenticatedRequest) {
     const profile = await this.profileService.getProfile(req.user.id);
     return profile;
   }
@@ -31,7 +36,10 @@ export class ProfileController {
   @ApiResponse({ status: 404, description: 'Perfil não encontrado' })
   @UseGuards(JwtAuthGuard)
   @Put()
-  async updateProfile(@Request() req, @Body() data: ProfileDto) {
+  async updateProfile(
+    @Request() req: AuthenticatedRequest,
+    @Body() data: ProfileDto,
+  ) {
     await this.profileService.updateProfile(req.user.id, data);
     return { message: 'Perfil atualizado com sucesso.', data: data };
   }
@@ -44,7 +52,7 @@ export class ProfileController {
   @ApiResponse({ status: 404, description: 'Conta não encontrada' })
   @UseGuards(JwtAuthGuard)
   @Delete()
-  async deleteProfile(@Request() req) {
+  async deleteProfile(@Request() req: AuthenticatedRequest) {
     await this.profileService.deleteProfile(req.user.id);
     return { message: 'Conta deletada com sucesso.' };
   }

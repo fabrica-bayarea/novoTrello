@@ -7,7 +7,6 @@ import { UpdateTaskDto } from 'src/dto/update-task.dto';
 
 describe('TaskService', () => {
   let service: TaskService;
-  let prisma: PrismaService;
 
   const mockPrisma = {
     task: {
@@ -28,7 +27,6 @@ describe('TaskService', () => {
     }).compile();
 
     service = module.get<TaskService>(TaskService);
-    prisma = module.get<PrismaService>(PrismaService);
   });
 
   afterEach(() => {

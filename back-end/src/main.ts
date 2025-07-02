@@ -13,7 +13,6 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   const DEBUG = configService.get<string>('DEBUG') === 'true';
-  const PRODUCTION = configService.get<string>('NODE_ENV') === 'production';
   const CORS_ORIGIN = configService.get<string>('CORS_ORIGIN') || '*';
   const PORT = configService.get<string>('PORT') ?? 3000;
 
@@ -95,18 +94,21 @@ async function bootstrap() {
   await app.listen(PORT);
   logger.log(`Application is running on: http://localhost:${PORT}`);
 
-  process.on('SIGINT', async () => {
+  process.on('SIGINT', (): void => {
     logger.log('Recebido SIGINT. Desligando...');
-    await app.close();
-    logger.log('Aplicação desligada.');
-    process.exit(0);
+    void app.close().then(() => {
+      logger.log('Aplicação desligada.');
+      process.exit(0);
+    });
   });
 
-  process.on('SIGTERM', async () => {
+  process.on('SIGTERM', (): void => {
     logger.log('Recebido SIGTERM. Desligando...');
-    await app.close();
-    logger.log('Aplicação desligada.');
-    process.exit(0);
+    void app.close().then(() => {
+      logger.log('Aplicação desligada.');
+      process.exit(0);
+    });
   });
 }
-bootstrap();
+
+void bootstrap();

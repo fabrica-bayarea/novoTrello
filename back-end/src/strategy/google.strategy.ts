@@ -2,6 +2,21 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { ConfigService } from '@nestjs/config';
+import { Request } from 'express';
+
+interface GoogleProfile {
+  id: string;
+  displayName: string;
+  name: { familyName: string; givenName: string };
+  emails: Array<{ value: string; verified: boolean }>;
+}
+
+interface GoogleUser {
+  google_id: string;
+  email: string;
+  name: string;
+  access_token: string;
+}
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -11,7 +26,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     const isProduction = configService.get<string>('NODE_ENV') === 'production';
 
     const baseUrl = configService.get<string>('BASE_URL') || 'http://localhost';
-    const baseurlApi = configService.get<string>('BASE_URL_API') || 'http://localhost:3000';
+    const baseurlApi =
+      configService.get<string>('BASE_URL_API') || 'http://localhost:3000';
     const ProductionBaseUrl = `${baseUrl}/api/v1/auth/google/callback`;
     const DevelopmentBaseUrl = `${baseurlApi}/v1/auth/google/callback`;
     const callbackURL = isProduction ? ProductionBaseUrl : DevelopmentBaseUrl;
@@ -28,19 +44,22 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       passReqToCallback: true,
     });
   }
-  
-  async validate(
-    req: any,
+
+  validate(
+    req: Request,
     accessToken: string,
     refreshToken: string,
-    profile: any,
+    profile: GoogleProfile,
     done: VerifyCallback,
-  ): Promise<any> {
-    if (!profile || !profile.name || !profile.emails || !profile.id) {
-      return done(new Error('Perfil do Google está incompleto ou inválido'), false);
+  ): void {
+    if (!profile?.id || !profile?.displayName || !profile?.emails?.[0]?.value) {
+      return done(
+        new Error('Perfil do Google está incompleto ou inválido'),
+        false,
+      );
     }
 
-    const user = {
+    const user: GoogleUser = {
       google_id: profile.id,
       email: profile.emails[0].value,
       name: profile.displayName,
