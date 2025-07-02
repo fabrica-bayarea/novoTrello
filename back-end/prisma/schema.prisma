@@ -31,18 +31,19 @@ model User {
   role         Role
   name         String
   email        String       @unique
-  image        String?      
+  image        String?
   userName     String       @unique
   passwordHash String
   authProvider AuthProvider
   isVerified   Boolean      @default(false)
-  CreatedAt    DateTime     @default(now())
+  createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   providerId   String?
 
-  createdAt DateTime @default(now())
-  Board Board[]
-  BoardMember BoardMember[]
+  ownedBoards      Board[]       @relation("OwnerBoards")
+  boardMemberships BoardMember[]
+  createdTasks     Task[]        @relation("TaskCreator")
+
   @@unique([authProvider, providerId], name: "AuthProviderAndIdUnique")
 }
 

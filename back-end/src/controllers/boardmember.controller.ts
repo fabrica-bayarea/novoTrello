@@ -23,12 +23,24 @@ export class BoardMemberController {
         return boardMembers;
     }
 
+    @ApiOperation({
+        summary: 'Chamar/Criar outros usuários para o board',
+        description: 'Adicionar usuários novos no board',
+    })
+    @ApiResponse({ status: 200, description: 'Sucesso ao criar usuários no board' })
+    @ApiResponse({ status: 404, description: 'Erro no endpoint' })
     @Post()
     async addMember(@Request() req, @Body() dto: CreateBoardMemberDto) {
         const currentUserId = (req.user.id)
         return this.boardMemberService.addMember(currentUserId, dto)
     }
 
+    @ApiOperation({
+        summary: 'Remover usuário',
+        description: 'Remove algum usuário do board (não pode ser o usuário quem criou)',
+    })
+    @ApiResponse({ status: 200, description: 'Sucesso ao remover usuários' })
+    @ApiResponse({ status: 404, description: 'Erro no endpoint' })
     @Delete()
     async removeMember(
         @Request() req, 

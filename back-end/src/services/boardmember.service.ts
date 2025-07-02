@@ -10,7 +10,7 @@ export class BoardMemberService {
     async addMember(currentUserId: number, dto: CreateBoardMemberDto) {
         const {boardId, userId} = dto;
 
-        const checkExistentBoard = await this.prisma.board.findUnique({
+        const checkExistentBoard = await this.prisma.boardMember.findUnique({
             where: {id: boardId}
         })
         if (!checkExistentBoard) {
@@ -40,7 +40,7 @@ export class BoardMemberService {
     }
 
     async removeMember(currentUserId: number, boardId: number, userId: number) {
-        const checkBoard = await this.prisma.board.findUnique({
+        const checkBoard = await this.prisma.boardMember.findUnique({
             where:{id:boardId}
         })
 
@@ -51,12 +51,66 @@ export class BoardMemberService {
             throw new ForbiddenException('You do not have permission')
         }
 
-        return await this.prisma.boardMember.delete(({
-            where:{boardId_userId: {
-                boardId,
-                userId
-            }}
-        }))
+        const currentUserIsMember = await this.prisma.boardMember.findUnique({
+            where: {
+                boardId_userId: {
+                    boardId,
+                    userId: currentUserId
+                }
+            }
+        });
+
+        if (!currentUserIsMember) {
+            throw new ForbiddenException('You do not have permission');
+        }
+
+        await this.prisma.boardMember.delete({
+            where: {
+                boardId_userId: {
+                    boardId,
+                    userId
+                }
+            }
+        });
+
+        const remainingMembers = await this.prisma.boardMember.findMany({
+            where: { boardId },
+            orderBy : { joinedAt: 'asc' }
+        });
+
+        if (remainingMembers.length === 0) {
+            await this.prisma.board.delete({
+                where: { id: boardId }
+            });
+            return { message: 'Board deleted because no members remained.' };
+        }
+
+        const hasAdmin = remainingMembers.some(member => member.role === 'ADMIN');
+
+        if (!hasAdmin) {
+            const oldest = remainingMembers[0];
+            await this.prisma.boardMember.update({
+                where: {
+                    boardId_userId: {
+                        boardId,
+                        userId: oldest.userId
+                    }
+                },
+                data: {
+                    role: 'ADMIN'
+                }
+            });
+        }
+
+        return { message: 'Member removed successfully.' };
+    
+
+        // return await this.prisma.boardMember.delete(({
+        //     where:{boardId_userId: {
+        //         boardId,
+        //         userId
+        //     }}
+        // }))
     }
 
     async listMembers(boardId: number) {
@@ -75,4 +129,5 @@ export class BoardMemberService {
             }
         })
     }
+
 }
