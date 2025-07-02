@@ -21,6 +21,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import 'dotenv/config';
 import { resolveTemplatePath } from 'src/utils/path.helper';
+import { ResetPasswordDto } from 'src/dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -172,7 +173,16 @@ export class AuthService {
       throw new ForbiddenException('Email não encontrado');
     }
 
-    const newPassword = randomBytes(4).toString('hex'); // 8 caracteres
+    const token = randomBytes(6).toString('base64');
+    const expires = new Date(Date.now() + 1000 * 60 * 15);
+
+    await this.prisma.user.update({
+      where: { email: forgotPasswordDto.email },
+      data: {
+        resetToken: token,
+        resetTokenExpiresAt: expires,
+      },
+    });
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -184,8 +194,7 @@ export class AuthService {
 
     const templatePath = resolveTemplatePath('forgot-password.template.html');
     let emailHtml = fs.readFileSync(templatePath, 'utf8');
-
-    emailHtml = emailHtml.replace('{{newPassword}}', newPassword);
+    emailHtml = emailHtml.replace('{{code}}', token);
 
     try {
       await transporter.sendMail({
@@ -211,12 +220,37 @@ export class AuthService {
         'Erro ao enviar o e-mail de recuperação. Erro: ' + error,
       );
     }
+  }
+  async resetPassword(dto: ResetPasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
 
-    const newPasswordHash = await argon2.hash(newPassword);
+    if (!user || !user.resetToken || !user.resetTokenExpiresAt) {
+      throw new ForbiddenException('Token inválido ou expirado.');
+    }
+
+    if (user.resetToken !== dto.token) {
+      throw new ForbiddenException('Token incorreto.');
+    }
+
+    if (user.resetTokenExpiresAt < new Date()) {
+      throw new ForbiddenException('Token expirado.');
+    }
+
+    if (dto.newPassword !== dto.confirmPassword) {
+      throw new ForbiddenException('As senhas não conferem.');
+    }
+
+    const passwordHash = await argon2.hash(dto.newPassword);
 
     await this.prisma.user.update({
-      where: { email: forgotPasswordDto.email },
-      data: { passwordHash: newPasswordHash },
+      where: { email: dto.email },
+      data: {
+        passwordHash,
+        resetToken: null,
+        resetTokenExpiresAt: null,
+      },
     });
   }
 
