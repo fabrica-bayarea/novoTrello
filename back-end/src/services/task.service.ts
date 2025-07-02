@@ -53,6 +53,13 @@ export class TaskService {
           lte: endOfDay(today),
         },
       },
+      include: {
+        list: {
+          include: {
+            board: true,
+          },
+        },
+      },
       orderBy: {
         dueDate: 'asc',
       },
