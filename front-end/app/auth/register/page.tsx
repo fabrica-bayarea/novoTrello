@@ -6,6 +6,11 @@ import { useRouter } from "next/navigation";
 import { register } from "@/actions/auth";
 import styles from "@/app/auth/style.module.css";
 import { CheckCircle } from "lucide-react";
+import AuthFormContainer from "@/components/auth/AuthFormContainer";
+import AuthInput from "@/components/auth/AuthInput";
+import AuthButton from "@/components/auth/AuthButton";
+import AuthError from "@/components/auth/AuthError";
+import AuthSuccess from "@/components/auth/AuthSuccess";
 
 export default function Register() {
   const router = useRouter()
@@ -17,10 +22,16 @@ export default function Register() {
   const [confirmPassword, setconfirmConfirmPassword] = useState("")
   const [error, setError] = useState("")
   const [isSuccess, setIsSuccess] = useState(false)
+  const [agreeTerms, setAgreeTerms] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError("")
+
+    if (!agreeTerms) {
+      setError("Você precisa concordar com os termos de serviço.");
+      return;
+    }
 
     if(confirmEmail != email){
       setError("E-mails não coincidem")
@@ -49,73 +60,65 @@ export default function Register() {
 
   if (isSuccess) {
     return (
-      <div className={styles.formContainer}>
-        <div className={styles.successContainer}>
-          <div className={styles.successIcon}>
-            <CheckCircle size={60} color="white" strokeWidth={3} />
-          </div>
-
-          <div className={styles.successMessage}>CONTA CRIADA COM SUCESSO!</div>
-
-          <div className={styles.successRedirect}>
-            <p>Aguarde!</p>
-            <p>Estamos redirecionando você para sua conta!</p>
-          </div>
-        </div>
-
-        <div className={styles.footer}>IESB - BAY AREA</div>
-      </div>
-    )
+      <AuthFormContainer title="Cadastro realizado!">
+        <AuthSuccess message="Cadastro realizado com sucesso! Redirecionando..." />
+      </AuthFormContainer>
+    );
   }
 
   return (
-    <div className={styles.formContainer}>
-      <h1 className={styles.title}>CRIE UMA CONTA</h1>
-
+    <AuthFormContainer title="CRIE SUA CONTA" showBackToLogin={true}>
       <form className={styles.form} onSubmit={handleSubmit}>
+        <AuthInput
+          onChange={(e) => setFullName(e.target.value)}
+          type="text"
+          placeholder="Nome completo"
+          value={fullname}
+        />
+        <AuthInput
+          onChange={(e) => setUserName(e.target.value)}
+          type="text"
+          placeholder="Nome de usuário"
+          value={userName}
+        />
+        <AuthInput
+          onChange={(e) => setEmail(e.target.value)}
+          type="email"
+          placeholder="E-mail"
+          value={email}
+        />
+        <AuthInput
+          onChange={(e) => setconfirmEmail(e.target.value)}
+          type="email"
+          placeholder="Confirme o e-mail"
+          value={confirmEmail}
+        />
+        <AuthInput
+          onChange={(e) => setPassword(e.target.value)}
+          type="password"
+          placeholder="Senha"
+          value={password}
+        />
+        <AuthInput
+          onChange={(e) => setconfirmConfirmPassword(e.target.value)}
+          type="password"
+          placeholder="Confirme a senha"
+          value={confirmPassword}
+        />
         <div className={styles.inputGroup}>
-          <input type="text" placeholder="NOME COMPLETO" className={styles.input} onChange={(e) => setFullName(e.target.value)} required />
-        </div>
-
-        <div className={styles.inputGroup}>
-          <input type="text" placeholder="NOME DE USUÁRIO" className={styles.input} onChange={(e) => setUserName(e.target.value)} required />
-        </div>
-
-        <div className={styles.inputGroup}>
-          <input type="email" placeholder="E-MAIL" className={styles.input} onChange={(e) => setEmail(e.target.value)} required />
-        </div>
-
-        <div className={styles.inputGroup}>
-          <input type="email" placeholder="CONFIRME SEU EMAIL" className={styles.input} onChange={(e) => setconfirmEmail(e.target.value)} required />
-        </div>
-
-        <div className={styles.inputGroup}>
-          <input type="password" placeholder="SENHA" className={styles.input} onChange={(e) => setPassword(e.target.value)} required />
-        </div>
-
-        <div className={styles.passwordInfo}>
-          <small>Combinação de 8 a 16 letras (maiúsculas/minúsculas), números e símbolos especiais.</small>
-        </div>
-
-        <div className={styles.inputGroup}>
-          <input type="password" placeholder="CONFIRME A SENHA" className={styles.input} onChange={(e) => setconfirmConfirmPassword(e.target.value)}  required />
-        </div>
-        <div className={styles.checkboxContainer}>
-          <input type="checkbox" id="privacy" className={styles.checkbox} required />
-          <label htmlFor="privacy" className={styles.checkboxLabel}>
-            Li e aceito os{" "}
-            <Link href="/privacy" className={styles.link}>
-              Política de privacidade
-            </Link>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'white', fontSize: 14 }}>
+            <input
+              type="checkbox"
+              checked={agreeTerms}
+              onChange={() => setAgreeTerms(!agreeTerms)}
+              style={{ accentColor: '#fff', width: 18, height: 18, borderRadius: 4, marginRight: 4 }}
+            />
+            Concordo com os <a href="/termos" target="_blank" rel="noopener noreferrer" style={{ color: '#fff', textDecoration: 'underline' }}>termos de serviço</a>
           </label>
         </div>
-
-        <button type="submit" className={styles.button} onClick={handleSubmit}>
-          CRIAR CONTA
-        </button>
+        <AuthError message={error} />
+        <AuthButton type="submit">Cadastrar</AuthButton>
       </form>
-
-      <div className={styles.footer}>IESB - BAY AREA</div>
-    </div>
-  )
+    </AuthFormContainer>
+  );
 }

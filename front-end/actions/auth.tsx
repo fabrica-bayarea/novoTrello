@@ -1,44 +1,37 @@
 "use server"
 
 import { cookies } from "next/headers"
+import { parseJwt, setAuthTokenCookie } from "@/utils/auth";
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export async function login(email: string, password: string, rememberMe: boolean) {
   try {
     const response = await fetch(`${apiBaseUrl}/v1/auth/signin`, {
-      method: "POST", 
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, password, rememberMe }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json()
-      return { success: false, error: errorData.message || "Erro ao fazer login" }
-    }
-
-    const { accessToken } = await response.json()
-
-    const cookieStore = await cookies();
-
-    const payload = JSON.parse(
-      Buffer.from(accessToken.split('.')[1], 'base64').toString()
-    )
-
-    cookieStore.set({
-      name: "auth-token",
-      value: accessToken,
-      httpOnly: true,
-      path: "/",
-      secure: process.env.NODE_ENV === "production",
-      expires: new Date(payload.exp * 1000),
     });
 
-    return { success: true }
+    if (!response.ok) {
+      let errorMsg = "Erro ao fazer login";
+      let status = response.status;
+      try {
+        const errorData = await response.json();
+        errorMsg = errorData.message || errorMsg;
+      } catch {}
+      return { success: false, error: errorMsg, status };
+    }
+
+    const { accessToken } = await response.json();
+    const payload = parseJwt(accessToken);
+    if (!payload) return { success: false, error: "Token inválido" };
+    await setAuthTokenCookie(accessToken, payload.exp);
+    return { success: true };
   } catch (error) {
-    return { success: false, error: "Erro ao conectar com o servidor" }
+    return { success: false, error: "Erro ao conectar com o servidor" };
   }
 }
 
@@ -49,64 +42,53 @@ export async function register(fullName: string, userName: string, email: string
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ fullName, userName, email, password }),
+      body: JSON.stringify({ name: fullName, userName, email, password }),
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      return { success: false, error: errorData.message || "Erro ao fazer registro" };
+      let errorMsg = "Erro ao fazer registro";
+      let status = response.status;
+      try {
+        const errorData = await response.json();
+        errorMsg = errorData.message || errorMsg;
+      } catch {}
+      return { success: false, error: errorMsg, status };
     }
 
-    const { accessToken } = await response.json()
+    const { accessToken } = await response.json();
+    const payload = parseJwt(accessToken);
+    if (!payload) return { success: false, error: "Token inválido" };
+    await setAuthTokenCookie(accessToken, payload.exp);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: "Erro ao conectar com o servidor" };
+  }
+}
 
-    const cookieStore = await cookies();
-
-    const payload = JSON.parse(
-      Buffer.from(accessToken.split('.')[1], 'base64').toString()
-    )
-
-    cookieStore.set({
-      name: "auth-token",
-      value: accessToken,
-      httpOnly: true,
-      path: "/",
-      secure: process.env.NODE_ENV === "production",
-      expires: new Date(payload.exp * 1000),
+export async function forgotPassword(email: string) {
+  try {
+    const response = await fetch(`${apiBaseUrl}/v1/auth/forgot-password`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
     });
 
+    if (!response.ok) {
+      let errorMsg = "Erro ao solicitar redefinição de senha";
+      let status = response.status;
+      try {
+        const errorData = await response.json();
+        errorMsg = errorData.message || errorMsg;
+      } catch {}
+      return { success: false, error: errorMsg, status };
+    }
     return { success: true };
   } catch (error: any) {
     return { success: false, error: "Erro ao conectar com o servidor" };
   }
 }
-
-// TODO implementar essas funções.
-
-// export async function checkAuth() {
-//   const cookieStore = await cookies()
-//   const token = cookieStore.get("auth-token")
-
-//   if (!token) {
-//     return false
-//   }
-
-//   try {
-//     const response = await fetch("API_URL/check-auth", {
-//       method: "GET",
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     })
-
-//     if (!response.ok) {
-//       return false
-//     }
-
-//     return true
-//   } catch (error) {
-//     return false
-//   }
-// }
 
 // export async function logout() {
 //   try {
