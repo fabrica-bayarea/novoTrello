@@ -35,7 +35,8 @@ export class TaskController {
 
   @ApiOperation({
     summary: 'Busca todas as tarefas de uma lista',
-    description: 'Busca todas as tarefas de uma lista específica do usuário autenticado',
+    description:
+      'Busca todas as tarefas de uma lista específica do usuário autenticado',
   })
   @ApiResponse({ status: 200, description: 'Tarefas encontradas com sucesso' })
   @ApiResponse({ status: 400, description: 'Erro ao buscar as tarefas' })
@@ -83,5 +84,19 @@ export class TaskController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.taskService.remove(id);
+  }
+
+  @ApiOperation({
+    summary: 'Busca tarefas vencidas ou com vencimento hoje',
+    description:
+      'Busca todas as tarefas que estão vencidas ou com vencimento no dia atual do usuário autenticado',
+  })
+  @ApiResponse({ status: 200, description: 'Tarefas encontradas com sucesso' })
+  @ApiResponse({ status: 400, description: 'Erro ao buscar as tarefas' })
+  @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
+  @ApiResponse({ status: 403, description: 'Acesso negado' })
+  @Get('due/today')
+  getTodayOrOverdueTasks(@CurrentUser() user: any) {
+    return this.taskService.findTasksOverdueDate(user.id);
   }
 }
