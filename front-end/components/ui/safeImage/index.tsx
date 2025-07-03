@@ -19,7 +19,7 @@ const Image = (props: ImageProps) => {
   }
 
   // eslint-disable-next-line @next/next/no-img-element
-  return <img {...finalProps} />
+  return <img {...finalProps} alt={finalProps.alt ?? ''} />
 }
 
 export default Image

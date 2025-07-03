@@ -41,7 +41,7 @@ export class TaskService {
   async updatePosition(id: string, newPosition: number) {
     const task = await this.findOne(id);
     const oldPosition = task.position;
-    
+
     if (newPosition < oldPosition) {
       await this.prisma.task.updateMany({
         where: {
@@ -60,7 +60,7 @@ export class TaskService {
           position: { decrement: 1 },
         },
       });
-    } 
+    }
 
     await this.prisma.task.update({
       where: { id },

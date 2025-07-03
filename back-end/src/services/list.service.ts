@@ -72,7 +72,7 @@ export class ListService {
   async updatePosition(id: string, newPosition: number) {
     const list = await this.findOne(id);
     const oldPosition = list.position;
-    
+
     if (newPosition < oldPosition) {
       await this.prisma.list.updateMany({
         where: {

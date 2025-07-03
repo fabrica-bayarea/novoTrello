@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, Trash2, CheckCircle2, Plus } from "lucide-react";
+import { Check, Trash2, CheckCircle2 } from "lucide-react";
 
 import { getBoards } from "@/lib/actions/board";
 import { getExpiredTasks } from "@/lib/actions/task";
@@ -92,7 +92,7 @@ export default function Dashboard() {
           showNotification(result.error || "Erro ao buscar tarefas expiradas", 'failed')
         }
       } catch (error) {
-        showNotification("Erro ao buscar tarefas expiradas", 'failed');
+        showNotification(error as string || "Erro ao buscar tarefas expiradas", 'failed');
       }
     }
 

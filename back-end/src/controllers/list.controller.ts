@@ -86,7 +86,10 @@ export class ListController {
   @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
   @ApiResponse({ status: 403, description: 'Acesso negado' })
   @Patch(':id/position')
-  updatePosition(@Param('id') id: string, @Body() dto: { newPosition: number }) {
+  updatePosition(
+    @Param('id') id: string,
+    @Body() dto: { newPosition: number },
+  ) {
     return this.listService.updatePosition(id, dto.newPosition);
   }
 
