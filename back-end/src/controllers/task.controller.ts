@@ -97,7 +97,7 @@ export class TaskController {
   @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
   @ApiResponse({ status: 403, description: 'Acesso negado' })
   @Get('due/today')
-  getTodayOrOverdueTasks(@CurrentUser() user: any) {
+  getTodayOrOverdueTasks(@CurrentUser() user: AuthenticatedUser) {
     return this.taskService.findTasksOverdueDate(user.id);
   }
 }
