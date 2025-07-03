@@ -38,6 +38,36 @@ export class TaskService {
     });
   }
 
+  async updatePosition(id: string, newPosition: number) {
+    const task = await this.findOne(id);
+    const oldPosition = task.position;
+    
+    if (newPosition < oldPosition) {
+      await this.prisma.task.updateMany({
+        where: {
+          position: { gte: newPosition, lt: oldPosition },
+        },
+        data: {
+          position: { increment: 1 },
+        },
+      });
+    } else if (newPosition > oldPosition) {
+      await this.prisma.task.updateMany({
+        where: {
+          position: { gt: oldPosition, lte: newPosition },
+        },
+        data: {
+          position: { decrement: 1 },
+        },
+      });
+    } 
+
+    await this.prisma.task.update({
+      where: { id },
+      data: { position: newPosition },
+    });
+  }
+
   async remove(id: string) {
     await this.findOne(id);
     return this.prisma.task.delete({ where: { id } });

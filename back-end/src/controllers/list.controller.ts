@@ -78,6 +78,19 @@ export class ListController {
   }
 
   @ApiOperation({
+    summary: 'Atualiza a posição de uma lista',
+    description: 'Atualiza a posição de uma lista específica pelo ID',
+  })
+  @ApiResponse({ status: 200, description: 'Lista atualizada com sucesso' })
+  @ApiResponse({ status: 400, description: 'Erro ao atualizar a lista' })
+  @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
+  @ApiResponse({ status: 403, description: 'Acesso negado' })
+  @Patch(':id/position')
+  updatePosition(@Param('id') id: string, @Body() dto: { newPosition: number }) {
+    return this.listService.updatePosition(id, dto.newPosition);
+  }
+
+  @ApiOperation({
     summary: 'Remove uma lista',
     description: 'Remove uma lista específica pelo ID',
   })

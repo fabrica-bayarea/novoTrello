@@ -220,6 +220,13 @@ export class AuthController {
     return this.authService.forgotPassword(forgotPasswordDto);
   }
 
+  @ApiOperation({
+    summary: 'Altera a senha do usuário com token de recuperação',
+    description:
+      'Permite que o usuário altere sua senha usando um token de recuperação enviado por email.',
+  })
+  @ApiResponse({ status: 200, description: 'Email enviado com sucesso' })
+  @ApiResponse({ status: 401, description: 'Falha ao enviar o email' })
   @Put('reset-password')
   resetPassword(@Body() dto: ResetPasswordDto) {
     return this.authService.resetPassword(dto);

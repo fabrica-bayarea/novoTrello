@@ -69,6 +69,36 @@ export class ListService {
     });
   }
 
+  async updatePosition(id: string, newPosition: number) {
+    const list = await this.findOne(id);
+    const oldPosition = list.position;
+    
+    if (newPosition < oldPosition) {
+      await this.prisma.list.updateMany({
+        where: {
+          position: { gte: newPosition, lt: oldPosition },
+        },
+        data: {
+          position: { increment: 1 },
+        },
+      });
+    } else if (newPosition > oldPosition) {
+      await this.prisma.list.updateMany({
+        where: {
+          position: { gt: oldPosition, lte: newPosition },
+        },
+        data: {
+          position: { decrement: 1 },
+        },
+      });
+    }
+
+    await this.prisma.list.update({
+      where: { id },
+      data: { position: newPosition },
+    });
+  }
+
   async remove(id: string) {
     await this.findOne(id);
     return this.prisma.list.delete({ where: { id } });

@@ -75,6 +75,19 @@ export class TaskController {
   }
 
   @ApiOperation({
+    summary: 'Atualiza a posição de uma tarefa',
+    description: 'Atualiza a posição de uma tarefa específica pelo ID',
+  })
+  @ApiResponse({ status: 200, description: 'tarefa atualizada com sucesso' })
+  @ApiResponse({ status: 400, description: 'Erro ao atualizar a tarefa' })
+  @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
+  @ApiResponse({ status: 403, description: 'Acesso negado' })
+  @Patch(':id/position')
+  updatePosition(@Param('id') id: string, @Body() dto: { newPosition: number }) {
+    return this.taskService.updatePosition(id, dto.newPosition);
+  }
+
+  @ApiOperation({
     summary: 'Remove uma tarefa',
     description: 'Remove uma tarefa específica pelo ID',
   })
