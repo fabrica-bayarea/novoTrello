@@ -31,7 +31,7 @@ if [ $? -eq 0 ]; then
   if [ -n "$outobund_rule" ]; then
     echo " [OK] Regra de saída está correta"
   else
-    echo " >[ERRO] Regra de saída para o mundo não encontrada.
+    echo " >[ERRO] Regra de saída para o mundo não encontrada."
   fi
 else
   echo ">[ERRO] Não achei o security group novoTrello-dev. Ele foi criado?"
