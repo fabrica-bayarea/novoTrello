@@ -140,3 +140,30 @@ export async function deleteList(listId: string) {
     return { success: true, data: null };
   }
 }
+
+export async function moveList(listId: string, newPosition: number) {
+  const token = await getAuthTokenCookie();
+  const response = await fetch(`${BASE_URL_API}/v1/lists/${listId}/position`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ newPosition }),
+  });
+
+  if (!response.ok) {
+    return {
+      success: false,
+      error: await handleFetchError(response, 'Falha ao mover lista'),
+    };
+  }
+
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return { success: true, data: await response.json() };
+  } else {
+    return { success: true, data: null };
+  }
+}

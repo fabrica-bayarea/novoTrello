@@ -139,3 +139,55 @@ export async function deleteTask(taskId: string) {
 
   return { success: true, data: { message: 'Tarefa deletada com sucesso' } };
 }
+
+export async function moveTask(taskId: string, newPosition: number) {
+  const token = await getAuthTokenCookie();
+  const response = await fetch(`${BASE_URL_API}/v1/tasks/${taskId}/position`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+    body: JSON.stringify({ newPosition }),
+  });
+
+  if (!response.ok) {
+    return {
+      success: false,
+      error: await handleFetchError(response, "Falha ao mover a tarefa"),
+    };
+  }
+  
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return { success: true, data: await response.json() };
+  } else {
+    return { success: true, data: null };
+  }
+}
+
+export async function getExpiredTasks() {
+  const token = await getAuthTokenCookie();
+  const response = await fetch(`${BASE_URL_API}/v1/tasks/due/today`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    return {
+      success: false,
+      error: await handleFetchError(response, "Falha ao buscar tarefas expiradas"),
+    };
+  }
+
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    const data = await response.json();
+    return { success: true, data };
+  } else {
+    return { success: true, data: [] };
+  }
+}

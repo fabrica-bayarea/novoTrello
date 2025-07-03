@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
-import { createList, editList, deleteList } from '@/lib/actions/list';
+import { createList, editList, deleteList, moveList } from '@/lib/actions/list';
 import { useBoardStore } from '@/lib/stores/board';
 import { useModalStore } from '@/lib/stores/modal';
 import { useNotificationStore } from '@/lib/stores/notification';
 import type { CreateListData } from '@/lib/types/board';
 
 export function useListOperations(boardId: string) {
-  const { lists, addList, renameList, removeList } = useBoardStore();
+  const { lists, addList, renameList, removeList, updateListPosition } = useBoardStore();
   const { closeCreateListModal } = useModalStore();
   const { showNotification } = useNotificationStore();
 
@@ -60,9 +60,28 @@ export function useListOperations(boardId: string) {
     }
   }, [removeList, showNotification]);
 
+  const handleMoveList = useCallback(async (listId: string, newPosition: number) => {
+    try {
+      const result = await moveList(listId, newPosition);
+      if (result.success) {
+        // Atualizar a posição no store local
+        updateListPosition(listId, newPosition);
+        showNotification("Lista movida com sucesso!", "success");
+        return true;
+      } else {
+        showNotification("Erro ao mover lista: " + result.error, "failed");
+        return false;
+      }
+    } catch (error) {
+      showNotification("Erro inesperado ao mover lista: " + error, "failed");
+      return false;
+    }
+  }, [updateListPosition, showNotification]);
+
   return {
     handleCreateList,
     handleDeleteList,
     handleRenameList,
+    handleMoveList,
   };
 }

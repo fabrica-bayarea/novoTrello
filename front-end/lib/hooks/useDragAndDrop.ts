@@ -2,9 +2,13 @@ import { useCallback } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { useBoardStore } from '@/lib/stores/board';
+import { useListOperations } from './useListOperations';
+import { useTaskOperations } from './useTaskOperations';
 
-export function useDragAndDrop() {
+export function useDragAndDrop(boardId: string) {
   const { lists, setLists, getListIndex, getTaskPosition, moveTask } = useBoardStore();
+  const { handleMoveList } = useListOperations(boardId);
+  const { handleMoveTask } = useTaskOperations();
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
@@ -17,6 +21,12 @@ export function useDragAndDrop() {
     if (activeListIdx !== -1 && overListIdx !== -1) {
       const newLists = arrayMove(lists, activeListIdx, overListIdx);
       setLists(newLists);
+      
+      // Fazer a requisição para o backend
+      const listId = active.id as string;
+      const newPosition = overListIdx + 1; // Posição baseada em 1
+      handleMoveList(listId, newPosition);
+      
       return;
     }
 
@@ -41,8 +51,35 @@ export function useDragAndDrop() {
 
     if (destListIdx === -1) return;
 
+    // Mover a tarefa no estado local
     moveTask(sourceListIdx, taskIdx, destListIdx, destTaskIdx === -1 ? undefined : destTaskIdx);
-  }, [lists, setLists, getListIndex, getTaskPosition, moveTask]);
+    
+    // Fazer requisição para o backend apenas se for dentro da mesma lista
+    if (sourceListIdx === destListIdx) {
+      const taskId = active.id as string;
+      const sourceList = lists[sourceListIdx];
+      
+      // Calcular a nova posição baseada na posição final após o movimento
+      let newPosition: number;
+      if (destTaskIdx === -1 || destTaskIdx === undefined) {
+        // Se solto no final da lista, usar a próxima posição disponível
+        newPosition = sourceList.tasks.length > 0 ? 
+          Math.max(...sourceList.tasks.map(t => t.position)) + 1 : 1;
+      } else {
+        // Se solto entre tarefas, calcular baseado no índice de destino
+        if (destTaskIdx === 0) {
+          // Se movido para o início
+          newPosition = sourceList.tasks.length > 0 ? 
+            Math.min(...sourceList.tasks.map(t => t.position)) - 1 : 1;
+        } else {
+          // Se movido para o meio, usar o índice como posição
+          newPosition = destTaskIdx + 1;
+        }
+      }
+      
+      handleMoveTask(taskId, newPosition);
+    }
+  }, [lists, setLists, getListIndex, getTaskPosition, moveTask, handleMoveList, handleMoveTask]);
 
   return {
     handleDragEnd,

@@ -49,6 +49,29 @@
   padding: 0 0 12px 0;
 }
 
+.noPendenciasMessage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 32px;
+  text-align: center;
+  background: #fff;
+  border-radius: 0 0 10px 10px;
+}
+
+.noPendenciasIcon {
+  color: #15bd2e;
+  margin-bottom: 16px;
+}
+
+.noPendenciasMessage h3 {
+  color: #888;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
 .pendenciaRow {
   display: grid;
   grid-template-columns: 2fr 1fr 2fr auto auto 1fr;
@@ -112,6 +135,32 @@
   padding: 24px 32px;
   background: #fff;
   border-radius: 0 0 10px 10px;
+}
+
+.noBoardsMessage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 32px;
+  text-align: center;
+  background: #fff;
+  border-radius: 0 0 10px 10px;
+  width: 100%;
+}
+
+.noBoardsMessage h3 {
+  color: #333;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.noBoardsMessage p {
+  color: #666;
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 400;
 }
 
 .boardCard {

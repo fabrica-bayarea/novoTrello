@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { createTask, updateTask, deleteTask } from '@/lib/actions/task';
+import { createTask, updateTask, deleteTask, moveTask } from '@/lib/actions/task';
 import { useBoardStore } from '@/lib/stores/board';
 import { useModalStore } from '@/lib/stores/modal';
 import { useNotificationStore } from '@/lib/stores/notification';
@@ -71,10 +71,27 @@ export function useTaskOperations() {
     }
   }, [removeTask, showNotification]);
 
+  const handleMoveTask = useCallback(async (taskId: string, newPosition: number) => {
+    try {
+      const result = await moveTask(taskId, newPosition);
+      if (result.success) {
+        showNotification("Tarefa movida com sucesso!", "success");
+        return true;
+      } else {
+        showNotification("Erro ao mover tarefa: " + result.error, "failed");
+        return false;
+      }
+    } catch (error) {
+      showNotification("Erro inesperado ao mover tarefa: " + error, "failed");
+      return false;
+    }
+  }, [showNotification]);
+
   return {
     handleCreateTask,
     handleEditTask,
     handleDeleteTask,
+    handleMoveTask,
     getNextTaskPosition,
   };
 }

@@ -14,7 +14,7 @@ import ListCard from '@/components/features/dashboard/selectedDashboard/listCard
 import styles from './style.module.css';
 
 export default function BoardLists({ boardId }: { boardId: string }) {
-  const { handleDragEnd } = useDragAndDrop();
+  const { handleDragEnd } = useDragAndDrop(boardId);
   const { lists } = useBoardStore();
 
   useBoardData(boardId);

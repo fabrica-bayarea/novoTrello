@@ -12,6 +12,7 @@ interface BoardState {
   addList: (list: List) => void;
   renameList: (listId: string, title: string) => void;
   removeList: (listId: string) => void;
+  updateListPosition: (listId: string, position: number) => void;
   setLoading: (loading: boolean) => void;
   
   // Actions para tarefas
@@ -47,6 +48,12 @@ export const useBoardStore = create<BoardState>()(
 
     removeList: (listId) => set((state) => ({
       lists: state.lists.filter(list => list.id !== listId)
+    })),
+
+    updateListPosition: (listId, position) => set((state) => ({
+      lists: state.lists.map((list) =>
+        list.id === listId ? { ...list, position } : list
+      )
     })),
     
     setLoading: (loading) => set({ isLoading: loading }),
