@@ -4,6 +4,7 @@ import { TaskService } from 'src/services/task.service';
 import { CreateTaskDto } from 'src/dto/create-task.dto';
 import { UpdateTaskDto } from 'src/dto/update-task.dto';
 import { AuthenticatedUser } from 'src/types/user.interface';
+import { TaskStatus } from 'src/common/enums/task-status.enum';
 
 describe('TaskController', () => {
   let controller: TaskController;
@@ -43,7 +44,7 @@ describe('TaskController', () => {
         title: 'Nova tarefa',
         listId: 'list-1',
         position: 1,
-        status: 'todo',
+        status: TaskStatus.TODO,
       };
       const expectedResult = { id: 'task-1', ...dto, creatorId: user.id };
 
