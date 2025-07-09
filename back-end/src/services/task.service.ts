@@ -49,6 +49,7 @@ export class TaskService {
     return this.prisma.task.findMany({
       where: {
         creatorId: userId,
+        status: { in: ['TODO', 'IN_PROGRESS'] },
         dueDate: {
           lte: endOfDay(today),
         },
