@@ -34,6 +34,12 @@ export class ProfileService {
       throw new Error('Erro ao atualizar o perfil');
     }
 
+    if (updatedProfile.providerId) {
+      throw new Error(
+        'Não é possível atualizar o email de um usuário cadastrado por provedor externo',
+      );
+    }
+
     return updatedProfile;
   }
 
