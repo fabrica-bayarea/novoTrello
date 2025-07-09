@@ -4,6 +4,7 @@ import { PrismaService } from 'src/services/prisma.service';
 import { NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from 'src/dto/create-task.dto';
 import { UpdateTaskDto } from 'src/dto/update-task.dto';
+import { TaskStatus } from 'src/common/enums/task-status.enum';
 
 describe('TaskService', () => {
   let service: TaskService;
@@ -40,7 +41,7 @@ describe('TaskService', () => {
         title: 'Tarefa Teste',
         listId: 'list-1',
         position: 1,
-        status: 'TODO',
+        status: TaskStatus.TODO,
       };
       const createdTask = { id: 'task-1', ...dto, creatorId: userId };
 
