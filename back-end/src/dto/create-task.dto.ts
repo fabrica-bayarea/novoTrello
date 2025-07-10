@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsOptional, IsInt, IsDateString } from 'class-validator';
+import { TaskStatus } from 'src/common/enums/task-status.enum';
 
 export class CreateTaskDto {
   @ApiProperty({
@@ -34,10 +35,10 @@ export class CreateTaskDto {
 
   @ApiProperty({
     description: 'Status da tarefa',
-    example: 'pending',
+    example: 'TODO',
   })
   @IsString()
-  status: string;
+  status: TaskStatus;
 
   @ApiProperty({
     description: 'Data de criação da tarefa',

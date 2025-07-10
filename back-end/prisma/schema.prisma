@@ -75,7 +75,7 @@ model Task {
   title       String
   description String?
   position    Int
-  status      String
+  status      Status      @default(TODO)
   dueDate     DateTime?
   isArchived  Boolean     @default(false)
   createdAt   DateTime    @default(now())
@@ -121,4 +121,11 @@ enum BoardVisibility {
   PUBLIC
   PRIVATE
   TEAM
+}
+
+enum Status {
+  TODO
+  IN_PROGRESS
+  DONE
+  ARCHIVED
 }
