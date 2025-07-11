@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   poweredByHeader: false,
   async headers() {
+    // TODO: Ao implementar TLS, colocar "upgrade-insecure-requests;"
     const cspHeader = `
       default-src 'self';
       script-src 'self';
@@ -12,7 +13,6 @@ const nextConfig: NextConfig = {
       font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com;
       connect-src 'self';
       frame-ancestors 'self';
-      upgrade-insecure-requests;
       form-action 'self';
       base-uri 'self';
       object-src 'none';

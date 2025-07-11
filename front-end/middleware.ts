@@ -4,6 +4,7 @@ const isDev = process.env.NODE_ENV === 'development'
 
 export function middleware(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
+  // TODO: Ao implementar TLS, colocar "upgrade-insecure-requests;"
   const cspHeader = `
     default-src 'self';
     script-src 'nonce-${nonce}' 'strict-dynamic' ${isDev ? "'unsafe-eval'" : ''};
@@ -12,7 +13,6 @@ export function middleware(request: NextRequest) {
     font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com;
     connect-src 'self';
     frame-ancestors 'self';
-    upgrade-insecure-requests;
     form-action 'self';
     base-uri 'self';
     object-src 'none';
