@@ -5,7 +5,7 @@ group "default" {
 target "api" {
   context = "./back-end/"
   dockerfile = "Dockerfile"
-  tags = ["iesb-bayarea/novo-trello-api:latest"]
+  tags = ["bayareatrello/novo-trello-api:latest"]
   labels = {
     "maintainer" = "IESB Bay Area <nde.ads@iesb.br>"
     "org.opencontainers.image.title" = "Novo Trello API"
@@ -20,7 +20,7 @@ target "api" {
 target "webui" {
   context = "./front-end/"
   dockerfile = "Dockerfile"
-  tags = ["iesb-bayarea/novo-trello-webui:latest"]
+  tags = ["bayareatrello/novo-trello-webui:latest"]
   labels = {
     "maintainer" = "IESB Bay Area <nde.ads@iesb.br>"
     "org.opencontainers.image.title" = "Novo Trello Web UI"

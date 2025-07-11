@@ -20,16 +20,9 @@ if [ ! -f ".env" ]; then
     cp ".env.example" ".env"
 fi
 
-export DOCKER_BUILDKIT=1
-
-# Executa o build com bake
-if ! docker buildx bake; then
-    error_exit "Falha no comando 'docker buildx bake'."
-fi
-
 # Executa o docker compose
 if ! $compose_command; then
     error_exit "Erro ao executar 'docker compose up -d'."
 fi
 
-echo "Build e deploy finalizados com sucesso."
+echo "Deploy finalizado com sucesso."
