@@ -17,7 +17,7 @@ export async function setAuthTokenCookie(token: string, exp: number) {
     value: token,
     httpOnly: true,
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    //secure: process.env.NODE_ENV === "production",
     sameSite: 'strict',
     expires: new Date(exp * 1000),
   });
