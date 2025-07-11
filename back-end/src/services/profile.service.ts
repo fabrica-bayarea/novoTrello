@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 import { ProfileDto } from '../dto/profile.dto';
 
@@ -44,14 +44,50 @@ export class ProfileService {
   }
 
   async deleteProfile(userId: string) {
-    const deletedProfile = await this.prisma.user.delete({
+    const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
 
-    if (!deletedProfile) {
-      throw new Error('Erro ao deletar o perfil');
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
     }
 
-    return deletedProfile;
+    await this.prisma.$transaction(async (tx) => {
+      await tx.task.deleteMany({
+        where: {
+          list: {
+            board: {
+              ownerId: userId,
+            },
+          },
+        },
+      });
+
+      await tx.list.deleteMany({
+        where: {
+          board: {
+            ownerId: userId,
+          },
+        },
+      });
+
+      await tx.boardMember.deleteMany({
+        where: {
+          userId: userId,
+        },
+      });
+
+      await tx.board.deleteMany({
+        where: {
+          ownerId: userId,
+        },
+      });
+
+      await tx.user.delete({
+        where: { id: userId },
+      });
+    });
+
+    return { message: 'Conta e dados associados excluídos com sucesso' };
   }
 }

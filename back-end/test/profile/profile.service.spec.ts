@@ -1,7 +1,13 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProfileService } from '../../src/services/profile.service';
 import { PrismaService } from '../../src/services/prisma.service';
 import { ProfileDto } from '../../src/dto/profile.dto';
+import { NotFoundException } from '@nestjs/common/exceptions/not-found.exception';
 
 describe('ProfileService', () => {
   let service: ProfileService;
@@ -12,6 +18,7 @@ describe('ProfileService', () => {
       update: jest.fn(),
       delete: jest.fn(),
     },
+    $transaction: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -90,25 +97,40 @@ describe('ProfileService', () => {
   });
 
   describe('deleteProfile', () => {
-    it('must delete and return the deleted profile', async () => {
-      const deletedUser = {
-        id: '1',
-        name: 'Deletado',
-        userName: 'deletado',
-        email: 'deletado@email.com',
-      };
+    it('must delete the user and all associated data', async () => {
+      const userId = 'user-123';
 
-      mockPrisma.user.delete.mockResolvedValue(deletedUser);
+      const mockTransaction = jest.fn(async (callback: any) => {
+        return callback({
+          task: { deleteMany: jest.fn() },
+          list: { deleteMany: jest.fn() },
+          boardMember: { deleteMany: jest.fn() },
+          board: { deleteMany: jest.fn() },
+          user: { delete: jest.fn() },
+        });
+      });
 
-      const result = await service.deleteProfile('1');
-      expect(result).toEqual(deletedUser);
+      mockPrisma.user.findUnique = jest
+        .fn()
+        .mockResolvedValue({ id: userId }) as any;
+      mockPrisma.$transaction = mockTransaction;
+
+      const result = await service.deleteProfile(userId);
+
+      expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({
+        where: { id: userId },
+      });
+      expect(mockPrisma.$transaction).toHaveBeenCalled();
+      expect(result).toEqual({
+        message: 'Conta e dados associados excluídos com sucesso',
+      });
     });
 
-    it('should throw error if deletion fails', async () => {
-      mockPrisma.user.delete.mockResolvedValue(null);
+    it('should throw NotFoundException if the user does not exist', async () => {
+      mockPrisma.user.findUnique = jest.fn().mockResolvedValue(null);
 
-      await expect(service.deleteProfile('1')).rejects.toThrow(
-        'Erro ao deletar o perfil',
+      await expect(service.deleteProfile('invalid-id')).rejects.toThrow(
+        NotFoundException,
       );
     });
   });
