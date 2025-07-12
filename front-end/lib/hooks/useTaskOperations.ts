@@ -3,7 +3,7 @@ import { createTask, updateTask, deleteTask, moveTask } from '@/lib/actions/task
 import { useBoardStore } from '@/lib/stores/board';
 import { useModalStore } from '@/lib/stores/modal';
 import { useNotificationStore } from '@/lib/stores/notification';
-import type { CreateTaskData } from '@/lib/types/board';
+import type { CreateTaskData, Status } from '@/lib/types/board';
 
 export function useTaskOperations() {
   const { addTask, editTask, removeTask, getNextTaskPosition } = useBoardStore();
@@ -28,7 +28,7 @@ export function useTaskOperations() {
         title: result.data.title,
         description: result.data.description,
         position: result.data.position,
-        status: result.data.status,
+        status: result.data.status as Status,
         dueDate: result.data.dueDate
       };
       
@@ -49,7 +49,7 @@ export function useTaskOperations() {
           title: result.data.title,
           description: result.data.description,
           position: result.data.position,
-          status: result.data.status,
+          status: result.data.status as Status,
           dueDate: result.data.dueDate
         });
         showNotification("Tarefa editada com sucesso!", "success");

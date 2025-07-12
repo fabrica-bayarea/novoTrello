@@ -5,7 +5,7 @@ import { getTasksByList } from '@/lib/actions/task';
 import { useBoardStore } from '@/lib/stores/board';
 import { useNotificationStore } from '@/lib/stores/notification';
 
-import { List, Task } from '@/lib/types/board'
+import { List, Status } from '@/lib/types/board'
 
 export function useBoardData(boardId: string) {
   const { setLists, setLoading } = useBoardStore();
@@ -25,13 +25,13 @@ export function useBoardData(boardId: string) {
               const tasksResult = await getTasksByList(list.id);
               return {
                 ...list,
-                tasks: tasksResult.success && tasksResult.data ? tasksResult.data.map((task: Task) => ({
-                  id: task.id,
-                  title: task.title,
-                  description: task.description,
-                  position: task.position,
-                  status: task.status,
-                  dueDate: task.dueDate
+                tasks: tasksResult.success && tasksResult.data ? tasksResult.data.map((taskResponse) => ({
+                  id: taskResponse.id,
+                  title: taskResponse.title,
+                  description: taskResponse.description,
+                  position: taskResponse.position,
+                  status: taskResponse.status as Status,
+                  dueDate: taskResponse.dueDate
                 })) : []
               };
             })

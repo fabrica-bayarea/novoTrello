@@ -7,6 +7,8 @@ import { useTaskOperations } from '@/lib/hooks/useTaskOperations';
 
 import { Input, Textarea } from "@/components/ui";
 
+import { Status } from '@/lib/types/board';
+
 import styles from './style.module.css';
 
 export default function EditTaskModal () {
@@ -15,14 +17,14 @@ export default function EditTaskModal () {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState('pending');
+  const [status, setStatus] = useState<Status>(Status.TODO);
   const [dueDate, setDueDate] = useState('');
 
   useEffect(() => {
     if (isEditTaskModalOpen && selectedTask) {
       setTitle(selectedTask.title || '');
       setDescription(selectedTask.description || '');
-      setStatus(selectedTask.status || 'pending');
+      setStatus(selectedTask.status || Status.TODO);
       setDueDate(selectedTask.dueDate ? toLocalDateTime(selectedTask.dueDate) : '');
     }
   }, [isEditTaskModalOpen, selectedTask]);
@@ -92,12 +94,12 @@ export default function EditTaskModal () {
         
         <select
           value={status}
-          onChange={(e) => setStatus(e.target.value)}
+          onChange={(e) => setStatus(e.target.value as Status)}
           className={styles.modalSelect}
         >
-          <option value="pending">Pendente</option>
-          <option value="in-progress">Em Progresso</option>
-          <option value="completed">Concluída</option>
+          <option value="TODO">Pendente</option>
+          <option value="IN_PROGRESS">Em progresso</option>
+          <option value="DONE">Concluído</option>
         </select>
         
         <input

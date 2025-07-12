@@ -38,6 +38,11 @@ async function bootstrap() {
       frameguard: {
         action: 'sameorigin',
       },
+      contentSecurityPolicy: {
+        directives: {
+          upgradeInsecureRequests: null,
+        },
+      },
     }),
   );
 

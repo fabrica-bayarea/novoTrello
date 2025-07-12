@@ -6,6 +6,8 @@ import { useModalStore } from '@/lib/stores/modal';
 import { useBoardStore } from '@/lib/stores/board';
 import { useTaskOperations } from '@/lib/hooks/useTaskOperations';
 
+import { Status } from '@/lib/types/board';
+
 import { Input, Textarea } from "@/components/ui";
 
 import styles from './style.module.css';
@@ -17,16 +19,16 @@ export default function CreateTaskModal () {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState('pending');
+  const [status, setStatus] = useState<Status>(Status.TODO);
   const [dueDate, setDueDate] = useState('');
 
-  const nextPosition = selectedListId ? getNextTaskPosition(selectedListId) : 0
+  const nextPosition = selectedListId ? getNextTaskPosition(selectedListId) : 0;
 
   useEffect(() => {
     if (isCreateTaskModalOpen) {
       setTitle('');
       setDescription('');
-      setStatus('pending');
+      setStatus(Status.TODO);
       setDueDate('');
     }
   }, [isCreateTaskModalOpen]);
@@ -52,7 +54,7 @@ export default function CreateTaskModal () {
         title: title.trim(),
         description: description.trim() || undefined,
         position: nextPosition,
-        status,
+        status: status,
         dueDate: formatToISO(dueDate),
       });
     }
@@ -88,12 +90,12 @@ export default function CreateTaskModal () {
         
         <select
           value={status}
-          onChange={(e) => setStatus(e.target.value)}
+          onChange={(e) => setStatus(e.target.value as Status)}
           className={styles.modalSelect}
         >
-          <option value="pending">Pendente</option>
-          <option value="in-progress">Em Progresso</option>
-          <option value="completed">Concluída</option>
+          <option value="TODO">Pendente</option>
+          <option value="IN_PROGRESS">Em progresso</option>
+          <option value="DONE">Concluído</option>
         </select>
         
         <input

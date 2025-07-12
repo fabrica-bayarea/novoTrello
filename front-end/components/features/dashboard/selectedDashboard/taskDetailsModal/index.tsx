@@ -23,33 +23,34 @@ export default function TaskDetailsModal() {
     });
   };
 
+  const statusMap = {
+    TODO: {
+      color: styles.statusPending,
+      label: 'Pendente',
+    },
+    IN_PROGRESS: {
+      color: styles.statusInProgress,
+      label: 'Em Progresso',
+    },
+    DONE: {
+      color: styles.statusCompleted,
+      label: 'Concluído',
+    },
+    DEFAULT: {
+      color: styles.statusDefault,
+      label: '',
+    },
+  };
+
   const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'pending':
-      case 'pendente':
-        return styles.statusPending;
-      case 'in_progress':
-      case 'em_progresso':
-        return styles.statusInProgress;
-      case 'completed':
-      case 'concluído':
-        return styles.statusCompleted;
-      default:
-        return styles.statusDefault;
-    }
+    const key = status?.toUpperCase() as keyof typeof statusMap;
+    return statusMap[key]?.color || statusMap.DEFAULT.color;
   };
 
   const getStatusLabel = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return 'Pendente';
-      case 'in_progress':
-        return 'Em Progresso';
-      case 'completed':
-        return 'Concluído';
-      default:
-        return status;
-    }
+    console.log(status);
+    const key = status?.toUpperCase() as keyof typeof statusMap;
+    return statusMap[key]?.label || status;
   };
 
   return (
