@@ -16,7 +16,10 @@ describe('TaskService', () => {
       findUnique: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      count: jest.fn(),
+      updateMany: jest.fn(),
     },
+    $transaction: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -40,17 +43,37 @@ describe('TaskService', () => {
       const dto: CreateTaskDto = {
         title: 'Tarefa Teste',
         listId: 'list-1',
-        position: 1,
         status: TaskStatus.TODO,
       };
-      const createdTask = { id: 'task-1', ...dto, creatorId: userId };
 
+      const createdTask = {
+        id: 'task-1',
+        ...dto,
+        creatorId: userId,
+        description: undefined,
+        dueDate: undefined,
+        position: 0,
+      };
+
+      mockPrisma.task.count = jest.fn().mockResolvedValue(0);
       mockPrisma.task.create.mockResolvedValue(createdTask);
 
       const result = await service.create(userId, dto);
 
+      expect(mockPrisma.task.count).toHaveBeenCalledWith({
+        where: { listId: dto.listId },
+      });
+
       expect(mockPrisma.task.create).toHaveBeenCalledWith({
-        data: { ...dto, creatorId: userId },
+        data: {
+          creatorId: userId,
+          listId: dto.listId,
+          title: dto.title,
+          description: undefined,
+          position: 0,
+          status: dto.status,
+          dueDate: undefined,
+        },
       });
       expect(result).toEqual(createdTask);
     });
@@ -120,20 +143,80 @@ describe('TaskService', () => {
     });
   });
 
-  describe('remove', () => {
-    it('should delete a task if it exists', async () => {
-      const id = 'task-1';
-      const existingTask = { id, title: 'Para deletar' };
+  it('must remove a task and adjust the position of the others', async () => {
+    const taskId = 'task-1';
+    const taskToDelete = {
+      id: taskId,
+      listId: 'list-123',
+      position: 2,
+    };
 
-      mockPrisma.task.findUnique.mockResolvedValue(existingTask);
-      mockPrisma.task.delete.mockResolvedValue({ id });
+    mockPrisma.task.findUnique.mockResolvedValue(taskToDelete);
 
-      const result = await service.remove(id);
+    const deleteMock = { where: { id: taskId } };
+    const updateManyMock = {
+      where: {
+        listId: taskToDelete.listId,
+        position: { gt: taskToDelete.position },
+      },
+      data: {
+        position: { decrement: 1 },
+      },
+    };
 
-      expect(mockPrisma.task.delete).toHaveBeenCalledWith({
-        where: { id },
-      });
-      expect(result).toEqual({ id });
+    mockPrisma.task.delete.mockReturnValue(deleteMock as unknown);
+    mockPrisma.task.updateMany.mockReturnValue(updateManyMock as unknown);
+
+    mockPrisma.$transaction = jest.fn().mockImplementation((operations) => {
+      return Promise.resolve(operations);
     });
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const result = await service.remove(taskId);
+
+    expect(mockPrisma.task.findUnique).toHaveBeenCalledWith({
+      where: { id: taskId },
+    });
+
+    expect(mockPrisma.task.delete).toHaveBeenCalledWith({
+      where: { id: taskId },
+    });
+
+    expect(mockPrisma.task.updateMany).toHaveBeenCalledWith({
+      where: {
+        listId: taskToDelete.listId,
+        position: { gt: taskToDelete.position },
+      },
+      data: {
+        position: { decrement: 1 },
+      },
+    });
+
+    expect(mockPrisma.$transaction).toHaveBeenCalledTimes(1);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    const operations: unknown[] = mockPrisma.$transaction.mock.calls[0][0];
+
+    expect(operations[0]).toMatchObject({
+      where: { id: taskId },
+    });
+
+    expect(operations[1]).toMatchObject({
+      where: {
+        listId: taskToDelete.listId,
+        position: { gt: taskToDelete.position },
+      },
+      data: {
+        position: { decrement: 1 },
+      },
+    });
+  });
+
+  it('should throw NotFoundException if the task does not exist', async () => {
+    mockPrisma.task.findUnique.mockResolvedValue(null);
+
+    await expect(service.remove('not-found')).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });

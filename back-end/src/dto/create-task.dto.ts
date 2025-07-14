@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsOptional, IsInt, IsDateString } from 'class-validator';
+import { IsString, IsOptional, IsDateString } from 'class-validator';
 import { TaskStatus } from 'src/common/enums/task-status.enum';
 
 export class CreateTaskDto {
@@ -25,13 +25,6 @@ export class CreateTaskDto {
   @IsOptional()
   @IsString()
   description?: string;
-
-  @ApiProperty({
-    description: 'Posição da tarefa na lista',
-    example: 1,
-  })
-  @IsInt()
-  position: number;
 
   @ApiProperty({
     description: 'Status da tarefa',

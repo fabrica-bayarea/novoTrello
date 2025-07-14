@@ -116,4 +116,19 @@ export class TaskController {
   getTodayOrOverdueTasks(@CurrentUser() user: AuthenticatedUser) {
     return this.taskService.findTasksOverdueDate(user.id);
   }
+
+  @ApiOperation({
+    summary: 'Move uma tarefa para outra lista',
+    description: 'Move uma tarefa específica para uma nova lista',
+  })
+  @ApiResponse({ status: 200, description: 'Tarefa movida com sucesso' })
+  @ApiResponse({ status: 400, description: 'Erro ao mover a tarefa' })
+  @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
+  @ApiResponse({ status: 403, description: 'Acesso negado' })
+  @ApiResponse({ status: 404, description: 'Lista não encontrada' })
+  @ApiResponse({ status: 404, description: 'Tarefa não encontrada' })
+  @Patch(':id/move')
+  moveTask(@Param('id') taskId: string, @Body('newListId') newListId: string) {
+    return this.taskService.moveTaskToList(taskId, newListId);
+  }
 }
