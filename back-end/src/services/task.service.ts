@@ -8,13 +8,24 @@ import { endOfDay } from 'date-fns';
 export class TaskService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(userId: string, dto: CreateTaskDto) {
-    return this.prisma.task.create({
+  async create(userId: string, dto: CreateTaskDto) {
+    const count = await this.prisma.task.count({
+      where: { listId: dto.listId },
+    });
+
+    const newTask = await this.prisma.task.create({
       data: {
-        ...dto,
         creatorId: userId,
+        listId: dto.listId,
+        title: dto.title,
+        description: dto.description,
+        position: count,
+        status: dto.status,
+        dueDate: dto.dueDate,
       },
     });
+
+    return newTask;
   }
 
   findAllByList(listId: string) {
@@ -68,9 +79,31 @@ export class TaskService {
     });
   }
 
-  async remove(id: string) {
-    await this.findOne(id);
-    return this.prisma.task.delete({ where: { id } });
+  async remove(taskId: string) {
+    const taskToDelete = await this.prisma.task.findUnique({
+      where: { id: taskId },
+    });
+
+    if (!taskToDelete) throw new NotFoundException('Task não encontrada');
+
+    await this.prisma.$transaction([
+      this.prisma.task.delete({
+        where: { id: taskId },
+      }),
+      this.prisma.task.updateMany({
+        where: {
+          listId: taskToDelete.listId,
+          position: {
+            gt: taskToDelete.position,
+          },
+        },
+        data: {
+          position: {
+            decrement: 1,
+          },
+        },
+      }),
+    ]);
   }
 
   async findTasksOverdueDate(userId: string) {
@@ -93,6 +126,42 @@ export class TaskService {
       },
       orderBy: {
         dueDate: 'asc',
+      },
+    });
+  }
+
+  async moveTaskToList(taskId: string, newListId: string) {
+    const task = await this.prisma.task.findUnique({
+      where: { id: taskId },
+    });
+
+    if (!task) {
+      throw new NotFoundException('Task não encontrada');
+    }
+
+    await this.prisma.task.updateMany({
+      where: {
+        listId: task.listId,
+        position: {
+          gt: task.position,
+        },
+      },
+      data: {
+        position: {
+          decrement: 1,
+        },
+      },
+    });
+
+    const newPosition = await this.prisma.task.count({
+      where: { listId: newListId },
+    });
+
+    return this.prisma.task.update({
+      where: { id: taskId },
+      data: {
+        listId: newListId,
+        position: newPosition,
       },
     });
   }

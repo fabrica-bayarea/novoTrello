@@ -43,7 +43,6 @@ describe('TaskController', () => {
       const dto: CreateTaskDto = {
         title: 'Nova tarefa',
         listId: 'list-1',
-        position: 1,
         status: TaskStatus.TODO,
       };
       const expectedResult = { id: 'task-1', ...dto, creatorId: user.id };
