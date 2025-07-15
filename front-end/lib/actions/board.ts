@@ -1,6 +1,7 @@
 'use server';
 
-import { getAuthTokenCookie, handleFetchError } from "@/lib/utils/tokenCookie";
+import { handleFetchError } from "@/lib/utils/handleFetchError";
+import { getSessionCookie } from "@/lib/utils/sessionCookie";
 
 interface BoardData {
   title: string;
@@ -9,18 +10,17 @@ interface BoardData {
 
 interface BoardListItemAPI {
   id: string;
-  title: string; // Corrigido para refletir a estrutura correta dos dados retornados pela API
+  title: string;
 }
 
 const BASE_URL_API = process.env.BASE_URL_API || 'http://localhost:3000';
 
 export async function createBoard(boardData: BoardData) {
-  const token = await getAuthTokenCookie();
   const response = await fetch(`${BASE_URL_API}/v1/boards`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      "Cookie": await getSessionCookie(),
     },
     body: JSON.stringify({
       ...boardData,
@@ -39,12 +39,11 @@ export async function createBoard(boardData: BoardData) {
 }
 
 export async function getBoards() {
-  const token = await getAuthTokenCookie();
   const response = await fetch(`${BASE_URL_API}/v1/boards`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      "Cookie": await getSessionCookie(),
     },
   });
 
@@ -68,12 +67,11 @@ export async function getBoards() {
 }
 
 export async function getBoardById(boardId: string) {
-  const token = await getAuthTokenCookie();
   const response = await fetch(`${BASE_URL_API}/v1/boards/${boardId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      "Cookie": await getSessionCookie(),
     },
   });
 

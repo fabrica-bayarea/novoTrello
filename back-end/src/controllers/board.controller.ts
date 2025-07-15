@@ -13,9 +13,11 @@ import { BoardService } from '../services/board.service';
 import { CreateBoardDto } from '../dto/create-board.dto';
 import { UpdateBoardDto } from '../dto/update-board.dto';
 import { JwtAuthGuard } from 'src/guards/jwt.guard';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiCookieAuth, ApiTags } from '@nestjs/swagger';
 import { AuthenticatedUser } from 'src/types/user.interface';
 
+@ApiCookieAuth()
+@ApiTags('Quadros')
 @UseGuards(JwtAuthGuard)
 @Controller({ path: 'boards', version: '1' })
 export class BoardController {

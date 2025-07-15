@@ -1,6 +1,7 @@
 'use server';
 
-import { getAuthTokenCookie, handleFetchError } from "@/lib/utils/tokenCookie";
+import { handleFetchError } from "@/lib/utils/handleFetchError";
+import { getSessionCookie } from "../utils/sessionCookie";
 
 const BASE_URL_API = process.env.BASE_URL_API || 'http://localhost:3000';
 
@@ -35,12 +36,11 @@ interface TaskResponse {
 }
 
 export async function createTask(taskData: TaskData) {
-  const token = await getAuthTokenCookie();
   const response = await fetch(`${BASE_URL_API}/v1/tasks`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      "Cookie": await getSessionCookie(),
     },
     body: JSON.stringify(taskData),
   });
@@ -57,12 +57,11 @@ export async function createTask(taskData: TaskData) {
 }
 
 export async function getTasksByList(listId: string) {
-  const token = await getAuthTokenCookie();
   const response = await fetch(`${BASE_URL_API}/v1/tasks/list/${listId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      "Cookie": await getSessionCookie(),
     },
   });
 
@@ -78,12 +77,11 @@ export async function getTasksByList(listId: string) {
 }
 
 export async function getTaskById(taskId: string) {
-  const token = await getAuthTokenCookie();
   const response = await fetch(`${BASE_URL_API}/v1/tasks/${taskId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      "Cookie": await getSessionCookie(),
     },
   });
 
@@ -99,12 +97,11 @@ export async function getTaskById(taskId: string) {
 }
 
 export async function updateTask(taskId: string, updateData: UpdateTaskData) {
-  const token = await getAuthTokenCookie();
   const response = await fetch(`${BASE_URL_API}/v1/tasks/${taskId}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      "Cookie": await getSessionCookie(),
     },
     body: JSON.stringify(updateData),
   });
@@ -121,12 +118,11 @@ export async function updateTask(taskId: string, updateData: UpdateTaskData) {
 }
 
 export async function deleteTask(taskId: string) {
-  const token = await getAuthTokenCookie();
   const response = await fetch(`${BASE_URL_API}/v1/tasks/${taskId}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      "Cookie": await getSessionCookie()
     },
   });
 
@@ -141,12 +137,11 @@ export async function deleteTask(taskId: string) {
 }
 
 export async function moveTask(taskId: string, newPosition: number) {
-  const token = await getAuthTokenCookie();
   const response = await fetch(`${BASE_URL_API}/v1/tasks/${taskId}/position`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      "Cookie": await getSessionCookie()
     },
     body: JSON.stringify({ newPosition }),
   });
@@ -167,12 +162,11 @@ export async function moveTask(taskId: string, newPosition: number) {
 }
 
 export async function getExpiredTasks() {
-  const token = await getAuthTokenCookie();
   const response = await fetch(`${BASE_URL_API}/v1/tasks/due/today`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      "Cookie": await getSessionCookie()
     },
   });
 

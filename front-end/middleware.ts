@@ -24,13 +24,21 @@ export function middleware(request: NextRequest) {
 
   const isProtectedRoute = !request.nextUrl.pathname.startsWith('/auth');
   if (isProtectedRoute) {
-    const tokenCookie = request.cookies.get('auth-token');
+    const tokenCookie = request.cookies.get('trello-session');
     if (!tokenCookie?.value) {
       const loginURL = new URL('/auth/login', request.url);
       const redirectResponse = NextResponse.redirect(loginURL);
       redirectResponse.headers.set('Content-Security-Policy', sanitizedCspHeader);
       return redirectResponse;
     }
+  }
+
+  const homeToDashboard = request.nextUrl.pathname === '/';
+  if (homeToDashboard) {
+    const dashboardURL = new URL('/dashboard', request.url);
+    const redirectResponse = NextResponse.redirect(dashboardURL);
+    redirectResponse.headers.set('Content-Security-Policy', sanitizedCspHeader);
+    return redirectResponse;
   }
 
   const response = NextResponse.next();

@@ -61,19 +61,29 @@ async function bootstrap() {
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Novo Trello API - IESB')
     .setDescription('Documentação da API do novo trello do BayArea - IESB')
-    .addBearerAuth({
-      type: 'http',
-      scheme: 'bearer',
-      bearerFormat: 'JWT',
-    })
-    .setExternalDoc(
-      'Documentação adicional',
-      'https://github.com/fabrica-bayarea/novoTrello',
-    )
+    .addCookieAuth('trello-session')
+    .setExternalDoc('Documentação adicional', 'https://github.com/fabrica-bayarea/novoTrello')
     .setContact('BayArea', '', 'nde.ads@iesb.br')
-    .setLicense(
-      'License GPL-3.0',
-      'https://github.com/fabrica-bayarea/novoTrello?tab=GPL-3.0-1-ov-file',
+    .setLicense('License GPL-3.0', 'https://github.com/fabrica-bayarea/novoTrello?tab=GPL-3.0-1-ov-file')
+    .addTag(
+      'Autenticação e Autorização',
+      'Autenticação e autorização via cookie "trello-session" (JWT).'
+    )
+    .addTag(
+      'Perfil de usuário',
+      'Operações relacionadas ao perfil e gerenciamento de usuários.'
+    )
+    .addTag(
+      'Quadros',
+      'Gerenciamento de quadros (criação, listagem, atualização e remoção).'
+    )
+    .addTag(
+      'Listas',
+      'Gerenciamento de listas dentro dos quadros (criação, ordenação, atualização e remoção).'
+    )
+    .addTag(
+      'Tarefas',
+      'Gerenciamento de tarefas dentro das listas (criação, movimentação, atualização, remoção e atribuição).'
     )
     .setVersion('1.0')
     .build();

@@ -1,15 +1,14 @@
 "use server";
 
-import { getAuthTokenCookie, handleFetchError } from "@/lib/utils/tokenCookie";
+import { getSessionCookie } from "@/lib/utils/sessionCookie";
+import { handleFetchError } from "@/lib/utils/handleFetchError";
 
 const BASE_URL_API = process.env.BASE_URL_API || 'http://localhost:3000';
 
 export async function getUserProfile() {
-  const token = await getAuthTokenCookie();
-
   const response = await fetch(`${BASE_URL_API}/v1/profile`, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      "Cookie": await getSessionCookie(),
     }
   });
 
@@ -24,13 +23,13 @@ export async function getUserProfile() {
 }
 
 export async function updateUserProfile(formData: { name: string; userName: string; email: string; }) {
-  const token = await getAuthTokenCookie();
+
 
   const response = await fetch(`${BASE_URL_API}/v1/profile`, {
     method: "PUT",
     headers: {
-      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
+      "Cookie": await getSessionCookie(),
     },
     body: JSON.stringify(formData),
   });
@@ -46,12 +45,12 @@ export async function updateUserProfile(formData: { name: string; userName: stri
 }
 
 export async function deleteUserProfile() {
-  const token = await getAuthTokenCookie();
+
 
   const response = await fetch(`${BASE_URL_API}/v1/profile`, {
     method: "DELETE",
     headers: {
-      Authorization: `Bearer ${token}`,
+      "Cookie": await getSessionCookie(),
     },
   });
 

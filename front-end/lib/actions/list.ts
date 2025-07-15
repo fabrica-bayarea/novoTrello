@@ -1,6 +1,7 @@
 'use server';
 
-import { getAuthTokenCookie, handleFetchError } from "@/lib/utils/tokenCookie";
+import { getSessionCookie } from "@/lib/utils/sessionCookie";
+import { handleFetchError } from "@/lib/utils/handleFetchError";
 
 const BASE_URL_API = process.env.BASE_URL_API || 'http://localhost:3000';
 
@@ -31,11 +32,10 @@ interface PatchListData {
 
 
 export async function getAllList(boardId: string) {
-  const token = await getAuthTokenCookie();
   const response = await fetch(`${BASE_URL_API}/v1/lists/board/${boardId}`, {
     headers: {
       'Accept': 'application/json',
-      'Authorization': `Bearer ${token}`,
+      "Cookie": await getSessionCookie(),
     },
   });
 
@@ -51,13 +51,12 @@ export async function getAllList(boardId: string) {
 }
 
 export async function createList(newListData: NewListData) {
-  const token = await getAuthTokenCookie();
   const response = await fetch(`${BASE_URL_API}/v1/lists`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Authorization': `Bearer ${token}`,
+      "Cookie": await getSessionCookie(),
     },
     body: JSON.stringify(newListData),
   });
@@ -82,7 +81,6 @@ export async function createList(newListData: NewListData) {
 }
 
 export async function editList(List: PatchListData) {
-  const token = await getAuthTokenCookie();
   const updateData: Partial<Omit<PatchListData, 'id'>> = {};
   if (List.title !== undefined) {
     updateData.title = List.title;
@@ -96,7 +94,7 @@ export async function editList(List: PatchListData) {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Authorization': `Bearer ${token}`,
+      "Cookie": await getSessionCookie(),
     },
     body: JSON.stringify(updateData),
   });
@@ -117,12 +115,11 @@ export async function editList(List: PatchListData) {
 }
 
 export async function deleteList(listId: string) {
-  const token = await getAuthTokenCookie();
   const response = await fetch(`${BASE_URL_API}/v1/lists/${listId}`, {
     method: 'DELETE',
     headers: {
       'Accept': 'application/json',
-      'Authorization': `Bearer ${token}`,
+      "Cookie": await getSessionCookie(),
     },
   });
 
@@ -142,13 +139,12 @@ export async function deleteList(listId: string) {
 }
 
 export async function moveList(listId: string, newPosition: number) {
-  const token = await getAuthTokenCookie();
   const response = await fetch(`${BASE_URL_API}/v1/lists/${listId}/position`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Authorization': `Bearer ${token}`,
+      "Cookie": await getSessionCookie(),
     },
     body: JSON.stringify({ newPosition }),
   });

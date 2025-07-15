@@ -14,10 +14,12 @@
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
+    "@types/set-cookie-parser": "^2.4.10",
     "lucide-react": "^0.487.0",
     "next": "^15.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "set-cookie-parser": "^2.7.1",
     "zustand": "^5.0.5"
   },
   "devDependencies": {

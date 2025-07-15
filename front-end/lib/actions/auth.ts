@@ -1,6 +1,7 @@
 "use server"
 
-import { parseJwt, setAuthTokenCookie, handleFetchError } from "@/lib/utils/tokenCookie";
+import { handleFetchError } from "@/lib/utils/handleFetchError";
+import { setSessioCookie } from "@/lib/utils/sessionCookie";
 
 const BASE_URL_API = process.env.BASE_URL_API || 'http://trello-api:3000';
 
@@ -20,9 +21,8 @@ export async function login(email: string, password: string, rememberMe: boolean
     };
   }
 
-  const { accessToken } = await response.json();
-  const payload = parseJwt(accessToken);
-  await setAuthTokenCookie(accessToken, payload.exp);
+  const rawSetCookie = response.headers.get("set-cookie");
+  await setSessioCookie(rawSetCookie!);
 
   return { success: true, data: { message: 'success' } };
 }
@@ -43,9 +43,8 @@ export async function register(fullName: string, userName: string, email: string
     };
   }
 
-  const { accessToken } = await response.json();
-  const payload = parseJwt(accessToken);
-  await setAuthTokenCookie(accessToken, payload.exp);
+  const rawSetCookie = response.headers.get("set-cookie");
+  await setSessioCookie(rawSetCookie!);
 
   return { success: true, data: { message: 'success' } };
 }
@@ -73,7 +72,7 @@ export async function forgotPassword(email: string) {
 //   try {
 //     const cookieStore = await cookies()
 
-//     cookieStore.delete("auth-token")
+//     cookieStore.delete("trello-session")
 //     redirect("/auth/login")
 //   } catch (error) {
 //     console.error("Erro ao fazer logout:", error)
