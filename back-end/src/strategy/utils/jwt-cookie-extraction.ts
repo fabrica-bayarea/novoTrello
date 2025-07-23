@@ -1,9 +1,9 @@
 import { Request } from 'express';
 
 export const jwtFromCookie = (req: Request) => {
-  let token = null;
+  let token: string | null = null;
   if (req && req.cookies) {
-    token = req.cookies['trello-session'];
+    token = (req.cookies as Record<string, string>)['trello-session'];
   }
   return token;
 };
