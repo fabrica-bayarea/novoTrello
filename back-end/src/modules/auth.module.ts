@@ -9,6 +9,7 @@ import { MicrosoftStrategy } from 'src/strategy/microsoft.strategy';
 import { PrismaService } from 'src/services/prisma.service';
 import { AuthService } from 'src/services/auth.service';
 import { AuthController } from 'src/controllers/auth.controller';
+import { EmailModule } from './email.module';
 
 @Module({})
 export class AuthModule {
@@ -18,6 +19,7 @@ export class AuthModule {
       imports: [
         ConfigModule,
         PassportModule,
+        EmailModule,
         JwtModule.registerAsync({
           imports: [ConfigModule],
           inject: [ConfigService],

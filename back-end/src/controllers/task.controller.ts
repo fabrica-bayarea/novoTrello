@@ -13,7 +13,12 @@ import { CreateTaskDto } from '../dto/create-task.dto';
 import { UpdateTaskDto } from '../dto/update-task.dto';
 import { JwtAuthGuard } from '../guards/jwt.guard';
 import { CurrentUser } from '../strategy/decorators/current-user.decorator';
-import { ApiOperation, ApiResponse, ApiCookieAuth, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiCookieAuth,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthenticatedUser } from 'src/types/user.interface';
 
 @ApiCookieAuth()
