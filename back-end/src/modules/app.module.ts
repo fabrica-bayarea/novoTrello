@@ -9,6 +9,7 @@ import { LoggingMiddleware } from 'src/middleware/logging.middleware';
 import { BoardModule } from './board.module';
 import { ListModule } from './list.module';
 import { TaskModule } from './task.module';
+import { RolesUsersModule } from './roles.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { TaskModule } from './task.module';
     BoardModule,
     ListModule,
     TaskModule,
+    RolesUsersModule
   ],
   controllers: [AppController],
   providers: [AppService],
