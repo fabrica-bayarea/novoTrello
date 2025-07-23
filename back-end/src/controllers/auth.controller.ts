@@ -116,7 +116,6 @@ export class AuthController {
     } catch (error) {
       this.logger.error(
         `Erro ao registrar usuário: ${(error as Error).message}`,
-        error.stack,
       );
 
       if (error instanceof BadRequestException) {
@@ -166,7 +165,6 @@ export class AuthController {
     } catch (error) {
       this.logger.error(
         `Erro ao autenticar usuário: ${(error as Error).message}`,
-        error.stack,
       );
 
       if (
@@ -244,7 +242,6 @@ export class AuthController {
     } catch (error) {
       this.logger.error(
         `Erro no callback do Google: ${(error as Error).message}`,
-        error.stack,
       );
       return res.redirect(
         `${this.BASE_URL_UI}/auth/error?message=google_login_failed`,
@@ -317,7 +314,6 @@ export class AuthController {
     } catch (error) {
       this.logger.error(
         `Erro no callback da Microsoft: ${(error as Error).message}`,
-        error.stack,
       );
       return res.redirect(
         `${this.BASE_URL_UI}/auth/error?message=microsoft_login_failed`,
