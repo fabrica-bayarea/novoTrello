@@ -103,7 +103,9 @@ export class SignResponseJwtDto {
 export class ForgotPasswordDto {
   @ApiProperty({ example: 'exemple@email.com' })
   @IsEmail({}, { message: 'Deve ser um email válido' })
-  email?: string;
+  @IsNotEmpty({ message: 'O email não pode estar vazio' })
+  @IsString({ message: 'O email deve ser uma string' })
+  email: string;
 }
 
 export class ChangePasswordDto {

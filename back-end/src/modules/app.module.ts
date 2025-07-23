@@ -14,7 +14,7 @@ import { TaskModule } from './task.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: ['.env'],
     }),
     PrismaModule,
     AuthModule.register(),

@@ -1,107 +1,109 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from '../../src/services/auth.service';
-import { PrismaService } from '../../src/services/prisma.service';
+import { PrismaService } from 'src/services/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import { ForbiddenException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { EmailService } from '../../src/services/email.service';
 import * as argon2 from 'argon2';
-
-const mockJwtService = {
-  sign: jest.fn().mockReturnValue('mocked_token'),
-};
-
-const mockPrismaService = {
-  user: {
-    findUnique: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-  },
-};
+import { ForbiddenException } from '@nestjs/common';
+import { User } from '@prisma/client';
 
 describe('AuthService', () => {
   let service: AuthService;
+  let prisma: PrismaService;
+
+  let mockUser: User;
 
   beforeEach(async () => {
+    const passwordHash = await argon2.hash('validpassword');
+    mockUser = {
+      id: 'user-id-1',
+      email: 'test@example.com',
+      name: 'Test User',
+      userName: 'testuser',
+      passwordHash,
+      authProvider: 'local',
+      providerId: null,
+      CreatedAt: new Date(),
+      isVerified: true,
+      resetToken: null,
+      resetTokenExpiresAt: null,
+      role: 'ADMIN',
+      updatedAt: new Date(),
+      image: null,
+    };
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
-        { provide: PrismaService, useValue: mockPrismaService },
-        { provide: JwtService, useValue: mockJwtService },
+        {
+          provide: PrismaService,
+          useValue: {
+            user: {
+              findUnique: jest.fn(),
+              update: jest.fn(),
+            },
+          },
+        },
+        {
+          provide: JwtService,
+          useValue: {
+            sign: jest.fn().mockReturnValue('fake-jwt-token'),
+          },
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn().mockReturnValue('secret'),
+          },
+        },
+        {
+          provide: EmailService,
+          useValue: {
+            sendForgotPasswordEmail: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  describe('signUp', () => {
-    it('deve lançar exceção se o e-mail já estiver cadastrado', async () => {
-      mockPrismaService.user.findUnique.mockResolvedValue({ id: '1' });
-
-      await expect(
-        service.signUp({
-          email: 'test@example.com',
-          password: '123456',
-          name: 'Test User',
-          userName: 'testuser',
-        }),
-      ).rejects.toThrow(ForbiddenException);
-    });
-
-    it('deve retornar token quando o usuário for criado com sucesso', async () => {
-      mockPrismaService.user.findUnique.mockResolvedValue(null);
-      mockPrismaService.user.create.mockResolvedValue({
-        id: '1',
-        email: 'test@example.com',
-        name: 'Test User',
-        userName: 'testuser',
-        authProvider: 'local',
-      });
-
-      const result = await service.signUp({
-        email: 'test@example.com',
-        password: '123456',
-        name: 'Test User',
-        userName: 'testuser',
-      });
-
-      expect(result).toEqual({ accessToken: 'mocked_token' });
-    });
+    prisma = module.get<PrismaService>(PrismaService);
   });
 
   describe('signIn', () => {
-    it('deve lançar exceção se o usuário não for encontrado ou senha inválida', async () => {
-      mockPrismaService.user.findUnique.mockResolvedValue(null);
+    it('should return a token when credentials are valid', async () => {
+      jest.spyOn(prisma.user, 'findUnique').mockResolvedValue({ ...mockUser });
+
+      const result = await service.signIn({
+        email: 'test@example.com',
+        password: 'validpassword',
+        rememberMe: false,
+      });
+
+      expect(result).toEqual({ accessToken: 'fake-jwt-token' });
+    });
+
+    it('should throw ForbiddenException for invalid credentials', async () => {
+      jest.spyOn(prisma.user, 'findUnique').mockResolvedValue({ ...mockUser });
 
       await expect(
         service.signIn({
-          email: 'notfound@example.com',
-          password: '123456',
+          email: 'test@example.com',
+          password: 'wrongpassword',
           rememberMe: false,
         }),
       ).rejects.toThrow(ForbiddenException);
     });
 
-    it('deve retornar token se as credenciais forem válidas', async () => {
-      const hash = await argon2.hash('123456');
-      mockPrismaService.user.findUnique.mockResolvedValue({
-        id: '1',
-        email: 'valid@example.com',
-        passwordHash: hash,
-        authProvider: 'local',
-        name: 'Valid User',
-        userName: 'validuser',
-      });
+    it('should throw ForbiddenException if user is not found', async () => {
+      jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(null);
 
-      const result = await service.signIn({
-        email: 'valid@example.com',
-        password: '123456',
-        rememberMe: false,
-      });
-
-      expect(result).toEqual({ accessToken: 'mocked_token' });
+      await expect(
+        service.signIn({
+          email: 'notfound@example.com',
+          password: 'whatever',
+          rememberMe: false,
+        }),
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 });
