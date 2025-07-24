@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import styles from './error.module.css';
 
 export default function Error({ error, reset }: { error: Error; reset: () => void }) {
   useEffect(() => {
@@ -8,10 +9,10 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
   }, [error]);
 
   return (
-    <div style={{ height: '100vh', display:'flex', justifyContent:'center', alignItems:'center', flexDirection:'column', textAlign:'center' }}>
-      <h1 style={{ fontSize: '4rem', marginBottom: '1rem' }}>Erro inesperado</h1>
-      <p style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Ocorreu um erro. Tente recarregar a página.</p>
-      <button onClick={() => reset()} style={{ padding: '0.75rem 1.5rem', cursor: 'pointer' }}>
+    <div className={styles.container}>
+      <h1 className={styles.title}>Erro inesperado</h1>
+      <p className={styles.message}>Ocorreu um erro. Tente recarregar a página.</p>
+      <button onClick={() => reset()} className={styles.button}>
         Tentar novamente
       </button>
     </div>
