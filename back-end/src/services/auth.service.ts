@@ -21,6 +21,7 @@ import * as fs from 'fs';
 import 'dotenv/config';
 import { resolveTemplatePath } from 'src/utils/path.helper';
 import { ResetPasswordDto } from 'src/dto/reset-password.dto';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -83,7 +84,7 @@ export class AuthService {
         userName: data.email.split('@')[0],
         passwordHash: provider === 'local' ? data.password! : data.providerId!,
         providerId: provider === 'local' ? null : data.providerId!,
-        role: 'ADMIN' as const,
+        role: Role.MEMBER,
         authProvider: provider as 'local' | 'google' | 'microsoft',
       };
 
@@ -96,9 +97,6 @@ export class AuthService {
     return existingUser;
   }
 
-  /**
-   * Trata erros específicos ao criar um usuário.
-   */
   private handleSignUpError(error: unknown): never {
     if (
       error instanceof PrismaClientKnownRequestError &&
