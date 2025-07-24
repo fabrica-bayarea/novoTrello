@@ -13,7 +13,12 @@ import { CreateListDto } from '../dto/create-list.dto';
 import { UpdateListDto } from '../dto/update-list.dto';
 import { JwtAuthGuard } from '../guards/jwt.guard';
 import { CurrentUser } from 'src/strategy/decorators/current-user.decorator';
-import { ApiOperation, ApiResponse, ApiCookieAuth, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiCookieAuth,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthenticatedUser } from 'src/types/user.interface';
 
 @ApiCookieAuth()

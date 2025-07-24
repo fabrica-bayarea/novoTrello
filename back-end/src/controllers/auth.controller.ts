@@ -16,10 +16,10 @@ import {
   UnauthorizedException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { 
-  ApiOperation, 
-  ApiResponse, 
-  ApiTags, 
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
   ApiCookieAuth,
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
@@ -49,14 +49,17 @@ export class AuthController {
   ) {}
 
   private get BASE_URL_UI(): string {
-    const isProduction = this.configService.get<string>('NODE_ENV') === 'production';
-    const baseUrl = this.configService.get<string>('BASE_URL') || 'http://localhost';
-    const baseUrlUI = this.configService.get<string>('BASE_URL_UI') || 'http://localhost:3001';
+    const isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
+    const baseUrl =
+      this.configService.get<string>('BASE_URL') || 'http://localhost';
+    const baseUrlUI =
+      this.configService.get<string>('BASE_URL_UI') || 'http://localhost:3001';
     return isProduction ? baseUrl : baseUrlUI;
   }
 
   private setCookieOptions(rememberMe = false) {
-    const expirationTime = rememberMe 
+    const expirationTime = rememberMe
       ? 30 * 24 * 60 * 60 * 1000 // 30 dias
       : 24 * 60 * 60 * 1000; // 1 dia
 
@@ -73,18 +76,21 @@ export class AuthController {
     summary: 'Cadastra um novo Usuário',
     description: 'Cria um novo usuário e o grava no banco de dados.',
   })
-  @ApiResponse({ 
-    status: HttpStatus.CREATED, 
+  @ApiResponse({
+    status: HttpStatus.CREATED,
     description: 'Usuário cadastrado com sucesso',
     schema: {
       type: 'object',
       properties: {
-        message: { type: 'string', example: 'Usuário cadastrado com sucesso' }
-      }
-    }
+        message: { type: 'string', example: 'Usuário cadastrado com sucesso' },
+      },
+    },
   })
   @ApiBadRequestResponse({ description: 'Dados inválidos fornecidos' })
-  @ApiResponse({ status: HttpStatus.CONFLICT, description: 'Email já está em uso' })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT,
+    description: 'Email já está em uso',
+  })
   @ApiInternalServerErrorResponse({ description: 'Erro interno do servidor' })
   @HttpCode(HttpStatus.CREATED)
   @Post('signup')
@@ -95,35 +101,43 @@ export class AuthController {
       }
 
       const result = await this.authService.signUp(dto);
-      
+
       return res
-        .cookie('trello-session', result.accessToken, this.setCookieOptions(false))
+        .cookie(
+          'trello-session',
+          result.accessToken,
+          this.setCookieOptions(false),
+        )
         .status(HttpStatus.CREATED)
         .json({ message: 'Usuário cadastrado com sucesso' });
     } catch (error) {
-      this.logger.error(`Erro ao registrar usuário: ${(error as Error).message}`, error.stack);
-      
+      this.logger.error(
+        `Erro ao registrar usuário: ${(error as Error).message}`,
+        error.stack,
+      );
+
       if (error instanceof BadRequestException) {
         throw error;
       }
-      
+
       throw new InternalServerErrorException('Erro interno durante o registro');
     }
   }
 
   @ApiOperation({
     summary: 'Autenticação de usuário',
-    description: 'Realiza a autenticação do usuário e retorna um token de acesso para utilização no sistema.',
+    description:
+      'Realiza a autenticação do usuário e retorna um token de acesso para utilização no sistema.',
   })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'Usuário autenticado com sucesso',
     schema: {
       type: 'object',
       properties: {
-        message: { type: 'string', example: 'Usuário autenticado com sucesso' }
-      }
-    }
+        message: { type: 'string', example: 'Usuário autenticado com sucesso' },
+      },
+    },
   })
   @ApiUnauthorizedResponse({ description: 'Credenciais inválidas' })
   @ApiBadRequestResponse({ description: 'Dados de login inválidos' })
@@ -137,19 +151,31 @@ export class AuthController {
       }
 
       const result = await this.authService.signIn(dto);
-      
+
       return res
-        .cookie('trello-session', result.accessToken, this.setCookieOptions(dto.rememberMe))
+        .cookie(
+          'trello-session',
+          result.accessToken,
+          this.setCookieOptions(dto.rememberMe),
+        )
         .status(HttpStatus.OK)
         .json({ message: 'Usuário autenticado com sucesso' });
     } catch (error) {
-      this.logger.error(`Erro ao autenticar usuário: ${(error as Error).message}`, error.stack);
-      
-      if (error instanceof BadRequestException || error instanceof UnauthorizedException) {
+      this.logger.error(
+        `Erro ao autenticar usuário: ${(error as Error).message}`,
+        error.stack,
+      );
+
+      if (
+        error instanceof BadRequestException ||
+        error instanceof UnauthorizedException
+      ) {
         throw error;
       }
-      
-      throw new InternalServerErrorException('Erro interno durante a autenticação');
+
+      throw new InternalServerErrorException(
+        'Erro interno durante a autenticação',
+      );
     }
   }
 
@@ -165,13 +191,17 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Callback do Google após autenticação' })
-  @ApiResponse({ status: HttpStatus.FOUND, description: 'Login do Google bem-sucedido' })
+  @ApiResponse({
+    status: HttpStatus.FOUND,
+    description: 'Login do Google bem-sucedido',
+  })
   @ApiUnauthorizedResponse({ description: 'Não autorizado' })
   @ApiInternalServerErrorResponse({ description: 'Erro interno do servidor' })
   @Get('google/callback')
   @UseGuards(IsEnabledAuthGuard('google', 'ENABLE_GOOGLE_OAUTH'))
   async googleAuthRedirect(
-    @Req() req: {
+    @Req()
+    req: {
       user: {
         google_id: string;
         email: string;
@@ -183,10 +213,12 @@ export class AuthController {
   ) {
     try {
       const { user } = req;
-      
+
       if (!user || !user.google_id || !user.email) {
         this.logger.warn('Dados do usuário do Google incompletos');
-        return res.redirect(`${this.BASE_URL_UI}/auth/error?message=incomplete_google_data`);
+        return res.redirect(
+          `${this.BASE_URL_UI}/auth/error?message=incomplete_google_data`,
+        );
       }
 
       const authResult = await this.authService.signInWithProvider('google', {
@@ -200,11 +232,20 @@ export class AuthController {
       }
 
       return res
-        .cookie('trello-session', authResult.accessToken, this.setCookieOptions(false))
+        .cookie(
+          'trello-session',
+          authResult.accessToken,
+          this.setCookieOptions(false),
+        )
         .redirect(`${this.BASE_URL_UI}/dashboard`);
     } catch (error) {
-      this.logger.error(`Erro no callback do Google: ${(error as Error).message}`, error.stack);
-      return res.redirect(`${this.BASE_URL_UI}/auth/error?message=google_login_failed`);
+      this.logger.error(
+        `Erro no callback do Google: ${(error as Error).message}`,
+        error.stack,
+      );
+      return res.redirect(
+        `${this.BASE_URL_UI}/auth/error?message=google_login_failed`,
+      );
     }
   }
 
@@ -220,13 +261,17 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Callback da Microsoft após autenticação' })
-  @ApiResponse({ status: HttpStatus.FOUND, description: 'Login da Microsoft bem-sucedido' })
+  @ApiResponse({
+    status: HttpStatus.FOUND,
+    description: 'Login da Microsoft bem-sucedido',
+  })
   @ApiUnauthorizedResponse({ description: 'Não autorizado' })
   @ApiInternalServerErrorResponse({ description: 'Erro interno do servidor' })
   @Get('microsoft/callback')
   @UseGuards(IsEnabledAuthGuard('microsoft', 'ENABLE_MICROSOFT_OAUTH'))
   async microsoftAuthRedirect(
-    @Req() req: {
+    @Req()
+    req: {
       user: {
         microsoftId: string;
         email: string;
@@ -238,44 +283,62 @@ export class AuthController {
   ) {
     try {
       const { user } = req;
-      
+
       if (!user || !user.microsoftId || !user.email) {
         this.logger.warn('Dados do usuário da Microsoft incompletos');
-        return res.redirect(`${this.BASE_URL_UI}/auth/error?message=incomplete_microsoft_data`);
+        return res.redirect(
+          `${this.BASE_URL_UI}/auth/error?message=incomplete_microsoft_data`,
+        );
       }
 
-      const authResult = await this.authService.signInWithProvider('microsoft', {
-        providerId: user.microsoftId,
-        email: user.email,
-        name: user.name,
-      });
+      const authResult = await this.authService.signInWithProvider(
+        'microsoft',
+        {
+          providerId: user.microsoftId,
+          email: user.email,
+          name: user.name,
+        },
+      );
 
       if (!authResult?.accessToken) {
         throw new Error('Token de acesso não gerado');
       }
 
       return res
-        .cookie('trello-session', authResult.accessToken, this.setCookieOptions(false))
+        .cookie(
+          'trello-session',
+          authResult.accessToken,
+          this.setCookieOptions(false),
+        )
         .redirect(`${this.BASE_URL_UI}/dashboard`);
     } catch (error) {
-      this.logger.error(`Erro no callback da Microsoft: ${(error as Error).message}`, error.stack);
-      return res.redirect(`${this.BASE_URL_UI}/auth/error?message=microsoft_login_failed`);
+      this.logger.error(
+        `Erro no callback da Microsoft: ${(error as Error).message}`,
+        error.stack,
+      );
+      return res.redirect(
+        `${this.BASE_URL_UI}/auth/error?message=microsoft_login_failed`,
+      );
     }
   }
 
   @ApiOperation({
     summary: 'Envia email para recuperação de senha',
-    description: 'Envia um email com instruções para recuperação de senha ao usuário.',
+    description:
+      'Envia um email com instruções para recuperação de senha ao usuário.',
   })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'Email enviado com sucesso',
     schema: {
       type: 'object',
       properties: {
-        message: { type: 'string', example: 'Email de recuperação enviado com sucesso' }
-      }
-    }
+        message: {
+          type: 'string',
+          example: 'Email de recuperação enviado com sucesso',
+        },
+      },
+    },
   })
   @ApiBadRequestResponse({ description: 'Email inválido ou não fornecido' })
   @ApiInternalServerErrorResponse({ description: 'Falha ao enviar o email' })
@@ -290,29 +353,35 @@ export class AuthController {
       await this.authService.forgotPassword(forgotPasswordDto);
       return { message: 'Email de recuperação enviado com sucesso' };
     } catch (error) {
-      this.logger.error(`Erro ao processar esqueci senha: ${(error as Error).message}`, error.stack);
-      
+      this.logger.error(
+        `Erro ao processar esqueci senha: ${(error as Error).message}`,
+        error.stack,
+      );
+
       if (error instanceof BadRequestException) {
         throw error;
       }
-      
-      throw new InternalServerErrorException('Erro interno ao processar solicitação');
+
+      throw new InternalServerErrorException(
+        'Erro interno ao processar solicitação',
+      );
     }
   }
 
   @ApiOperation({
     summary: 'Altera a senha do usuário com token de recuperação',
-    description: 'Permite que o usuário altere sua senha usando um token de recuperação enviado por email.',
+    description:
+      'Permite que o usuário altere sua senha usando um token de recuperação enviado por email.',
   })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'Senha alterada com sucesso',
     schema: {
       type: 'object',
       properties: {
-        message: { type: 'string', example: 'Senha alterada com sucesso' }
-      }
-    }
+        message: { type: 'string', example: 'Senha alterada com sucesso' },
+      },
+    },
   })
   @ApiBadRequestResponse({ description: 'Token inválido ou dados incompletos' })
   @ApiUnauthorizedResponse({ description: 'Token expirado ou inválido' })
@@ -328,12 +397,18 @@ export class AuthController {
       await this.authService.resetPassword(dto);
       return { message: 'Senha alterada com sucesso' };
     } catch (error) {
-      this.logger.error(`Erro ao resetar senha: ${(error as Error).message}`, error.stack);
-      
-      if (error instanceof BadRequestException || error instanceof UnauthorizedException) {
+      this.logger.error(
+        `Erro ao resetar senha: ${(error as Error).message}`,
+        error.stack,
+      );
+
+      if (
+        error instanceof BadRequestException ||
+        error instanceof UnauthorizedException
+      ) {
         throw error;
       }
-      
+
       throw new InternalServerErrorException('Erro interno ao alterar senha');
     }
   }
@@ -343,15 +418,15 @@ export class AuthController {
     summary: 'Altera a senha do usuário autenticado',
     description: 'Permite que o usuário autenticado altere sua senha atual.',
   })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'Senha alterada com sucesso',
     schema: {
       type: 'object',
       properties: {
-        message: { type: 'string', example: 'Senha alterada com sucesso' }
-      }
-    }
+        message: { type: 'string', example: 'Senha alterada com sucesso' },
+      },
+    },
   })
   @ApiUnauthorizedResponse({ description: 'Usuário não autenticado' })
   @ApiBadRequestResponse({ description: 'Dados inválidos fornecidos' })
@@ -365,20 +440,28 @@ export class AuthController {
   ) {
     try {
       if (!dto.oldPassword || !dto.newPassword) {
-        throw new BadRequestException('Senha atual e nova senha são obrigatórias');
+        throw new BadRequestException(
+          'Senha atual e nova senha são obrigatórias',
+        );
       }
 
       const userId = req.user.id;
       await this.authService.changePassword(userId, dto);
-      
+
       return { message: 'Senha alterada com sucesso' };
     } catch (error) {
-      this.logger.error(`Erro ao alterar senha para usuário ${req.user.id}: ${(error as Error).message}`, error.stack);
-      
-      if (error instanceof BadRequestException || error instanceof UnauthorizedException) {
+      this.logger.error(
+        `Erro ao alterar senha para usuário ${req.user.id}: ${(error as Error).message}`,
+        error.stack,
+      );
+
+      if (
+        error instanceof BadRequestException ||
+        error instanceof UnauthorizedException
+      ) {
         throw error;
       }
-      
+
       throw new InternalServerErrorException('Erro interno ao alterar senha');
     }
   }
@@ -386,17 +469,18 @@ export class AuthController {
   @ApiCookieAuth()
   @ApiOperation({
     summary: 'Logout do usuário',
-    description: 'Realiza o logout do usuário removendo o token de autenticação.',
+    description:
+      'Realiza o logout do usuário removendo o token de autenticação.',
   })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
+  @ApiResponse({
+    status: HttpStatus.OK,
     description: 'Logout realizado com sucesso',
     schema: {
       type: 'object',
       properties: {
-        message: { type: 'string', example: 'Logout realizado com sucesso' }
-      }
-    }
+        message: { type: 'string', example: 'Logout realizado com sucesso' },
+      },
+    },
   })
   @ApiUnauthorizedResponse({ description: 'Usuário não autenticado' })
   @UseGuards(JwtAuthGuard)
@@ -414,7 +498,10 @@ export class AuthController {
         .status(HttpStatus.OK)
         .json({ message: 'Logout realizado com sucesso' });
     } catch (error) {
-      this.logger.error(`Erro ao realizar logout: ${(error as Error).message}`, error.stack);
+      this.logger.error(
+        `Erro ao realizar logout: ${(error as Error).message}`,
+        error.stack,
+      );
       throw new InternalServerErrorException('Erro interno ao realizar logout');
     }
   }

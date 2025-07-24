@@ -14,13 +14,13 @@ model User {
   userName            String        @unique
   providerId          String?
   authProvider        AuthProvider
-  CreatedAt           DateTime      @default(now())
+  createdAt           DateTime      @default(now())
   isVerified          Boolean       @default(false)
   name                String
   passwordHash        String
   resetToken          String?
   resetTokenExpiresAt DateTime?
-  role                Role
+  role                Role          @default(USER)
   updatedAt           DateTime      @updatedAt
   image               String?
   boards              Board[]       @relation("OwnerBoards")
@@ -113,8 +113,8 @@ enum AuthProvider {
 
 enum Role {
   ADMIN
-  MEMBER
-  OBSERVER
+  SUPPORT
+  USER
 }
 
 enum BoardVisibility {
