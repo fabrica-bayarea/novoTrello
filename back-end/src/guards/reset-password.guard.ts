@@ -23,12 +23,18 @@ export class ResetPasswordGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const request: Request = context.switchToHttp().getRequest();
-    let token =
-      request.query.token || request.headers.authorization?.split(' ')[1];
+    const request: Request = context
+      .switchToHttp()
+      .getRequest<Request & { user?: ResetPasswordPayload }>();
 
-    if (Array.isArray(token)) {
-      token = token[0];
+    let token: string | undefined;
+
+    if (request.cookies && typeof request.cookies['reset_token'] === 'string') {
+      token = request.cookies['reset_token'];
+    } else if (Array.isArray(request.cookies?.['reset_token'])) {
+      token = String(request.cookies['reset_token'][0]);
+    } else {
+      token = undefined;
     }
 
     if (typeof token !== 'string' || !token) {
