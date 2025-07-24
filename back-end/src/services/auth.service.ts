@@ -182,7 +182,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new ForbiddenException('Email não encontrado');
+      return;
     }
 
     const code = randomBytes(6).toString('base64');

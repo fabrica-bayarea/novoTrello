@@ -30,7 +30,6 @@ export class EmailService {
     const filePath = path.join(templateBaseDir, templateName);
 
     try {
-      console.log(filePath);
       return fs.readFileSync(filePath, 'utf8');
     } catch {
       throw new InternalServerErrorException(

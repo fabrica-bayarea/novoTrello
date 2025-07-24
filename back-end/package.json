@@ -55,7 +55,7 @@
     "@swc/core": "^1.10.7",
     "@types/argon2": "^0.14.1",
     "@types/bcrypt": "^6.0.0",
-    "@types/cookie-parser": "^1.4.8",
+    "@types/cookie-parser": "^1.4.9",
     "@types/date-fns": "^2.5.3",
     "@types/express": "^5.0.1",
     "@types/jest": "^29.5.14",
