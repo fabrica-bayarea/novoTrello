@@ -1,6 +1,15 @@
 "use client"
 
 import { useState } from "react";
+// Função utilitária para checar requisitos de senha
+function getPasswordRequirements(password: string) {
+  return {
+    hasUppercase: /[A-Z]/.test(password),
+    hasLowercase: /[a-z]/.test(password),
+    hasNumber: /[0-9]/.test(password),
+    hasSpecial: /[^A-Za-z0-9]/.test(password),
+  };
+}
 import { useRouter } from "next/navigation";
 import { CheckCircle } from "lucide-react";
 
@@ -25,6 +34,8 @@ export default function Register() {
   const [confirmPassword, setconfirmConfirmPassword] = useState("")
   const [isSuccess, setIsSuccess] = useState(false)
   const [agreeTerms, setAgreeTerms] = useState(false)
+
+  const passwordRequirements = getPasswordRequirements(password);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -105,6 +116,20 @@ export default function Register() {
             placeholder="Senha"
             value={password}
           />
+          <div className={styles.passwordRequirements}>
+            <div className={`${styles.requirementItem} ${password ? (passwordRequirements.hasUppercase ? styles.requirementMet : styles.requirementNotMet) : styles.requirementNeutral}`}>
+              {passwordRequirements.hasUppercase ? '✔' : '✖'} Pelo menos 1 letra maiúscula
+            </div>
+            <div className={`${styles.requirementItem} ${password ? (passwordRequirements.hasLowercase ? styles.requirementMet : styles.requirementNotMet) : styles.requirementNeutral}`}>
+              {passwordRequirements.hasLowercase ? '✔' : '✖'} Pelo menos 1 letra minúscula
+            </div>
+            <div className={`${styles.requirementItem} ${password ? (passwordRequirements.hasNumber ? styles.requirementMet : styles.requirementNotMet) : styles.requirementNeutral}`}>
+              {passwordRequirements.hasNumber ? '✔' : '✖'} Pelo menos 1 número
+            </div>
+            <div className={`${styles.requirementItem} ${password ? (passwordRequirements.hasSpecial ? styles.requirementMet : styles.requirementNotMet) : styles.requirementNeutral}`}>
+              {passwordRequirements.hasSpecial ? '✔' : '✖'} Pelo menos 1 caractere especial
+            </div>
+          </div>
           <AuthInput
             onChange={(e) => setconfirmConfirmPassword(e.target.value)}
             type="password"
