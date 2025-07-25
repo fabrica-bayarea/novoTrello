@@ -2,94 +2,63 @@
 
 # Novo Trello - Next.js + NestJS
 
-O novo trello composto por duas partes: o front-end em **Next.js** e o back-end em **NestJS**. Ambos os componentes estão no mesmo repositório, separados em pastas distintas: `front-end/` para o Next.js e `back-end/` para o NestJS. 
+Uma plataforma de gerenciamento de tarefas baseada no modelo Kanban, desenvolvida com **Next.js** (front-end) e **NestJS** (back-end). Oferece funcionalidades como criação de quadros, listas e cartões, autenticação, atribuição de responsáveis, notificações e integração com outros serviços.
 
-A seguir, estão as instruções para rodar ambos os ambientes localmente.
+## Tecnologias Utilizadas
 
-## Estrutura do Projeto
+- **Next.js**
+- **NestJS**
+- **Prisma**
+- **PostgreSQL**
+- **Nginx**
+- **Docker**
 
-- **front-end/**: Contém o código do front-end utilizando Next.js.
-- **back-end/**: Contém o código do back-end utilizando NestJS.
+## Pré-requisitos
 
----
+Certifique-se de ter as seguintes ferramentas instaladas no seu ambiente:
 
-### Dependências
-Antes de começar, certifique-se de ter as seguintes ferramentas instaladas em seu ambiente de desenvolvimento:
-- Node.js: [Instalação do Node.js](https://nodejs.org/)
-- Docker: [Instalação do Docker](https://docs.docker.com/desktop/install/linux-install/)
+- **Git**: [Guia de instalação](https://git-scm.com/downloads)
+- **Docker**: [Guia de instalação](https://docs.docker.com/desktop/install/linux-install/)
 
-Após isso clone o projeto:
+## Como executar a Aplicação
+
+### Passos para Rodar Localmente
+
+1. Clone o repositório:
+
   ```bash
-  git clone https://github.com/fabrica-bayarea/novoTrello.git
+  git clone https://github.com/fabrica-bayarea/novoTrello.git .
   ```
 
-## Back-end - NestJS
+2. Inicie a aplicação:
 
-### Tecnologias
-- NestJS
-- TypeScript
-- Prisma
-- Postgres
-- Docker
-
-### Rodando localmente
-1. Mude para a pasta `back-end`:
   ```bash
-  cd back-end
+  bash start.sh
   ```
 
-2. Instale as dependências:
-  ```bash
-  npm install
-  ```
+> **Nota:**  
+> Você pode personalizar as configurações copiando o arquivo `.env.example` para `.env` e ajustando conforme necessário.
 
-3. Crie um container do Postgres:
-  ```bash
-  docker run --name database_trello \
-    -e POSTGRES_PASSWORD=password_postgres -e POSTGRES_USER=user_postgres \
-    -d -p 5432:5432 postgres
-  ```
+## Desenvolvimento
 
-4. Criar arquivo .env de acordo com o arquivo .env.example que está na pasta "back-end/"
-  
-> [!IMPORTANT]  
-> É crucial que as variaveis de ambiente usada na criação do container seja a mesma no "DATABASE_URL"
+Para obter informações detalhadas sobre como executar o projeto em modo de desenvolvimento, consulte os arquivos README localizados nas pastas `back-end` e `front-end`. Para orientações sobre como contribuir com o projeto, veja o arquivo [CONTRIBUTING.md](CONTRIBUTING.md).
 
-5. Aplique as migrações no banco de dados:
-  ```bash
-  npx prisma migrate dev
-  ```
+## Licença
 
-6. Inicie a aplicação:
-  ```bash
-  npm run start:dev
-  ```
+Distribuído sob a Licença GPL3. Veja [LICENSE](LICENSE.md) para mais informações.
 
----
+## Contato ou Suporte
 
-7. Acesse [http://localhost:3000](http://localhost:3000) com o seu navegador para ver o resultado.
+Se você tiver perguntas, encontrar um bug, tiver sugestões para novos recursos ou precisar de ajuda, abra um issue no repositório do GitHub. Isso garante que sua preocupação seja visível para outros, possa ser discutida colaborativamente e ajude a construir um arquivo público de soluções para consultas semelhantes no futuro.
 
-## Front-end - Next.js
+## Colaboradores
 
-### Tecnologias
-- Next.js
-- TypeScript
-- Docker
+Agradecemos a todos os incríveis colaboradores que tornaram este projeto possível:
 
-### Rodando localmente
-1. Mude para a pasta `front-end`:
-  ```bash
-  cd front-end
-  ```
+|<img src="https://github.com/aureliovieirarocha.png" width="100">|<img src="https://github.com/ApenasGui.png" width="100">|<img src="https://github.com/vgabriel-pereira.png" width="100">|
+|:-:|:-:|:-:|
+|[Aurélio Vieira Rocha](https://github.com/aureliovieirarocha)|[Guilherme](https://github.com/ApenasGui)|[Victor Gabriel Pereira](https://github.com/vgabriel-pereira)|
 
-2. Instale as dependências:
-  ```bash
-  npm install
-  ```
-
-3. Inicie a aplicação:
-  ```bash
-  npm run dev
-  ```
-
-4. Acesse [http://localhost:3001](http://localhost:3001) com o seu navegador para ver o resultado.
+|<img src="https://github.com/gabrieldnf.png" width="100">|<img src="https://github.com/ArthurRabel.png" width="100">|<img src="https://github.com/GeorgesCarmo.png" width="100">|
+|:-:|:-:|:-:|
+[Gabriel D. N. F.](https://github.com/gabrieldnf)|[Arthur Rabelo](https://github.com/ArthurRabel)|[GeorgesCarmo](https://github.com/GeorgesCarmo)|

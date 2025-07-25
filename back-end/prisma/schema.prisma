@@ -9,7 +9,123 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  email String @unique
-  name String
+  id                  String        @id @default(uuid())
+  email               String        @unique
+  userName            String        @unique
+  providerId          String?
+  authProvider        AuthProvider
+  CreatedAt           DateTime      @default(now())
+  isVerified          Boolean       @default(false)
+  name                String
+  passwordHash        String
+  resetToken          String?
+  resetTokenExpiresAt DateTime?
+  role                Role
+  updatedAt           DateTime      @updatedAt
+  image               String?
+  boards              Board[]       @relation("OwnerBoards")
+  memberships         BoardMember[]
+  tasksCreated        Task[]        @relation("TaskCreator")
+
+  @@unique([authProvider, providerId], name: "AuthProviderAndIdUnique")
+}
+
+model Board {
+  id          String          @id @default(uuid())
+  ownerId     String
+  title       String
+  description String?
+  visibility  BoardVisibility @default(PRIVATE)
+  isArchived  Boolean         @default(false)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  owner       User            @relation("OwnerBoards", fields: [ownerId], references: [id])
+  members     BoardMember[]
+  labels      Label[]
+  lists       List[]
+}
+
+model BoardMember {
+  boardId  String
+  userId   String
+  role     Role
+  joinedAt DateTime @default(now())
+  board    Board    @relation(fields: [boardId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@id([boardId, userId])
+}
+
+model List {
+  id         String   @id @default(uuid())
+  boardId    String
+  title      String
+  position   Int
+  isArchived Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  board      Board    @relation(fields: [boardId], references: [id])
+  tasks      Task[]
+}
+
+model Task {
+  id          String      @id @default(uuid())
+  listId      String
+  creatorId   String
+  title       String
+  description String?
+  position    Int
+  status      Status      @default(TODO)
+  dueDate     DateTime?
+  isArchived  Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  creator     User        @relation("TaskCreator", fields: [creatorId], references: [id])
+  list        List        @relation(fields: [listId], references: [id])
+  labels      TaskLabel[]
+}
+
+model Label {
+  id        String      @id @default(uuid())
+  boardId   String
+  name      String
+  color     String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  board     Board       @relation(fields: [boardId], references: [id])
+  tasks     TaskLabel[]
+}
+
+model TaskLabel {
+  taskId  String
+  labelId String
+  label   Label  @relation(fields: [labelId], references: [id])
+  task    Task   @relation(fields: [taskId], references: [id])
+
+  @@id([taskId, labelId])
+}
+
+enum AuthProvider {
+  local
+  google
+  microsoft
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+  OBSERVER
+}
+
+enum BoardVisibility {
+  PUBLIC
+  PRIVATE
+  TEAM
+}
+
+enum Status {
+  TODO
+  IN_PROGRESS
+  DONE
+  ARCHIVED
 }

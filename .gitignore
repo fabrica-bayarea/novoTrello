@@ -1,0 +1,102 @@
+# ----------------------
+# Node.js
+# ----------------------
+**/node_modules
+
+# ----------------------
+# Logs
+# ----------------------
+**/logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ----------------------
+# Testing
+# ----------------------
+**/coverage
+**/test-results
+
+# ----------------------
+# TypeScript
+# ----------------------
+*.tsbuildinfo
+*.d.ts.map
+next-env.d.ts
+
+# ----------------------
+# Build Output
+# ----------------------
+**/dist
+**/build
+**/.next
+**/out
+
+# ----------------------
+# Environment Files
+# ----------------------
+**/.env
+**/.env.local
+**/.env.*.local
+
+# ----------------------
+# IDEs
+# ----------------------
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.swp
+
+# ----------------------
+# OS / Misc
+# ----------------------
+.DS_Store
+Thumbs.db
+*.pem
+*.pid
+*.seed
+
+# ----------------------
+# Yarn 2 (Pnp)
+# ----------------------
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# ----------------------
+# Prisma
+# ----------------------
+**/prisma/migrations/migration_lock.toml
+
+# ----------------------
+# Front-end Specific
+# ----------------------
+front-end/.next
+front-end/out
+front-end/.vercel
+front-end/.temp
+front-end/.tmp
+
+# ----------------------
+# Back-end Specific (NestJS)
+# ----------------------
+back-end/dist
+back-end/test-results
+
+# ----------------------
+# Miscellaneous
+# ----------------------
+/package.json
+/package-lock.json
