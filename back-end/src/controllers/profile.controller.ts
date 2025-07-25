@@ -1,6 +1,11 @@
 import { Body, Controller, Get, UseGuards, Put, Delete } from '@nestjs/common';
 import { ProfileService } from '../services/profile.service';
-import { ApiOperation, ApiResponse, ApiTags, ApiCookieAuth } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiCookieAuth,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../guards/jwt.guard';
 import { ProfileDto } from '../dto/profile.dto';
 import { AuthenticatedUser } from 'src/types/user.interface';

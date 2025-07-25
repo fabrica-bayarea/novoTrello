@@ -2,7 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
-  InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/services/prisma.service';
@@ -15,18 +15,19 @@ import {
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { User } from '@prisma/client';
 import * as argon2 from 'argon2';
-import { createTransport, Transporter } from 'nodemailer';
 import { randomBytes } from 'crypto';
-import * as fs from 'fs';
 import 'dotenv/config';
-import { resolveTemplatePath } from 'src/utils/path.helper';
-import { ResetPasswordDto } from 'src/dto/reset-password.dto';
+import { VerifyResetCodeDto } from 'src/dto/verify-reset-code.dto';
+import { ConfigService } from '@nestjs/config';
+import { EmailService } from './email.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private configService: ConfigService,
+    private readonly emailService: EmailService,
   ) {}
 
   /**
@@ -173,7 +174,7 @@ export class AuthService {
   }
 
   /**
-   * Gera uma nova senha aleatória e envia por email para recuperação de senha.
+   * Gera um código aleatório e envia por email para recuperação de senha.
    */
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
     const user = await this.prisma.user.findUnique({
@@ -181,89 +182,90 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new ForbiddenException('Email não encontrado');
+      return;
     }
 
-    const token = randomBytes(6).toString('base64');
+    const code = randomBytes(6).toString('base64');
     const expires = new Date(Date.now() + 1000 * 60 * 15);
 
     await this.prisma.user.update({
       where: { email: forgotPasswordDto.email },
       data: {
-        resetToken: token,
+        resetToken: code,
         resetTokenExpiresAt: expires,
       },
     });
 
-    const transporter: Transporter = createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL!,
-        pass: process.env.PASS!,
-      },
-    });
-
-    const templatePath = resolveTemplatePath('forgot-password.template.html');
-    let emailHtml = fs.readFileSync(templatePath, 'utf8');
-    emailHtml = emailHtml.replace('{{code}}', token);
-
-    try {
-      await transporter.sendMail({
-        from: `"Suporte novoTrello" <${process.env.EMAIL!}>`,
-        to: forgotPasswordDto.email,
-        subject: 'Recuperação de senha',
-        html: emailHtml,
-        attachments: [
-          {
-            filename: 'bayarea-logo.png',
-            path: 'src/assets/bayarea-logo.png',
-            cid: 'bayarea-logo',
-          },
-          {
-            filename: 'iesb-logo.png',
-            path: 'src/assets/iesb-logo.png',
-            cid: 'iesb-logo',
-          },
-        ],
-      });
-    } catch (error) {
-      throw new InternalServerErrorException(
-        'Erro ao enviar o e-mail de recuperação. Erro: ' + String(error),
-      );
-    }
+    await this.emailService.sendForgotPasswordEmail(
+      forgotPasswordDto.email,
+      code,
+    );
   }
 
-  async resetPassword(dto: ResetPasswordDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+  /**
+   * Verifica se o código de recuperação de senha é válido e gera um token JWT.
+   */
+  async verifyResetCode(
+    verifyResetCodeDto: VerifyResetCodeDto,
+  ): Promise<string> {
+    const user = await this.prisma.user.findFirst({
+      where: { resetToken: verifyResetCodeDto.code },
     });
 
-    if (!user || !user.resetToken || !user.resetTokenExpiresAt) {
-      throw new ForbiddenException('Token inválido ou expirado.');
+    if (!user) {
+      throw new ForbiddenException('Código inválido ou expirado.');
     }
 
-    if (user.resetToken !== dto.token) {
-      throw new ForbiddenException('Token incorreto.');
+    if (!user.resetToken || user.resetToken !== verifyResetCodeDto.code) {
+      throw new UnauthorizedException('Código de verificação inválido.');
     }
 
-    if (user.resetTokenExpiresAt < new Date()) {
-      throw new ForbiddenException('Token expirado.');
+    if (user.resetTokenExpiresAt && user.resetTokenExpiresAt < new Date()) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          resetToken: null,
+          resetTokenExpiresAt: null,
+        },
+      });
+      throw new UnauthorizedException('Código de verificação expirado.');
     }
 
-    if (dto.newPassword !== dto.confirmPassword) {
-      throw new ForbiddenException('As senhas não conferem.');
-    }
+    const payload = {
+      userId: user.id,
+      email: user.email,
+      purpose: 'reset-password',
+    };
 
-    const passwordHash = await argon2.hash(dto.newPassword);
+    const resetJwtToken = this.jwtService.sign(payload, {
+      expiresIn: '15m',
+      secret: this.configService.get('JWT_RESET_SECRET'),
+    });
 
     await this.prisma.user.update({
-      where: { email: dto.email },
+      where: { id: user.id },
       data: {
-        passwordHash,
         resetToken: null,
         resetTokenExpiresAt: null,
       },
     });
+
+    return resetJwtToken;
+  }
+
+  async resetPassword(userId: string, newPasswordPlain: string): Promise<void> {
+    try {
+      const hashedPassword = await this.hashPassword(newPasswordPlain);
+
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { passwordHash: hashedPassword },
+      });
+    } catch (error) {
+      throw new BadRequestException(
+        'Erro ao redefinir a senha: ' + String(error),
+      );
+    }
   }
 
   /**
