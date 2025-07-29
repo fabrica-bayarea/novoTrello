@@ -22,7 +22,7 @@ export function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-nonce', nonce);
 
-  /*const isProtectedRoute = !request.nextUrl.pathname.startsWith('/auth');
+  const isProtectedRoute = !request.nextUrl.pathname.startsWith('/auth');
   if (isProtectedRoute) {
     const tokenCookie = request.cookies.get('trello-session');
     if (!tokenCookie?.value) {
@@ -31,7 +31,7 @@ export function middleware(request: NextRequest) {
       redirectResponse.headers.set('Content-Security-Policy', sanitizedCspHeader);
       return redirectResponse;
     }
-  }*/
+  }
 
   const homeToDashboard = request.nextUrl.pathname === '/';
   if (homeToDashboard) {
