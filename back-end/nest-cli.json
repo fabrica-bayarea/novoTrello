@@ -5,7 +5,7 @@
   "compilerOptions": {
     "deleteOutDir": true,
     "assets": [
-      { "include": "mail/**/*.html", "watch": true, "outDir": "dist/src" },
+      { "include": "email/**/*.html", "watch": true, "outDir": "dist/src" },
       { "include": "assets/**/*", "watch": true, "outDir": "dist/src" }
     ],
     "webpack": false,
@@ -15,7 +15,7 @@
     "type": "tsc",
     "options": {
       "assets": [
-        { "include": "mail/**/*.html", "watch": true, "outDir": "dist/src" },
+        { "include": "email/**/*.html", "watch": true, "outDir": "dist/src" },
         { "include": "assets/**/*", "watch": true, "outDir": "dist/src" }
       ]
     }

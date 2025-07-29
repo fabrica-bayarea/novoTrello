@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthController } from '../../src/controllers/auth.controller';
-import { AuthService } from '../../src/services/auth.service';
+import { AuthController } from '../../src/auth/auth.controller';
+import { AuthService } from '../../src/auth/auth.service';
 import { ConfigService } from '@nestjs/config';
-import { SignUpDto } from '../../src/dto/auth.dto';
+import { SignUpDto } from '../../src/auth/dto/signup.dto';
 import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 
