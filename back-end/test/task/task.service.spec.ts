@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TaskService } from 'src/services/task.service';
-import { PrismaService } from 'src/services/prisma.service';
+import { TaskService } from 'src/task/task.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
-import { CreateTaskDto } from 'src/dto/create-task.dto';
-import { UpdateTaskDto } from 'src/dto/update-task.dto';
+import { CreateTaskDto } from 'src/task/dto/create-task.dto';
+import { UpdateTaskDto } from 'src/task/dto/update-task.dto';
 import { TaskStatus } from 'src/common/enums/task-status.enum';
 
 describe('TaskService', () => {

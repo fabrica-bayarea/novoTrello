@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ListController } from '../../src/controllers/list.controller';
-import { ListService } from '../../src/services/list.service';
-import { CreateListDto } from '../../src/dto/create-list.dto';
-import { UpdateListDto } from '../../src/dto/update-list.dto';
+import { ListController } from '../../src/list/list.controller';
+import { ListService } from '../../src/list/list.service';
+import { CreateListDto } from '../../src/list/dto/create-list.dto';
+import { UpdateListDto } from '../../src/list/dto/update-list.dto';
 import { AuthenticatedUser } from '../../src/types/user.interface';
 
 describe('ListController', () => {

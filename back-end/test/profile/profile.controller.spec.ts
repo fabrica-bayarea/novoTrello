@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ProfileController } from '../../src/controllers/profile.controller';
-import { ProfileService } from '../../src/services/profile.service';
-import { ProfileDto } from '../../src/dto/profile.dto';
+import { ProfileController } from '../../src/profile/profile.controller';
+import { ProfileService } from '../../src/profile/profile.service';
+import { ProfileDto } from '../../src/profile/dto/update-profile.dto';
 import { AuthenticatedUser } from '../../src/types/user.interface';
 
 describe('ProfileController', () => {

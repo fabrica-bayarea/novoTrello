@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TaskController } from 'src/controllers/task.controller';
-import { TaskService } from 'src/services/task.service';
-import { CreateTaskDto } from 'src/dto/create-task.dto';
-import { UpdateTaskDto } from 'src/dto/update-task.dto';
+import { TaskController } from 'src/task/task.controller';
+import { TaskService } from 'src/task/task.service';
+import { CreateTaskDto } from 'src/task/dto/create-task.dto';
+import { UpdateTaskDto } from 'src/task/dto/update-task.dto';
 import { AuthenticatedUser } from 'src/types/user.interface';
 import { TaskStatus } from 'src/common/enums/task-status.enum';
 
