@@ -11,8 +11,8 @@ import {
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { JwtAuthGuard } from '../guards/jwt.guard';
-import { CurrentUser } from '../strategy/decorators/current-user.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
+import { CurrentUser } from '../auth/strategy/decorators/current-user.decorator';
 import {
   ApiOperation,
   ApiResponse,

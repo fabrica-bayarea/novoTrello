@@ -1,14 +1,12 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule } from 'src/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { ProfileModule } from 'src/profile/profile.module';
 import { LoggingMiddleware } from 'src/middleware/logging.middleware';
 import { BoardModule } from 'src/board/board.module';
-import { ListModule } from '../list/list.module';
-import { TaskModule } from '../task/task.module';
+import { ListModule } from 'src/list/list.module';
+import { TaskModule } from 'src/task/task.module';
 import { HealthModule } from 'src/health/health.module';
 
 @Module({
@@ -25,8 +23,6 @@ import { HealthModule } from 'src/health/health.module';
     TaskModule,
     HealthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

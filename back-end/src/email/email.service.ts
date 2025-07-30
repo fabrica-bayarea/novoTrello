@@ -28,7 +28,6 @@ export class EmailService {
   private loadTemplate(templateName: string): string {
     const templateBaseDir = path.join(__dirname, 'templates');
     const filePath = path.join(templateBaseDir, templateName);
-    console.log('Loading email template from:', filePath);
     try {
       return fs.readFileSync(filePath, 'utf8');
     } catch {

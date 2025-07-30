@@ -6,10 +6,10 @@ import {
   ApiTags,
   ApiCookieAuth,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../guards/jwt.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { ProfileDto } from '../profile/dto/update-profile.dto';
 import { AuthenticatedUser } from 'src/types/user.interface';
-import { CurrentUser } from 'src/strategy/decorators/current-user.decorator';
+import { CurrentUser } from 'src/auth/strategy/decorators/current-user.decorator';
 
 @ApiCookieAuth()
 @ApiTags('Perfil de usuário')

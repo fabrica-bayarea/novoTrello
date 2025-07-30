@@ -3,9 +3,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import { JwtStrategy } from 'src/strategy/jwt.strategy';
-import { GoogleStrategy } from 'src/strategy/google.strategy';
-import { MicrosoftStrategy } from 'src/strategy/microsoft.strategy';
+import { JwtStrategy } from 'src/auth/strategy/jwt.strategy';
+import { GoogleStrategy } from 'src/auth/strategy/google.strategy';
+import { MicrosoftStrategy } from 'src/auth/strategy/microsoft.strategy';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
 import { AuthController } from 'src/auth/auth.controller';

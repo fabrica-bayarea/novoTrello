@@ -34,12 +34,12 @@ import { SignUpDto } from 'src/auth/dto/signup.dto';
 import { ForgotPasswordDto } from 'src/email/dto/forgot-password.dto';
 import { ChangePasswordDto } from 'src/email/dto/change-password.dto';
 import { Response } from 'express';
-import { IsEnabledAuthGuard } from 'src/guards/is-enable-oauth.guard';
+import { IsEnabledAuthGuard } from 'src/auth/guards/is-enable-oauth.guard';
 import { ConfigService } from '@nestjs/config';
-import { JwtAuthGuard } from 'src/guards/jwt.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { ResetPasswordDto } from 'src/auth/dto/reset-password.dto';
 import { VerifyResetCodeDto } from 'src/auth/dto/verify-reset-code.dto';
-import { ResetPasswordGuard } from 'src/guards/reset-password.guard';
+import { ResetPasswordGuard } from 'src/auth/guards/reset-password.guard';
 
 @ApiTags('Autenticação e Autorização')
 @Controller({ path: 'auth', version: '1' })

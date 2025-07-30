@@ -10,7 +10,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Observable } from 'rxjs';
-import { ResetPasswordPayload } from '../types/jwt-payload.interface';
+import { ResetPasswordPayload } from 'src/types/jwt-payload.interface';
 import { Request } from 'express';
 
 @Injectable()
