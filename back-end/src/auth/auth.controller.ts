@@ -433,17 +433,15 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     try {
-      // O serviço agora retornará o token ou lançará uma exceção
       const resetJwtToken =
         await this.authService.verifyResetCode(verifyResetCodeDto);
 
-      // Definir o cookie HTTP-only
-      res.cookie('reset_token', resetJwtToken, {
-        httpOnly: true, // Não acessível via JavaScript do cliente
-        secure: process.env.NODE_ENV === 'production', // Apenas via HTTPS em produção
-        sameSite: 'lax', // Ou 'strict' para maior segurança, 'none' para cross-site com secure=true
-        maxAge: 15 * 60 * 1000, // 15 minutos em milissegundos (deve corresponder ao expiresIn do JWT)
-        path: '/v1/auth/reset-password', // <-- Opcional: restringir o cookie apenas para a rota de reset
+      res.cookie('reset-token', resetJwtToken, {
+        httpOnly: true,
+        //secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 15 * 60 * 1000,
+        path: '/',
       });
 
       return {
