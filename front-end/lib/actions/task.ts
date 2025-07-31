@@ -161,6 +161,31 @@ export async function moveTask(taskId: string, newPosition: number) {
   }
 }
 
+export async function moveTaskOtherList(taskId: string, newPosition: number, newListId: string) {
+  const response = await fetch(`${BASE_URL_API}/v1/tasks/${taskId}/position`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Cookie": await getCookie("trello-session")
+    },
+    body: JSON.stringify({ newPosition }),
+  });
+
+  if (!response.ok) {
+    return {
+      success: false,
+      error: await handleFetchError(response, "Falha ao mover a tarefa"),
+    };
+  }
+  
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return { success: true, data: await response.json() };
+  } else {
+    return { success: true, data: null };
+  }
+}
+
 export async function getExpiredTasks() {
   const response = await fetch(`${BASE_URL_API}/v1/tasks/due/today`, {
     method: "GET",
