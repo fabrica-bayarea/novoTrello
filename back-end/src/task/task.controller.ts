@@ -21,6 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { AuthenticatedUser } from 'src/types/user.interface';
 import { UpdatePositionDto } from './dto/update-position.dto';
+import { MoveTaskOtherListDto } from './dto/move-task-other-list.dto';
 
 @ApiCookieAuth()
 @ApiTags('Tarefas')
@@ -136,7 +137,7 @@ export class TaskController {
   @ApiResponse({ status: 404, description: 'Lista não encontrada' })
   @ApiResponse({ status: 404, description: 'Tarefa não encontrada' })
   @Patch(':id/move')
-  moveTask(@Param('id') taskId: string, @Body('newListId') newListId: string) {
-    return this.taskService.moveTaskToList(taskId, newListId);
+  moveTask(@Param('id') taskId: string, @Body() dto: MoveTaskOtherListDto) {
+    return this.taskService.moveTaskToList(taskId, dto.newListId, dto.newPosition);
   }
 }
