@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BoardController } from 'src/controllers/board.controller';
-import { BoardService } from 'src/services/board.service';
-import { CreateBoardDto } from 'src/dto/create-board.dto';
-import { UpdateBoardDto } from 'src/dto/update-board.dto';
+import { BoardController } from 'src/board/board.controller';
+import { BoardService } from 'src/board/board.service';
+import { CreateBoardDto } from 'src/board/dto/create-board.dto';
+import { UpdateBoardDto } from 'src/board/dto/update-board.dto';
 import { BoardVisibility } from 'src/common/enums/board-visibility.enum';
 import { AuthenticatedUser } from 'src/types/user.interface';
 

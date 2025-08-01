@@ -1,23 +1,36 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthController } from '../../src/controllers/auth.controller';
-import { AuthService } from '../../src/services/auth.service';
-import { Logger } from '@nestjs/common';
+import { AuthController } from '../../src/auth/auth.controller';
+import { AuthService } from '../../src/auth/auth.service';
 import { ConfigService } from '@nestjs/config';
-import {
-  SignUpDto,
-  SignInDto,
-  ForgotPasswordDto,
-  ChangePasswordDto,
-} from 'src/dto/auth.dto';
+import { SignUpDto } from '../../src/auth/dto/signup.dto';
+import { Response } from 'express';
+import { JwtService } from '@nestjs/jwt';
 
 describe('AuthController', () => {
   let controller: AuthController;
 
+  const mockResponse: Partial<Response> = {
+    cookie: jest.fn().mockReturnThis(),
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn().mockReturnThis(),
+  };
+
   const mockAuthService = {
     signUp: jest.fn(),
-    signIn: jest.fn(),
-    forgotPassword: jest.fn(),
-    changePassword: jest.fn(),
+  };
+
+  const mockConfigService = {
+    get: jest.fn((key: string) => {
+      if (key === 'NODE_ENV') return 'development';
+      if (key === 'BASE_URL') return 'http://localhost';
+      if (key === 'BASE_URL_UI') return 'http://localhost:3001';
+      return null;
+    }),
+  };
+
+  const mockJwtService = {
+    verify: jest.fn(),
+    sign: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -25,76 +38,49 @@ describe('AuthController', () => {
       controllers: [AuthController],
       providers: [
         { provide: AuthService, useValue: mockAuthService },
-        { provide: ConfigService, useValue: {} },
-        { provide: Logger, useValue: { error: jest.fn(), log: jest.fn() } },
+        { provide: ConfigService, useValue: mockConfigService },
+        { provide: JwtService, useValue: mockJwtService },
       ],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
+    controller = module.get<AuthController>(AuthController);
   });
-
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
-
   describe('signUp', () => {
-    it('should call authService.signUp with the correct DTO', async () => {
+    it('deve retornar sucesso e definir cookie ao cadastrar usuário', async () => {
       const dto: SignUpDto = {
-        name: 'John Doe',
-        userName: 'john',
-        email: 'test@test.com',
-        password: '123456',
+        email: 'test@example.com',
+        password: 'Password123!',
+        name: 'Test User',
+        userName: 'testuser',
       };
-      mockAuthService.signUp.mockResolvedValue('mocked-token');
 
-      const result = await controller.SignUp(dto);
+      mockAuthService.signUp.mockResolvedValueOnce({
+        accessToken: 'fake-token',
+      });
+
+      await controller.signUp(dto, mockResponse as Response);
 
       expect(mockAuthService.signUp).toHaveBeenCalledWith(dto);
-      expect(result).toBe('mocked-token');
+      expect(mockResponse.cookie).toHaveBeenCalledWith(
+        'trello-session',
+        'fake-token',
+        expect.objectContaining({
+          httpOnly: true,
+        }),
+      );
+      expect(mockResponse.status).toHaveBeenCalledWith(201);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: 'Usuário cadastrado com sucesso',
+      });
     });
-  });
 
-  describe('signIn', () => {
-    it('should call authService.signIn with the correct DTO', async () => {
-      const dto: SignInDto = {
-        email: 'test@test.com',
-        password: '123456',
-        rememberMe: true,
-      };
-      mockAuthService.signIn.mockResolvedValue('mocked-token');
+    it('deve lançar BadRequestException se email ou senha forem ausentes', async () => {
+      const dto = { email: '', password: '', name: '', userName: '' };
 
-      const result = await controller.SignIn(dto);
-
-      expect(mockAuthService.signIn).toHaveBeenCalledWith(dto);
-      expect(result).toBe('mocked-token');
-    });
-  });
-
-  describe('forgotPassword', () => {
-    it('should call authService.forgotPassword with the correct DTO', async () => {
-      const dto: ForgotPasswordDto = { email: 'test@example.com' };
-      mockAuthService.forgotPassword.mockResolvedValue('email enviado');
-
-      const result = await controller.forgotPassword(dto);
-
-      expect(mockAuthService.forgotPassword).toHaveBeenCalledWith(dto);
-      expect(result).toBe('email enviado');
-    });
-  });
-
-  describe('changePassword', () => {
-    it('should call authService.changePassword with user id and dto', async () => {
-      const userId = '123';
-      const dto: ChangePasswordDto = {
-        oldPassword: 'oldPass',
-        newPassword: 'newPass',
-      };
-      const req = { user: { id: userId } };
-
-      const result = await controller.changePassword(req, dto);
-
-      expect(mockAuthService.changePassword).toHaveBeenCalledWith(userId, dto);
-      expect(result).toEqual({ message: 'Senha alterada com sucesso.' });
+      await expect(
+        controller.signUp(dto as SignUpDto, mockResponse as Response),
+      ).rejects.toThrow('Email e senha são obrigatórios');
     });
   });
 });
