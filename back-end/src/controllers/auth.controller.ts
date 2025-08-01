@@ -486,7 +486,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('logout')
-  async logout(@Res() res: Response) {
+  logout(@Res() res: Response) {
     try {
       return res
         .clearCookie('trello-session', {

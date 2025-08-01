@@ -47,7 +47,7 @@ describe('AuthController', () => {
       };
       mockAuthService.signUp.mockResolvedValue('mocked-token');
 
-      const result = await controller.SignUp(dto);
+      const result = await controller.signUp(dto);
 
       expect(mockAuthService.signUp).toHaveBeenCalledWith(dto);
       expect(result).toBe('mocked-token');
@@ -63,7 +63,7 @@ describe('AuthController', () => {
       };
       mockAuthService.signIn.mockResolvedValue('mocked-token');
 
-      const result = await controller.SignIn(dto);
+      const result = await controller.signIn(dto);
 
       expect(mockAuthService.signIn).toHaveBeenCalledWith(dto);
       expect(result).toBe('mocked-token');
