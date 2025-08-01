@@ -84,7 +84,7 @@ export class AuthService {
         userName: data.email.split('@')[0],
         passwordHash: provider === 'local' ? data.password! : data.providerId!,
         providerId: provider === 'local' ? null : data.providerId!,
-        role: Role.MEMBER,
+        role: Role.USER,
         authProvider: provider as 'local' | 'google' | 'microsoft',
       };
 
