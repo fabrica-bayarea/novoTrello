@@ -162,13 +162,13 @@ export async function moveTask(taskId: string, newPosition: number) {
 }
 
 export async function moveTaskOtherList(taskId: string, newPosition: number, newListId: string) {
-  const response = await fetch(`${BASE_URL_API}/v1/tasks/${taskId}/position`, {
+  const response = await fetch(`${BASE_URL_API}/v1/tasks/${taskId}/move`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
       "Cookie": await getCookie("trello-session")
     },
-    body: JSON.stringify({ newPosition }),
+    body: JSON.stringify({ newListId, newPosition }),
   });
 
   if (!response.ok) {
