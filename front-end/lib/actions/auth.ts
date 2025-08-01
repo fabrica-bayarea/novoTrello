@@ -109,15 +109,3 @@ export async function resetPassword(newPassword: string, confirmNewPassword: str
 
   return { success: true, data: { message: 'success' } };
 }
-
-// export async function logout() {
-//   try {
-//     const cookieStore = await cookies()
-
-//     cookieStore.delete("trello-session")
-//     redirect("/auth/login")
-//   } catch (error) {
-//     console.error("Erro ao fazer logout:", error)
-//     redirect("/auth/login")
-//   }
-// }

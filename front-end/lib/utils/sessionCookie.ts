@@ -1,15 +1,7 @@
+"use server";
+
 import { cookies } from "next/headers";
 import setCookie from "set-cookie-parser";
-
-export function parseJwt(token: string) {
-  try {
-    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
-    if (!payload) throw new Error("Token inválido");
-    return payload
-  } catch {
-    return null;
-  }
-}
 
 export async function setSessioCookie(rawSetCookie: string) {
     const [parsed] = setCookie.parse(rawSetCookie);
