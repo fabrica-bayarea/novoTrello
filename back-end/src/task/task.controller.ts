@@ -92,10 +92,7 @@ export class TaskController {
   @ApiResponse({ status: 401, description: 'Usuário não autenticado' })
   @ApiResponse({ status: 403, description: 'Acesso negado' })
   @Patch(':id/position')
-  updatePosition(
-    @Param('id') id: string,
-    @Body() dto: UpdatePositionDto,
-  ) {
+  updatePosition(@Param('id') id: string, @Body() dto: UpdatePositionDto) {
     return this.taskService.updatePosition(id, dto.newPosition);
   }
 

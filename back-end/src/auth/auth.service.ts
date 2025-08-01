@@ -16,6 +16,7 @@ import { User } from '@prisma/client';
 import * as argon2 from 'argon2';
 import { randomBytes } from 'crypto';
 import 'dotenv/config';
+import { Role } from '@prisma/client';
 import { VerifyResetCodeDto } from 'src/auth/dto/verify-reset-code.dto';
 import { ConfigService } from '@nestjs/config';
 import { EmailService } from 'src/email/email.service';
@@ -83,7 +84,7 @@ export class AuthService {
         userName: data.email.split('@')[0],
         passwordHash: provider === 'local' ? data.password! : data.providerId!,
         providerId: provider === 'local' ? null : data.providerId!,
-        role: 'ADMIN' as const,
+        role: Role.USER,
         authProvider: provider as 'local' | 'google' | 'microsoft',
       };
 
@@ -96,9 +97,6 @@ export class AuthService {
     return existingUser;
   }
 
-  /**
-   * Trata erros específicos ao criar um usuário.
-   */
   private handleSignUpError(error: unknown): never {
     if (
       error instanceof PrismaClientKnownRequestError &&

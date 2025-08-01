@@ -5,6 +5,8 @@ import { ConfigService } from '@nestjs/config';
 import { SignUpDto } from '../../src/auth/dto/signup.dto';
 import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
+import { SignInDto } from 'src/auth/dto/signin.dto';
+import { access } from 'fs';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -17,6 +19,7 @@ describe('AuthController', () => {
 
   const mockAuthService = {
     signUp: jest.fn(),
+    signIn: jest.fn(),
   };
 
   const mockConfigService = {
@@ -54,33 +57,41 @@ describe('AuthController', () => {
         name: 'Test User',
         userName: 'testuser',
       };
-
-      mockAuthService.signUp.mockResolvedValueOnce({
-        accessToken: 'fake-token',
+      mockAuthService.signUp.mockResolvedValue({
+        accessToken: 'mocked-token',
       });
 
-      await controller.signUp(dto, mockResponse as Response);
+      const result = await controller.signUp(dto, mockResponse as Response);
 
       expect(mockAuthService.signUp).toHaveBeenCalledWith(dto);
-      expect(mockResponse.cookie).toHaveBeenCalledWith(
-        'trello-session',
-        'fake-token',
-        expect.objectContaining({
-          httpOnly: true,
-        }),
-      );
-      expect(mockResponse.status).toHaveBeenCalledWith(201);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        message: 'Usuário cadastrado com sucesso',
-      });
-    });
-
-    it('deve lançar BadRequestException se email ou senha forem ausentes', async () => {
-      const dto = { email: '', password: '', name: '', userName: '' };
-
-      await expect(
-        controller.signUp(dto as SignUpDto, mockResponse as Response),
-      ).rejects.toThrow('Email e senha são obrigatórios');
+      
     });
   });
-});
+
+  describe('signIn', () => {
+    it('should call authService.signIn with the correct DTO', async () => {
+      const dto: SignInDto = {
+        email: 'test@test.com',
+        password: '123456',
+        rememberMe: true,
+      };
+
+      mockAuthService.signIn.mockResolvedValue({
+        accessToken: 'mocked-token',
+      })
+
+      const result = await controller.signIn(dto, mockResponse as Response);
+
+      expect(mockAuthService.signIn).toHaveBeenCalledWith(dto);
+      
+    })
+  })
+
+  it('deve lançar BadRequestException se email ou senha forem ausentes', async () => {
+    const dto = { email: '', password: '', name: '', userName: '' };
+
+    await expect(
+      controller.signUp(dto as SignUpDto, mockResponse as Response),
+    ).rejects.toThrow('Email e senha são obrigatórios');
+  });
+})

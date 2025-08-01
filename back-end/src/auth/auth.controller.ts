@@ -17,7 +17,6 @@ import {
   InternalServerErrorException,
   Query,
   ForbiddenException,
-  HttpException,
 } from '@nestjs/common';
 import {
   ApiOperation,
@@ -116,10 +115,9 @@ export class AuthController {
     } catch (error) {
       this.logger.error(
         `Erro ao registrar usuário: ${(error as Error).message}`,
-        error,
       );
 
-      if (error instanceof HttpException) {
+      if (error instanceof BadRequestException) {
         throw error;
       }
 
