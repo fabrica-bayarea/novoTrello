@@ -43,7 +43,7 @@ export function middleware(request: NextRequest) {
 
   const response = NextResponse.next();
 
-  response.headers.set(
+ response.headers.set(
     'Content-Security-Policy',
     sanitizedCspHeader
   );

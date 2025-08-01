@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { AppModule } from './modules/app.module';
+import { AppModule } from './app.module';
 import { ValidationPipe, VersioningType, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -11,6 +11,8 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const configService = app.get(ConfigService);
+
+  app.useGlobalPipes(new ValidationPipe());
 
   const DEBUG = configService.get<string>('DEBUG') === 'true';
   const CORS_ORIGIN = configService.get<string>('CORS_ORIGIN') || '*';
@@ -50,6 +52,7 @@ async function bootstrap() {
   app.enableCors({
     origin: CORS_ORIGIN,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
   });
 
   // API Versioning

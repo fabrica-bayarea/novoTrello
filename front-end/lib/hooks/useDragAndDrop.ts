@@ -22,7 +22,7 @@ export function useDragAndDrop(boardId: string) {
       const newLists = arrayMove(lists, activeListIdx, overListIdx);
       setLists(newLists);
       
-      // Fazer a requisição para o backend
+
       const listId = active.id as string;
       const newPosition = overListIdx + 1; // Posição baseada em 1
       handleMoveList(listId, newPosition);

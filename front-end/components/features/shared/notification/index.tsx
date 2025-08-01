@@ -53,7 +53,9 @@ export default function Notification() {
       ].filter(Boolean).join(" ")}
     >
       <span className={styles.notification__icon}>{icons[type]}</span>
-      <span>{message}</span>
+      <span>
+        {typeof message === "string" ? message : String(message)}
+      </span>
     </div>
   );
 };

@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ListService } from 'src/services/list.service';
-import { PrismaService } from 'src/services/prisma.service';
+import { ListService } from 'src/list/list.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
-import { CreateListDto } from 'src/dto/create-list.dto';
-import { UpdateListDto } from 'src/dto/update-list.dto';
+import { CreateListDto } from 'src/list/dto/create-list.dto';
+import { UpdateListDto } from 'src/list/dto/update-list.dto';
 
 describe('ListService', () => {
   let service: ListService;

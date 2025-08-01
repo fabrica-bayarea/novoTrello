@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ProfileController } from '../../src/controllers/profile.controller';
-import { ProfileService } from '../../src/services/profile.service';
-import { ProfileDto } from '../../src/dto/profile.dto';
+import { ProfileController } from '../../src/profile/profile.controller';
+import { ProfileService } from '../../src/profile/profile.service';
+import { ProfileDto } from '../../src/profile/dto/update-profile.dto';
 import { AuthenticatedUser } from '../../src/types/user.interface';
 
 describe('ProfileController', () => {
@@ -50,7 +50,7 @@ describe('ProfileController', () => {
 
       mockProfileService.getProfile.mockResolvedValue(mockProfile);
 
-      const result = await controller.getUserProfile({ user: mockUser });
+      const result = await controller.getUserProfile(mockUser);
 
       expect(mockProfileService.getProfile).toHaveBeenCalledWith('user-123');
       expect(result).toEqual(mockProfile);
@@ -67,7 +67,7 @@ describe('ProfileController', () => {
 
       mockProfileService.updateProfile.mockResolvedValue(dto);
 
-      const result = await controller.updateProfile({ user: mockUser }, dto);
+      const result = await controller.updateProfile(mockUser, dto);
 
       expect(mockProfileService.updateProfile).toHaveBeenCalledWith(
         'user-123',
@@ -84,7 +84,7 @@ describe('ProfileController', () => {
     it('should delete the user profile and return a success message', async () => {
       mockProfileService.deleteProfile.mockResolvedValue({});
 
-      const result = await controller.deleteProfile({ user: mockUser });
+      const result = await controller.deleteProfile(mockUser);
 
       expect(mockProfileService.deleteProfile).toHaveBeenCalledWith('user-123');
       expect(result).toEqual({ message: 'Conta deletada com sucesso.' });
