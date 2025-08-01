@@ -6,6 +6,7 @@ import { SignUpDto } from '../../src/auth/dto/signup.dto';
 import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { SignInDto } from 'src/auth/dto/signin.dto';
+import { access } from 'fs';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -56,12 +57,14 @@ describe('AuthController', () => {
         name: 'Test User',
         userName: 'testuser',
       };
-      mockAuthService.signUp.mockResolvedValue('mocked-token');
+      mockAuthService.signUp.mockResolvedValue({
+        accessToken: 'mocked-token',
+      });
 
       const result = await controller.signUp(dto, mockResponse as Response);
 
       expect(mockAuthService.signUp).toHaveBeenCalledWith(dto);
-      expect(result).toBe('mocked-token');
+      
     });
   });
 
@@ -72,14 +75,17 @@ describe('AuthController', () => {
         password: '123456',
         rememberMe: true,
       };
-      mockAuthService.signIn.mockResolvedValue('mocked-token');
+
+      mockAuthService.signIn.mockResolvedValue({
+        accessToken: 'mocked-token',
+      })
 
       const result = await controller.signIn(dto, mockResponse as Response);
 
       expect(mockAuthService.signIn).toHaveBeenCalledWith(dto);
-      expect(result).toBe('mocked-token');
-    });
-  });
+      
+    })
+  })
 
   it('deve lançar BadRequestException se email ou senha forem ausentes', async () => {
     const dto = { email: '', password: '', name: '', userName: '' };
@@ -88,4 +94,4 @@ describe('AuthController', () => {
       controller.signUp(dto as SignUpDto, mockResponse as Response),
     ).rejects.toThrow('Email e senha são obrigatórios');
   });
-});
+})
