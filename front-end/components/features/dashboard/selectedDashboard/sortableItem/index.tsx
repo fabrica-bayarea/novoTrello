@@ -2,7 +2,7 @@ import React, { createContext, useContext } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-const DragContext = createContext<any>(null);
+const DragContext = createContext<ReturnType<typeof useSortable>['listeners']>(undefined);
 
 export const useDragListeners = () => useContext(DragContext);
 

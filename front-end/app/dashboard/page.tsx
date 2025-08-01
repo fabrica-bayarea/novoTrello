@@ -63,7 +63,7 @@ export default function Dashboard() {
       } else {
         showNotification(result.error || "Erro ao deletar tarefa", 'failed');
       }
-    } catch (error) {
+    } catch {
       showNotification("Erro ao deletar tarefa", 'failed');
     }
   };
@@ -79,7 +79,7 @@ export default function Dashboard() {
       } else {
         showNotification(result.error || "Erro ao atualizar tarefa", 'failed');
       }
-    } catch (error) {
+    } catch {
       showNotification("Erro ao atualizar tarefa", 'failed');
     }
   };
