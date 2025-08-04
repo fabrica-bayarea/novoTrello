@@ -64,7 +64,6 @@ describe('AuthController', () => {
       const result = await controller.signUp(dto, mockResponse as Response);
 
       expect(mockAuthService.signUp).toHaveBeenCalledWith(dto);
-      
     });
   });
 
@@ -78,14 +77,13 @@ describe('AuthController', () => {
 
       mockAuthService.signIn.mockResolvedValue({
         accessToken: 'mocked-token',
-      })
+      });
 
       const result = await controller.signIn(dto, mockResponse as Response);
 
       expect(mockAuthService.signIn).toHaveBeenCalledWith(dto);
-      
-    })
-  })
+    });
+  });
 
   it('deve lançar BadRequestException se email ou senha forem ausentes', async () => {
     const dto = { email: '', password: '', name: '', userName: '' };
@@ -94,4 +92,4 @@ describe('AuthController', () => {
       controller.signUp(dto as SignUpDto, mockResponse as Response),
     ).rejects.toThrow('Email e senha são obrigatórios');
   });
-})
+});
