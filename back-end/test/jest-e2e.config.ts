@@ -1,8 +1,14 @@
-import { Config } from 'jest';
+import type { Config } from 'jest';
 import { pathsToModuleNameMapper } from 'ts-jest';
 import { compilerOptions } from '../tsconfig.json';
 
+require('ts-node').register();
+module.exports = require('./test/jest-e2e.config.ts').default;
+
 const config: Config = {
+  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
+    prefix: '<rootDir>/',
+  }),
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: '../.',
   testEnvironment: 'node',
@@ -10,9 +16,6 @@ const config: Config = {
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
-    prefix: '<rootDir>/',
-  }),
 };
 
 export default config;
