@@ -65,7 +65,7 @@ export class providerUserDto {
   @IsString({ message: 'O nome deve ser uma string' })
   name!: string;
 
-  @ApiProperty({ example: 'ya29.a0AfH6SM...' })
+  @ApiProperty({ example: '<google_access_token>' })
   @IsNotEmpty({ message: 'O access_token não pode estar vazio' })
   @IsString({ message: 'O access_token deve ser uma string' })
   access_token!: string;

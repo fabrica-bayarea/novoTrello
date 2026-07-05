@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { headers } from 'next/headers';
 import "./globals.css";
 import Providers from "@/providers";
 import { Toaster } from "@/components/ui/sonner";
@@ -16,11 +15,11 @@ export const metadata: Metadata = {
   description: "A simple Trello",
 };
 
-export default async function RootLayout(
+export default function RootLayout(
   {  children }: Readonly<{ children: React.ReactNode; }>
 ) {
   
-  const nonce = (await headers()).get('x-nonce')
+  // O nonce do CSP é aplicado automaticamente pelo Next a partir do header setado no proxy.ts
   
   return (
     <html lang="pt-br" suppressHydrationWarning>

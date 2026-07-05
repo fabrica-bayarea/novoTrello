@@ -82,7 +82,7 @@ export const useTaskStore = create<TaskStore>((set) => ({
   onAddTask: (sprintId, title) =>
     set((state) => {
       const newTask = {
-        id: `NEW-${Math.floor(Math.random() * 10000)}`,
+        id: `NEW-${crypto.randomUUID()}`,
         listId: "list-1",
         sprintId: sprintId,
         title: title,
