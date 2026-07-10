@@ -18,6 +18,15 @@ spec:
           image: 248189947068.dkr.ecr.us-east-1.amazonaws.com/bayarea-sprint-frontend-prod:latest
           ports:
             - containerPort: 3000
+          # Hardening (a imagem já roda como USER appuser, não-root)
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
           env:
             - name: BASE_URL_API
               value: "https://bayarea.dataiesb.com/sprint/api"
