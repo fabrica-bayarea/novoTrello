@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: ["main", "dev"]
   workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 0"  # domingo, full scan agendado
 
 permissions: read-all
 
@@ -412,3 +414,91 @@ jobs:
           fi
 
           echo "✅ Security pipeline APPROVED"
+
+  # =========================================================
+  # DAST BASELINE — roda em PR (rápido, sem AJAX)
+  # Estratégia: foco em vulnerabilidades reais de aplicação.
+  # rules.tsv classifica achados em FAIL/WARN/IGNORE conforme
+  # impacto real no projeto (não em headers de Nginx).
+  # =========================================================
+  dast_baseline_scan:
+    name: DAST ZAP Baseline Scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'https://bayarea.dataiesb.com/sprint-dev/'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: >-
+            -m 5
+            -a
+            -z "-config spider.handleParameters=IGNORE_VALUE
+                -config globalexcludeurl.url_list.url\(0\).regex='^https?://bayarea\.dataiesb\.com/(?!sprint-dev(?:/|$)).*$'
+                -config globalexcludeurl.url_list.url\(0\).description='Fora do escopo sprint-dev'
+                -config globalexcludeurl.url_list.url\(0\).enabled=true"
+          fail_action: true
+          allow_issue_writing: false
+      - name: Upload Baseline Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-baseline-report
+          path: |
+            report_html.html
+            report_md.md
+            report_json.json
+          retention-days: 30
+
+  # =========================================================
+  # DAST FULL SCAN — domingo, push na main, ou manual
+  # AJAX Spider habilitado pra cobrir SPA React
+  # Active scan completo (testa injeções, XSS, etc)
+  # =========================================================
+  dast_full_scan:
+    name: DAST ZAP Full Scan
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: ZAP Full Scan
+        uses: zaproxy/action-full-scan@v0.12.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'https://bayarea.dataiesb.com/sprint-dev/'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: >-
+            -m 10
+            -j
+            -a
+            -z "-config spider.handleParameters=IGNORE_VALUE
+                -config globalexcludeurl.url_list.url\(0\).regex='^https?://bayarea\.dataiesb\.com/(?!sprint-dev(?:/|$)).*$'
+                -config globalexcludeurl.url_list.url\(0\).description='Fora do escopo sprint-dev'
+                -config globalexcludeurl.url_list.url\(0\).enabled=true"
+          allow_issue_writing: false
+          artifact_name: 'zap_full_report'
+      - name: Upload Full Scan Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-full-scan-report
+          path: |
+            report_html.html
+            report_md.md
+            report_json.json
+          retention-days: 30
