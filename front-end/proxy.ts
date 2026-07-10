@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 const isDev = process.env.NODE_ENV === 'development'
 
 export function proxy(request: NextRequest) {
-  const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
 
   // TODO: Ao implementar TLS, colocar "upgrade-insecure-requests;"
   //
@@ -77,7 +77,7 @@ export function proxy(request: NextRequest) {
     sanitizedCspHeader
   );
 
-  return response
+  return response;
 }
 
 export const config = {

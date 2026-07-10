@@ -9,7 +9,7 @@ import { KanbanBoard } from "./kanban-board";
 import { useTaskStore } from "@/stores/use-task-store";
 
 export function CurrentSprint() {
-  const { sprints, onEdit, onDelete } = useTaskStore();
+  const { sprints, onEdit } = useTaskStore();
   const [selectedSprintId, setSelectedSprintId] = useState(sprints[0]?.id || "");
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("none");
