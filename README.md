@@ -53,12 +53,10 @@ Se você tiver perguntas, encontrar um bug, tiver sugestões para novos recursos
 
 ## Colaboradores
 
-Agradecemos a todos os incríveis colaboradores que tornaram este projeto possível:
+Agradecemos a todas as pessoas incríveis que tornaram este projeto possível — **todos os contribuidores do repositório**:
 
-|<img src="https://github.com/aureliovieirarocha.png" width="100">|<img src="https://github.com/ApenasGui.png" width="100">|<img src="https://github.com/vgabriel-pereira.png" width="100">|
-|:-:|:-:|:-:|
-|[Aurélio Vieira Rocha](https://github.com/aureliovieirarocha)|[Guilherme](https://github.com/ApenasGui)|[Victor Gabriel Pereira](https://github.com/vgabriel-pereira)|
+<a href="https://github.com/fabrica-bayarea/Sprint-Tracker/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=fabrica-bayarea/Sprint-Tracker" alt="Contribuidores do Sprint Tracker" />
+</a>
 
-|<img src="https://github.com/gabrieldnf.png" width="100">|<img src="https://github.com/ArthurRabel.png" width="100">|<img src="https://github.com/GeorgesCarmo.png" width="100">|
-|:-:|:-:|:-:|
-[Gabriel D. N. F.](https://github.com/gabrieldnf)|[Arthur Rabelo](https://github.com/ArthurRabel)|[GeorgesCarmo](https://github.com/GeorgesCarmo)|
+<sub>Imagem gerada automaticamente via <a href="https://contrib.rocks">contrib.rocks</a> a partir do gráfico de contribuidores do GitHub.</sub>
