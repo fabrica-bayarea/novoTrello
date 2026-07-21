@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getBoards } from "@/lib/actions/board";
 import { getExpiredTasks, deleteTask, updateTask } from "@/lib/actions/task";
-import { Board, ExpiredTask, PendenciaItem } from "@/types/board";
+import { ExpiredTask, PendenciaItem } from "@/types/board";
 import { toast } from "sonner";
 
 export function useDashboard() {

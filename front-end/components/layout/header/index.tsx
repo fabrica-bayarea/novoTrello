@@ -2,7 +2,7 @@
 
 import { User, LogOut } from "lucide-react";
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useQuery } from "@tanstack/react-query";
 import { removeCookie } from "@/lib/utils/session-cookie";
 import { withBasePath } from "@/lib/base-path";
@@ -20,7 +20,6 @@ interface UserProfile {
 }
 
 export default function Header() {
-  const router = useRouter();
   const pathname = usePathname();
   const { view, setView } = useSprintStore();
 

@@ -1,0 +1,140 @@
+# ZAP Rules File — Sprint-Tracker
+#
+# Estratégia: pipeline foca em VULNERABILIDADES REAIS que possam
+# comprometer a aplicação. Ruído de configuração de servidor
+# (headers faltando, cache control, etc) vira IGNORE/WARN porque
+# depende da equipe de infra (Nginx) e aparece em todo o host.
+#
+# Vulnerabilidades de aplicação (XSS, SQLi, NoSQL injection, auth
+# issues, etc) ficam FAIL — bloqueiam o pipeline porque são
+# responsabilidade direta do código.
+#
+# Formato: <rule_id>\t<action>\t<comentário>
+# Actions: IGNORE (silencia), WARN (aparece mas não falha), FAIL (bloqueia)
+#
+# Referência completa: https://www.zaproxy.org/docs/alerts/
+
+# ==========================================================
+# IGNORE — Ruído de configuração de servidor (Nginx)
+# Aparecem em todo o host. Crie issue na equipe de infra
+# para configurar os headers no Nginx — quando resolvido,
+# podem virar WARN para vigiar regressões.
+# ==========================================================
+
+10015	IGNORE	(Re-examine Cache-control Directives)
+10049	IGNORE	(Storable and Cacheable Content)
+10020	IGNORE	(Missing Anti-clickjacking Header)
+10021	IGNORE	(X-Content-Type-Options Header Missing)
+10035	IGNORE	(Strict-Transport-Security Header Not Set)
+10038	IGNORE	(Content Security Policy CSP Header Not Set)
+10063	IGNORE	(Permissions Policy Header Not Set)
+90004	IGNORE	(Cross-Origin-Embedder-Policy Header Missing or Invalid)
+90005	IGNORE	(Sec-Fetch-Dest Header is Missing)
+10027	IGNORE	(Information Disclosure - Suspicious Comments)
+10109	IGNORE	(Modern Web Application)
+10116	IGNORE	(ZAP is Out of Date)
+
+# ==========================================================
+# WARN — Vale revisar, mas não bloqueia (verá no relatório)
+# ==========================================================
+
+10054	WARN	(Cookie without SameSite Attribute)
+10011	WARN	(Cookie Without Secure Flag)
+10010	WARN	(Cookie No HttpOnly Flag)
+10108	WARN	(Reverse Tabnabbing)
+10017	WARN	(Cross-Domain JavaScript Source File Inclusion)
+10040	WARN	(Secure Pages Include Mixed Content)
+10096	WARN	(Timestamp Disclosure)
+
+# ==========================================================
+# FAIL — Vulnerabilidades reais de aplicação (bloqueiam)
+# ==========================================================
+
+# --- SQL Injection ---
+40018	FAIL	(SQL Injection)
+40019	FAIL	(SQL Injection - MySQL)
+40020	FAIL	(SQL Injection - Hypersonic SQL)
+40021	FAIL	(SQL Injection - Oracle)
+40022	FAIL	(SQL Injection - PostgreSQL)
+40024	FAIL	(SQL Injection - SQLite)
+40027	FAIL	(SQL Injection - MsSQL)
+
+# --- NoSQL Injection (CRÍTICO: vocês usam MongoDB) ---
+40033	FAIL	(NoSQL Injection - MongoDB)
+
+# --- Code/Command Injection ---
+90019	FAIL	(Server Side Code Injection)
+90020	FAIL	(Remote OS Command Injection)
+40028	FAIL	(LDAP Injection)
+90017	FAIL	(XSLT Injection)
+90035	FAIL	(Server Side Template Injection)
+90036	FAIL	(Server Side Template Injection - Blind)
+90021	FAIL	(XPath Injection)
+
+# --- XSS (Cross-Site Scripting) ---
+40012	FAIL	(Cross Site Scripting Reflected)
+40014	FAIL	(Cross Site Scripting Persistent)
+40016	FAIL	(Cross Site Scripting Persistent - Prime)
+40017	FAIL	(Cross Site Scripting Persistent - Spider)
+40026	FAIL	(Cross Site Scripting DOM Based)
+
+# --- Path Traversal / File Inclusion ---
+6	FAIL	(Path Traversal)
+7	FAIL	(Remote File Inclusion)
+
+# --- CSRF / Session Issues ---
+10202	FAIL	(Absence of Anti-CSRF Tokens)
+10105	FAIL	(Weak Authentication Method)
+90033	FAIL	(Loosely Scoped Cookie)
+3	FAIL	(Session ID in URL Rewrite)
+10029	FAIL	(Cookie Poisoning)
+
+# --- Information Disclosure crítica ---
+10023	FAIL	(Information Disclosure - Debug Error Messages)
+10024	FAIL	(Information Disclosure - Sensitive Information in URL)
+10025	FAIL	(Information Disclosure - Sensitive Information in HTTP Referrer Header)
+10062	FAIL	(PII Disclosure - importante em sistema de prontuário médico)
+10097	FAIL	(Hash Disclosure)
+2	FAIL	(Private IP Disclosure)
+10056	FAIL	(X-Debug-Token Information Leak)
+
+# --- CORS / Cross-Domain ---
+10098	FAIL	(Cross-Domain Misconfiguration)
+
+# --- Open Redirect ---
+10028	FAIL	(Open Redirect)
+
+# --- Server-side issues ---
+40009	FAIL	(Server Side Include)
+40003	FAIL	(CRLF Injection)
+40008	FAIL	(Parameter Tampering)
+40034	FAIL	(.env Information Leak)
+40042	FAIL	(Spring Actuator Information Leak)
+
+# --- Vulnerable Libraries (Retire.js) ---
+10003	FAIL	(Vulnerable JS Library)
+
+# --- Source Code Disclosure ---
+10099	FAIL	(Source Code Disclosure)
+41	FAIL	(Source Code Disclosure - Git)
+42	FAIL	(Source Code Disclosure - SVN)
+43	FAIL	(Source Code Disclosure - File Inclusion)
+
+# --- TLS / Crypto ---
+10034	FAIL	(Heartbleed OpenSSL Vulnerability)
+
+# --- Insecure Deserialization ---
+90002	FAIL	(Java Serialization Object)
+90001	FAIL	(Insecure JSF ViewState)
+
+# --- XXE ---
+90023	FAIL	(XML External Entity Attack)
+
+# --- SSRF ---
+40046	FAIL	(Server Side Request Forgery)
+
+# --- File Upload / Malicious files ---
+10115	FAIL	(Script Served From Malicious Domain - polyfill)
+
+# --- GraphQL (preparado pro futuro) ---
+110001	FAIL	(GraphQL Introspection Endpoint)
