@@ -234,6 +234,8 @@ export function ChartAreaInteractive() {
               content={
                 <ChartTooltipContent
                   labelFormatter={(value) => {
+                    // value pode vir undefined do recharts; evita new Date(undefined)
+                    if (value == null) return ""
                     return new Date(value).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
