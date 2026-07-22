@@ -6,17 +6,21 @@ FROM node:22-slim AS build
 # Define o diretório de trabalho dentro do container
 WORKDIR /app
 
-# Copia os arquivos de dependências (package.json e package-lock.json) para o container
-COPY package*.json ./
+# Copia os arquivos de dependências (package.json e pnpm-lock.yaml) para o container
+COPY package.json pnpm-lock.yaml ./
 
-# Instala as dependências de forma limpa
-RUN npm install --quiet --no-fund --loglevel=error
+# Instala as dependências EXATAS do lockfile (build reprodutível).
+# Antes usávamos `npm install`, que ignorava o pnpm-lock.yaml e resolvia
+# versões novas a cada build — o que quebrava o deploy quando um transitivo
+# (ex: recharts) mudava tipos entre builds.
+RUN corepack enable && corepack prepare pnpm@9.15.9 --activate \
+  && pnpm install --frozen-lockfile
 
 # Copia todos os arquivos do projeto para o container
 COPY . .
 
 # Executa o comando de build para gerar os arquivos otimizados da aplicação
-RUN npm run build
+RUN pnpm run build
 
 # ---------------------
 # Etapa final: produção

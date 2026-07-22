@@ -233,9 +233,11 @@ export function ChartAreaInteractive() {
               cursor={false}
               content={
                 <ChartTooltipContent
-                  labelFormatter={(value) => {
-                    // value pode vir undefined do recharts; evita new Date(undefined)
-                    if (value == null) return ""
+                  labelFormatter={(value: unknown) => {
+                    // O tipo de `value` varia entre versões do recharts
+                    // (undefined/bigint já quebraram o build). Normaliza
+                    // pra string|number antes do new Date.
+                    if (typeof value !== "string" && typeof value !== "number") return ""
                     return new Date(value).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
