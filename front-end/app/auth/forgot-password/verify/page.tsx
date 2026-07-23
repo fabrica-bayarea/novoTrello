@@ -5,9 +5,13 @@ import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import { useVerifyReset } from "@/hooks/auth/use-verify-reset";
+import { useScrubUrlQuery } from "@/hooks/auth/use-scrub-url-query";
 
 export default function VerifyCodeResetPassword() {
   const { step, verifyForm, resetForm, onVerify, onReset } = useVerifyReset();
+
+  // Limpa credenciais/códigos que tenham vindo na URL (links antigos do histórico).
+  useScrubUrlQuery();
 
   return (
     <main className="flex min-h-screen w-full bg-background">
@@ -39,12 +43,14 @@ export default function VerifyCodeResetPassword() {
               <p className="mb-8 text-center text-sm leading-relaxed text-foreground">
                 Digite o código de verificação enviado para seu e-mail para continuar com a redefinição da senha.
               </p>
-              <form className="flex flex-col gap-4" onSubmit={onVerify}>
+              {/* method="POST": fallback pré-hidratação não pode ser GET (código na URL) */}
+              <form method="POST" className="flex flex-col gap-4" onSubmit={onVerify}>
                 <div className="space-y-1">
                   <Input
                     type="text"
                     placeholder="Código de verificação"
                     maxLength={8}
+                    autoComplete="one-time-code"
                     className="border-input bg-card text-center text-lg font-bold tracking-[2px] text-foreground focus-visible:ring-[#e02b2b]"
                     {...verifyForm.register("code")}
                   />
@@ -65,11 +71,13 @@ export default function VerifyCodeResetPassword() {
               <p className="mb-8 text-center text-sm leading-relaxed text-foreground">
                 Agora você pode definir uma nova senha para sua conta.
               </p>
-              <form className="flex flex-col gap-4" onSubmit={onReset}>
+              {/* method="POST": fallback pré-hidratação não pode ser GET (senha nova na URL) */}
+              <form method="POST" className="flex flex-col gap-4" onSubmit={onReset}>
                 <div className="space-y-1">
                   <Input
                     type="password"
                     placeholder="Nova senha"
+                    autoComplete="new-password"
                     className="border-input bg-card text-foreground focus-visible:ring-[#e02b2b]"
                     {...resetForm.register("newPassword")}
                   />
@@ -79,6 +87,7 @@ export default function VerifyCodeResetPassword() {
                   <Input
                     type="password"
                     placeholder="Confirmar nova senha"
+                    autoComplete="new-password"
                     className="border-input bg-card text-foreground focus-visible:ring-[#e02b2b]"
                     {...resetForm.register("confirmNewPassword")}
                   />

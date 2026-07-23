@@ -7,9 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useRegister } from "../../../hooks/auth/use-register";
+import { useScrubUrlQuery } from "../../../hooks/auth/use-scrub-url-query";
 
 export default function Register() {
   const { registerField, handleSubmit, errors, password, isSubmitting, passwordRequirements, control } = useRegister();
+
+  // Limpa credenciais que tenham vindo na URL (links antigos do histórico).
+  useScrubUrlQuery();
 
   const getReqClass = (met: boolean) => {
     if (!password) return "text-muted-foreground";
@@ -39,7 +43,8 @@ export default function Register() {
             CRIE SUA CONTA
           </h1>
 
-          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          {/* method="POST": fallback pré-hidratação não pode ser GET (senha na URL) */}
+          <form method="POST" className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div className="space-y-1">
               <Input
                 placeholder="Nome completo"
@@ -85,6 +90,7 @@ export default function Register() {
                 <Input
                   type="password"
                   placeholder="Senha"
+                  autoComplete="new-password"
                   className="border-input bg-card text-foreground focus-visible:ring-[#e02b2b]"
                   {...registerField("password")}
                 />
@@ -93,6 +99,7 @@ export default function Register() {
                 <Input
                   type="password"
                   placeholder="Confirme a senha"
+                  autoComplete="new-password"
                   className="border-input bg-card text-foreground focus-visible:ring-[#e02b2b]"
                   {...registerField("confirmPassword")}
                 />

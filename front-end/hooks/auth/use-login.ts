@@ -29,8 +29,6 @@ export function useLogin() {
     try {
       const result = await login(data.email, data.password, data.rememberMe);
 
-      console.log(result);
-
       if (result && (result.success || !result.error)) {
         router.push("/dashboard");
       } else {
@@ -41,8 +39,9 @@ export function useLogin() {
     }
   };
 
-  const onErrors = (err: any) => {
-    console.log(JSON.stringify(err, null, 2));
+  const onErrors = () => {
+    // Erros de validação já aparecem inline nos campos; nada a logar
+    // (logar o objeto de erro é um ralo pronto pra vazar dados de form).
   };
 
   const handleOAuth = (provider: string) => {
