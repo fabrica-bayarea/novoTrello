@@ -52,8 +52,9 @@ export function useRegister() {
     }
   };
 
-  const onErrors = (err: any) => {
-    console.log(JSON.stringify(err, null, 2));
+  const onErrors = () => {
+    // Erros de validação já aparecem inline nos campos; nada a logar
+    // (logar o objeto de erro é um ralo pronto pra vazar dados de form).
   };
 
   return {

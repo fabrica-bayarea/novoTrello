@@ -5,9 +5,13 @@ import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import { useForgotPassword } from "@/hooks/auth/use-forgot-password";
+import { useScrubUrlQuery } from "@/hooks/auth/use-scrub-url-query";
 
 export default function ForgotPassword() {
   const { register, onSubmit, formState: { errors, isSubmitting } } = useForgotPassword();
+
+  // Limpa credenciais que tenham vindo na URL (links antigos do histórico).
+  useScrubUrlQuery();
 
   return (
     <main className="flex min-h-screen w-full bg-background">
@@ -40,7 +44,8 @@ export default function ForgotPassword() {
             Para redefinir sua senha, insira seu e-mail cadastrado e clique em &quot;Enviar e-mail&quot;. Você receberá um e-mail com instruções.
           </p>
 
-          <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+          {/* method="POST": fallback pré-hidratação não pode ser GET (e-mail na URL) */}
+          <form method="POST" className="flex flex-col gap-4" onSubmit={onSubmit}>
             <div className="space-y-1">
               <Input
                 type="email"

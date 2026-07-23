@@ -7,12 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useLogin } from "../../../hooks/auth/use-login";
+import { useScrubUrlQuery } from "../../../hooks/auth/use-scrub-url-query";
 
 export default function Login() {
   // handleOAuth removido do destructuring enquanto os botões Google/Microsoft
   // estão desabilitados (OAuth não configurado — dá 404). Re-adicionar quando
   // o OAuth for configurado em produção.
   const { register, handleSubmit, errors, control, isSubmitting } = useLogin();
+
+  // Limpa credenciais que tenham vindo na URL (links antigos do histórico).
+  useScrubUrlQuery();
 
   return (
     <main className="flex min-h-screen w-full bg-background">
@@ -38,10 +42,14 @@ export default function Login() {
             ACESSE SUA CONTA
           </h1>
 
-          <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+          {/* method="POST": se o submit acontecer ANTES do React hidratar
+              (JS lento/bloqueado), o fallback nativo do browser vira POST —
+              sem isso o default é GET e as credenciais vazam pra URL/logs. */}
+          <form method="POST" className="flex flex-col gap-5" onSubmit={handleSubmit}>
             <div className="space-y-1">
               <Input
                 placeholder="Nome de usuário ou e-mail"
+                autoComplete="username"
                 className="border-input bg-card text-foreground focus-visible:ring-[#e02b2b]"
                 {...register("email")}
               />
@@ -52,6 +60,7 @@ export default function Login() {
               <Input
                 type="password"
                 placeholder="Senha"
+                autoComplete="current-password"
                 className="border-input bg-card text-foreground focus-visible:ring-[#e02b2b]"
                 {...register("password")}
               />
