@@ -1,6 +1,6 @@
-# 🤝 Passe de Bastão — Sprint Tracker
+# 🤝 Guia de Continuidade — Sprint Tracker
 
-> Guia de continuidade para a comunidade da **Fábrica Bay Area / IESB**.
+> Para a comunidade da **Fábrica Bay Area / IESB**.
 > O projeto foi **entregue e está em produção**. Este documento existe para que qualquer pessoa nova consiga entender, rodar, evoluir e manter o Sprint Tracker **sem depender de quem construiu**.
 
 **Status:** ✅ Entregue · 🟢 Em produção em [bayarea.dataiesb.com/sprint](https://bayarea.dataiesb.com/sprint)
@@ -107,4 +107,4 @@ Abra uma **issue** no repositório descrevendo o contexto — assim a resposta f
 
 ---
 
-*O bastão é da comunidade. Bom código! 🚀*
+*O projeto agora é da comunidade. Bom código! 🚀*
