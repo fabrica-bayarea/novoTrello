@@ -32,6 +32,7 @@ model User {
   notifications       Notification[]
   sentInvites         Invite[]       @relation("Sender")
   ownedSprints        Sprint[]       @relation("OwnerSprints")
+  createdPokerSessions PokerSession[] @relation("CreatedPokerSessions")
 
   @@unique([authProvider, providerId], name: "AuthProviderAndIdUnique")
 }
@@ -52,6 +53,35 @@ model Board {
   sprints     Sprint[]
   taskLogs    TaskLog[]
   invites     Invite[]
+  pokerSessions PokerSession[]
+}
+
+/// Sessão de Poker Planning: um conjunto de tasks de um board selecionadas
+/// para estimativa em equipe. As tasks ficam em PokerSessionTask (relação
+/// explícita) para garantir integridade — task apagada some da sessão.
+model PokerSession {
+  id        String             @id @default(uuid())
+  boardId   String
+  createdById String
+  board     Board              @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  createdBy User               @relation("CreatedPokerSessions", fields: [createdById], references: [id])
+  tasks     PokerSessionTask[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  @@index([boardId])
+  @@index([createdById])
+}
+
+model PokerSessionTask {
+  sessionId String
+  taskId    String
+  session   PokerSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  task      Task         @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+
+  @@id([sessionId, taskId])
+  @@index([taskId])
 }
 
 model Sprint {
@@ -136,6 +166,7 @@ model Task {
   labels      TaskLabel[]
   logs        TaskLog[]
   comments    TaskComment[]
+  pokerSessions PokerSessionTask[]
 
   @@index([sprintId])
 }

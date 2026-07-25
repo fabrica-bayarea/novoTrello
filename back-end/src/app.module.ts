@@ -6,6 +6,7 @@ import { AuthModule } from '@/auth/auth.module';
 import { BoardModule } from '@/board/board.module';
 import { BoardMemberModule } from '@/board-member/board-member.module';
 import { LabelModule } from '@/label/label.module';
+import { PokerModule } from '@/poker/poker.module';
 import { SprintModule } from '@/sprint/sprint.module';
 import { TaskCommentModule } from '@/task-comment/task-comment.module';
 import { EventsModule } from '@/events/events.module';
@@ -34,6 +35,7 @@ import { TaskLogModule } from '@/task-log/task-log.module';
     BoardMemberModule,
     LabelModule,
     SprintModule,
+    PokerModule,
     TaskCommentModule,
     HealthModule,
     AnalysisModule,
