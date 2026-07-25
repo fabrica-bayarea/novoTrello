@@ -31,6 +31,10 @@ export function useRegister() {
   const password = watch("password", "");
 
   const passwordRequirements = {
+    // O schema exige 8+ caracteres, mas o painel de requisitos não mostrava
+    // isso: dava pra ver os 4 itens verdes com uma senha curta, clicar em
+    // Cadastrar e nada acontecer (o zod barrava em silêncio).
+    hasMinLength: password.length >= 8,
     hasUppercase: /[A-Z]/.test(password),
     hasLowercase: /[a-z]/.test(password),
     hasNumber: /[0-9]/.test(password),

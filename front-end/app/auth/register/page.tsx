@@ -94,6 +94,7 @@ export default function Register() {
                   className="border-input bg-card text-foreground focus-visible:ring-[#e02b2b]"
                   {...registerField("password")}
                 />
+                {errors.password && <span className="text-xs text-red-500">{errors.password.message}</span>}
               </div>
               <div className="space-y-1">
                 <Input
@@ -108,6 +109,9 @@ export default function Register() {
             </div>
 
             <div className="rounded-lg border border-border bg-muted p-3 text-[12px] leading-relaxed">
+              <div className={`flex items-center gap-1.5 ${getReqClass(passwordRequirements.hasMinLength)}`}>
+                <span>{passwordRequirements.hasMinLength ? '✔' : '✖'}</span> Pelo menos 8 caracteres
+              </div>
               <div className={`flex items-center gap-1.5 ${getReqClass(passwordRequirements.hasUppercase)}`}>
                 <span>{passwordRequirements.hasUppercase ? '✔' : '✖'}</span> Pelo menos 1 letra maiúscula
               </div>
