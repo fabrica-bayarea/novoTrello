@@ -41,6 +41,11 @@ export function proxy(request: NextRequest) {
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-nonce', nonce);
+  // O Next lê a CSP do header da REQUEST para descobrir o nonce e carimbá-lo
+  // nas tags <script> que ele injeta. Sem esta linha, o HTML sai com os
+  // scripts SEM nonce e a CSP ('nonce-...' + 'strict-dynamic') bloqueia todos
+  // eles: a página nunca hidrata — nada fica clicável e o tema não aplica.
+  requestHeaders.set('Content-Security-Policy', sanitizedCspHeader);
 
   // nextUrl.clone() preserva o basePath (/sprint em prod). Setar .pathname
   // e redirecionar mantém o prefixo — diferente de new URL(path, request.url),
