@@ -8,8 +8,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useRegister } from "../../../hooks/auth/use-register";
 import { useScrubUrlQuery } from "../../../hooks/auth/use-scrub-url-query";
+import { useHydrated } from "../../../hooks/use-hydrated";
 
 export default function Register() {
+  const hydrated = useHydrated();
   const { registerField, handleSubmit, errors, password, isSubmitting, passwordRequirements, control } = useRegister();
 
   // Limpa credenciais que tenham vindo na URL (links antigos do histórico).
@@ -147,9 +149,10 @@ export default function Register() {
               {errors.agreeTerms && <p className="text-xs text-red-500">{errors.agreeTerms.message}</p>}
             </div>
 
+            {/* disabled até hidratar — ver comentário na tela de login */}
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={!hydrated || isSubmitting}
               className="mt-2 w-full rounded-lg bg-[#e02b2b] p-3 text-base font-bold text-white transition-colors hover:bg-[#c92525] disabled:opacity-50"
             >
               {isSubmitting ? "Carregando..." : "Cadastrar"}

@@ -8,8 +8,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useLogin } from "../../../hooks/auth/use-login";
 import { useScrubUrlQuery } from "../../../hooks/auth/use-scrub-url-query";
+import { useHydrated } from "../../../hooks/use-hydrated";
 
 export default function Login() {
+  const hydrated = useHydrated();
   // handleOAuth removido do destructuring enquanto os botões Google/Microsoft
   // estão desabilitados (OAuth não configurado — dá 404). Re-adicionar quando
   // o OAuth for configurado em produção.
@@ -85,9 +87,12 @@ export default function Login() {
               </Label>
             </div>
 
+            {/* disabled até hidratar: um clique antes disso dispararia o
+                submit nativo do form, recarregando a página (o tema pisca de
+                claro pra escuro) sem efetuar o login. */}
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={!hydrated || isSubmitting}
               className="mt-2 w-full rounded-lg bg-[#e02b2b] p-3 text-base font-bold text-white transition-colors hover:bg-[#c92525] disabled:opacity-50"
             >
               {isSubmitting ? "Carregando..." : "Entrar"}
