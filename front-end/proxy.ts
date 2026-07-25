@@ -11,7 +11,13 @@ export function proxy(request: NextRequest) {
   // abre WebSocket pra hot reload. CSP estrito com nonce bloqueia esses
   // scripts e quebra interações (submit do form de login, por exemplo).
   // Por isso afrouxamos script-src e connect-src só em dev.
-  // Em prod, mantemos nonce + strict-dynamic + connect-src restrito.
+  // Em prod usávamos nonce + strict-dynamic, MAS o Next 16 não estava
+  // carimbando o nonce nas tags <script> que ele injeta: o HTML saía com 23
+  // scripts sem nonce e o navegador bloqueava TODOS — a página nunca
+  // hidratava (nada clicável, tema não aplicava, login não funcionava).
+  // Trocamos por 'self' + 'unsafe-inline': continua restrito ao próprio
+  // domínio (nada de script de terceiros), mas permite os inline do Next.
+  // TODO: voltar para nonce quando a propagação no Next 16 for resolvida.
   const cspHeader = isDev
     ? `
       default-src 'self';
@@ -27,8 +33,8 @@ export function proxy(request: NextRequest) {
     `
     : `
       default-src 'self';
-      script-src 'nonce-${nonce}' 'strict-dynamic';
-      style-src 'self' https://fonts.googleapis.com;
+      script-src 'self' 'unsafe-inline';
+      style-src 'self' https://fonts.googleapis.com 'unsafe-inline';
       img-src 'self' data:;
       font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com;
       connect-src 'self';
